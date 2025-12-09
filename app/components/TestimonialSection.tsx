@@ -15,7 +15,7 @@ export default function TestimonialSection() {
           </div>
 
           {/* Testimonial Text */}
-          <blockquote className="text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-relaxed mb-10 max-w-4xl mx-auto">
+          <blockquote className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-relaxed mb-8 sm:mb-10 max-w-4xl mx-auto px-4">
             &quot;SehatScan is helping our company to decrease operational
             expenses, improve efficiency, while innovating the{" "}
             <span className="text-[#037BFC]">
@@ -25,15 +25,17 @@ export default function TestimonialSection() {
           </blockquote>
 
           {/* Author */}
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:space-x-4">
             <img
               src="/creator_arron.png"
               alt="Dr. Sarah Johnson"
-              className="w-16 h-16 rounded-full shadow-lg object-cover"
+              className="w-16 h-16 sm:w-16 sm:h-16 rounded-full shadow-lg object-cover"
             />
-            <div className="text-left">
-              <p className="font-bold text-white text-lg">Dr. Sarah Johnson</p>
-              <p className="text-sm text-gray-400">
+            <div className="text-center sm:text-left">
+              <p className="font-bold text-white text-base sm:text-lg">
+                Dr. Sarah Johnson
+              </p>
+              <p className="text-xs sm:text-sm text-gray-400">
                 Chief Medical Officer, HealthTech Solutions
               </p>
             </div>

@@ -36,9 +36,13 @@ PYTHON_ENGINE_URL="http://localhost:8000"
 
 3. Set up Prisma and database:
 
+See [DATABASE_SETUP.md](./DATABASE_SETUP.md) for detailed instructions.
+
+Quick setup:
+
 ```bash
-npx prisma generate
-npx prisma db push
+npm run prisma:migrate
+npm run prisma:generate
 ```
 
 4. Run the development server:
@@ -81,6 +85,10 @@ frontend/
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm test` - Run tests
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run prisma:migrate` - Run database migrations
+- `npm run prisma:studio` - Open Prisma Studio
 
 ## Learn More
 

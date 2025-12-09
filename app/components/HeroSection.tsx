@@ -25,27 +25,27 @@ export default function HeroSection() {
 
         {/* Main Headline */}
         <div className="text-center animate-fade-in-up">
-          <h1 className="text-5xl font-semibold tracking-tight text-balance text-gray-900 dark:text-white sm:text-7xl">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-balance text-gray-900 dark:text-white">
             One Tool To Manage{" "}
             <span className="text-[#037BFC]">Health Reports</span> And Your
             Wellness
           </h1>
-          <p className="mt-8 text-lg font-medium text-pretty text-gray-500 dark:text-gray-400 sm:text-xl/8">
+          <p className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl font-medium text-pretty text-gray-500 dark:text-gray-400 px-4 sm:px-0">
             Transform your medical reports and photos into actionable health
             insights using advanced AI and computer vision technology.
           </p>
 
           {/* CTA Buttons */}
-          <div className="mt-10 flex items-center justify-center gap-x-6">
+          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-x-6">
             <Link
-              href="/scan/report"
-              className="rounded-md bg-[#037BFC] px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-[#0260c9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#037BFC] transition-all transform hover:scale-105"
+              href="/register"
+              className="w-full sm:w-auto rounded-md bg-[#037BFC] px-6 sm:px-3.5 py-3 sm:py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-[#0260c9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#037BFC] transition-all transform hover:scale-105 text-center"
             >
               Get started
             </Link>
             <a
               href="#demo"
-              className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+              className="text-sm sm:text-sm/6 font-semibold text-gray-900 dark:text-white"
             >
               Learn more <span aria-hidden="true">→</span>
             </a>
@@ -53,7 +53,7 @@ export default function HeroSection() {
         </div>
 
         {/* Tech Icons */}
-        <div className="mt-16 flex justify-center items-center gap-8 opacity-60 animate-fade-in -ml-6">
+        <div className="mt-12 sm:mt-16 flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 opacity-60 animate-fade-in -ml-6">
           <div className="relative group">
             <div className="w-8 h-8 flex items-center justify-center">
               <img

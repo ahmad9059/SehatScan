@@ -96,31 +96,31 @@ export default function FeaturesGrid() {
   return (
     <section id="features" className="py-20 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 px-4">
             Powerful Features
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto px-4">
             Everything you need to manage your health data effectively
           </p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-gray-800/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl hover:bg-gray-800 dark:hover:bg-gray-900 transition-all duration-300 group border border-gray-700/50 dark:border-gray-"
+              className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 group border border-gray-700/50"
             >
               {/* Header */}
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <h3 className="text-2xl font-bold text-white dark:text-white mb-2">
+              <div className="flex items-start justify-between mb-6 gap-4">
+                <div className="flex-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-400 dark:text-gray-400 text-sm leading-relaxed">
+                  <p className="text-gray-400 text-sm leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-[#037BFC] rounded-xl flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#037BFC] rounded-xl flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
                   {feature.icon}
                 </div>
               </div>

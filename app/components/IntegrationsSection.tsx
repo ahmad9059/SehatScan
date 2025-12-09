@@ -57,19 +57,19 @@ export default function IntegrationsSection() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
-        <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
+        <div className="text-center mb-12 sm:mb-16 md:mb-20">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-4">
             Don&apos;t Replace.{" "}
             <span className="text-[#037BFC]">Integrate.</span>
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto px-4">
             Built with industry-leading technologies for reliability and
             performance.
           </p>
         </div>
 
         {/* Integration Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-12 max-w-4xl mx-auto">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8 md:gap-12 max-w-4xl mx-auto">
           {integrations.map((integration, index) => (
             <div
               key={index}
@@ -83,14 +83,14 @@ export default function IntegrationsSection() {
                 </div>
               </div>
 
-              <div className="w-12 h-12 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
                 <img
                   src={integration.icon}
                   alt={integration.name}
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-xs font-medium text-gray-500 group-hover:text-gray-400 transition-colors text-center">
+              <span className="text-xs font-medium text-gray-500 group-hover:text-gray-400 transition-colors text-center hidden sm:block">
                 {integration.name}
               </span>
             </div>

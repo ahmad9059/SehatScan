@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "./context/ThemeContext";
+import { SessionProvider } from "./components/SessionProvider";
 
 export default function RootLayout({
   children,
@@ -54,7 +55,9 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

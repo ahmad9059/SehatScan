@@ -26,7 +26,11 @@ export default function TestimonialSection() {
 
           {/* Author */}
           <div className="flex items-center justify-center space-x-4">
-            <div className="w-16 h-16 bg-linear-to-br from-[#037BFC] to-[#3d9dfd] rounded-full shadow-lg"></div>
+            <img
+              src="/creator_arron.png"
+              alt="Dr. Sarah Johnson"
+              className="w-16 h-16 rounded-full shadow-lg object-cover"
+            />
             <div className="text-left">
               <p className="font-bold text-white text-lg">Dr. Sarah Johnson</p>
               <p className="text-sm text-gray-400">

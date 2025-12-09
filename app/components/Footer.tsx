@@ -41,11 +41,13 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center space-x-3 mb-6 group">
-              <div className="w-12 h-12 bg-linear-to-br from-[#037BFC] to-[#3d9dfd] rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg shadow-blue-500/30">
-                <span className="text-white font-bold text-xl">S</span>
-              </div>
+              <img
+                src="/logo.svg"
+                alt="SehatScan"
+                className="h-12 w-auto transition-transform group-hover:scale-110"
+              />
               <span className="text-2xl font-bold">
-                SehatScan<span className="text-[#037BFC]">AI</span>
+                Sehat<span className="text-[#037BFC]">Scan</span>
               </span>
             </Link>
             <p className="text-gray-400 mb-8 max-w-sm leading-relaxed">
@@ -118,7 +120,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-gray-400 text-sm">
-            © 2024 SehatScan AI. All rights reserved.
+            © 2024 SehatScan. All rights reserved.
           </p>
           <div className="flex items-center space-x-6">
             <a

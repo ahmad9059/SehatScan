@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="relative isolate px-6 pt-14 lg:px-8 min-h-screen flex items-center overflow-hidden">
+    <section className="relative isolate px-6 pt-14 lg:px-8 min-h-screen flex items-center overflow-hidden text-gray-900 dark:text-white">
       {/* Main Content */}
       <div className="mx-auto max-w-3xl py-32 sm:py-48 lg:py-56">
         {/* Announcement Badge */}
@@ -25,12 +25,12 @@ export default function HeroSection() {
 
         {/* Main Headline */}
         <div className="text-center animate-fade-in-up">
-          <h1 className="text-5xl font-semibold tracking-tight text-balance text-white sm:text-7xl">
+          <h1 className="text-5xl font-semibold tracking-tight text-balance text-gray-900 dark:text-white sm:text-7xl">
             One Tool To Manage{" "}
             <span className="text-[#037BFC]">Health Reports</span> And Your
             Wellness
           </h1>
-          <p className="mt-8 text-lg font-medium text-pretty text-gray-400 sm:text-xl/8">
+          <p className="mt-8 text-lg font-medium text-pretty text-gray-500 dark:text-gray-400 sm:text-xl/8">
             Transform your medical reports and photos into actionable health
             insights using advanced AI and computer vision technology.
           </p>
@@ -43,19 +43,81 @@ export default function HeroSection() {
             >
               Get started
             </Link>
-            <a href="#demo" className="text-sm/6 font-semibold text-white">
+            <a
+              href="#demo"
+              className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+            >
               Learn more <span aria-hidden="true">→</span>
             </a>
           </div>
         </div>
 
         {/* Tech Icons */}
-        <div className="mt-16 flex justify-center items-center gap-6 opacity-50 animate-fade-in">
-          <i className="devicon-python-plain colored text-3xl hover:opacity-100 transition-opacity cursor-pointer"></i>
-          <i className="devicon-opencv-plain colored text-3xl hover:opacity-100 transition-opacity cursor-pointer"></i>
-          <i className="devicon-nextjs-plain text-white text-3xl hover:opacity-100 transition-opacity cursor-pointer"></i>
-          <i className="devicon-postgresql-plain colored text-3xl hover:opacity-100 transition-opacity cursor-pointer"></i>
-          <i className="devicon-react-original colored text-3xl hover:opacity-100 transition-opacity cursor-pointer"></i>
+        <div className="mt-16 flex justify-center items-center gap-8 opacity-60 animate-fade-in -ml-6">
+          <div className="relative group">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg"
+                alt="Python"
+                className="w-full h-full object-contain group-hover:opacity-100 transition-opacity cursor-pointer"
+              />
+            </div>
+            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+              Python
+            </div>
+          </div>
+
+          <div className="relative group">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opencv/opencv-original.svg"
+                alt="OpenCV"
+                className="w-full h-full object-contain group-hover:opacity-100 transition-opacity cursor-pointer"
+              />
+            </div>
+            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+              OpenCV
+            </div>
+          </div>
+
+          <div className="relative group">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-original.svg"
+                alt="Next.js"
+                className="w-full h-full object-contain group-hover:opacity-100 transition-opacity cursor-pointer dark:invert"
+              />
+            </div>
+            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+              Next.js
+            </div>
+          </div>
+
+          <div className="relative group">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg"
+                alt="PostgreSQL"
+                className="w-full h-full object-contain group-hover:opacity-100 transition-opacity cursor-pointer"
+              />
+            </div>
+            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+              PostgreSQL
+            </div>
+          </div>
+
+          <div className="relative group">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg"
+                alt="React"
+                className="w-full h-full object-contain group-hover:opacity-100 transition-opacity cursor-pointer"
+              />
+            </div>
+            <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+              React
+            </div>
+          </div>
         </div>
       </div>
     </section>

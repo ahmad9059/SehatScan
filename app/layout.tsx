@@ -16,10 +16,15 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "SehatScan AI - AI-Powered Health Risk Assessment",
+  title: "SehatScan - AI-Powered Health Risk Assessment",
   description:
     "Transform your medical reports and photos into actionable health insights using advanced AI and computer vision technology.",
+  icons: {
+    icon: "/logo.svg",
+  },
 };
+
+import { ThemeProvider } from "./context/ThemeContext";
 
 export default function RootLayout({
   children,
@@ -33,9 +38,23 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('theme') || 'dark';
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

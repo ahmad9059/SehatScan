@@ -1,6 +1,21 @@
 "use client";
 
+import { useState } from "react";
+
 export default function FeaturesGrid() {
+  const [activeChart, setActiveChart] = useState(2);
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: true,
+    sms: false,
+  });
+  const [tasks, setTasks] = useState([
+    { id: 1, label: "Upload blood test", completed: true },
+    { id: 2, label: "Schedule checkup", completed: false },
+  ]);
+
+  const chartData = [16, 24, 32, 20, 12];
+
   const features = [
     {
       title: "Dynamic dashboard",
@@ -21,7 +36,7 @@ export default function FeaturesGrid() {
           />
         </svg>
       ),
-      image: "chart",
+      type: "chart",
       link: "Learn more →",
     },
     {
@@ -43,11 +58,7 @@ export default function FeaturesGrid() {
           />
         </svg>
       ),
-      items: [
-        { label: "Email notifications", enabled: true },
-        { label: "Push notifications", enabled: true },
-        { label: "SMS alerts", enabled: false },
-      ],
+      type: "notifications",
       link: "Customize →",
     },
     {
@@ -69,22 +80,27 @@ export default function FeaturesGrid() {
           />
         </svg>
       ),
-      tasks: [
-        { label: "Upload blood test", completed: true },
-        { label: "Schedule checkup", completed: false },
-      ],
+      type: "tasks",
       link: "View all →",
     },
   ];
+
+  const toggleTask = (id: number) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
 
   return (
     <section id="features" className="py-20 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
             Powerful Features
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-400 text-lg max-w-2xl mx-auto">
             Everything you need to manage your health data effectively
           </p>
         </div>
@@ -92,15 +108,15 @@ export default function FeaturesGrid() {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 shadow-sm hover:shadow-xl hover:bg-gray-800 transition-all duration-300 group border border-gray-700/50"
+              className="bg-gray-800/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl p-8 shadow-lg hover:shadow-xl hover:bg-gray-800 dark:hover:bg-gray-900 transition-all duration-300 group border border-gray-700/50 dark:border-gray-"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">
+                  <h3 className="text-2xl font-bold text-white dark:text-white mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">
+                  <p className="text-gray-400 dark:text-gray-400 text-sm leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -111,56 +127,74 @@ export default function FeaturesGrid() {
 
               {/* Content Area */}
               <div className="mb-6 min-h-[200px]">
-                {feature.image === "chart" && (
-                  <div className="bg-linear-to-br from-gray-700/50 to-gray-800/50 rounded-xl p-6 h-full flex items-end border border-gray-700/30">
+                {feature.type === "chart" && (
+                  <div className="bg-gray-900/50 dark:bg-gray-900/50 rounded-xl p-6 h-full flex items-end border border-gray-700/30 dark:border-gray-700/30">
                     <div className="w-full flex items-end justify-between space-x-2 h-32">
-                      <div className="w-full bg-gray-600 rounded-t-lg h-16"></div>
-                      <div className="w-full bg-gray-500 rounded-t-lg h-24"></div>
-                      <div className="w-full bg-[#037BFC] rounded-t-lg h-32"></div>
-                      <div className="w-full bg-gray-500 rounded-t-lg h-20"></div>
-                      <div className="w-full bg-gray-600 rounded-t-lg h-12"></div>
+                      {chartData.map((height, idx) => (
+                        <div
+                          key={idx}
+                          onMouseEnter={() => setActiveChart(idx)}
+                          className={`w-full rounded-t-lg transition-all duration-300 cursor-pointer ${
+                            activeChart === idx
+                              ? "bg-[#037BFC]"
+                              : "bg-gray-600 dark:bg-gray-600 hover:bg-[#037BFC]"
+                          }`}
+                          style={{ height: `${height * 4}px` }}
+                        />
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {feature.items && (
+                {feature.type === "notifications" && (
                   <div className="space-y-3">
-                    {feature.items.map((item, idx) => (
+                    {Object.entries(notifications).map(([key, enabled]) => (
                       <div
-                        key={idx}
-                        className="flex items-center justify-between p-4 bg-gray-700/30 rounded-xl border border-gray-700/30"
+                        key={key}
+                        className="flex items-center justify-between p-4 bg-gray-900/50 dark:bg-gray-900/50 rounded-xl border border-gray-700/30 dark:border-gra700/30"
                       >
-                        <span className="text-sm text-gray-300">
-                          {item.label}
+                        <span className="text-sm text-gray-300 dark:text-gray-300 capitalize">
+                          {key === "sms"
+                            ? "SMS alerts"
+                            : `${key} notifications`}
                         </span>
-                        <div
+                        <button
+                          onClick={() =>
+                            setNotifications({
+                              ...notifications,
+                              [key]: !enabled,
+                            })
+                          }
                           className={`w-12 h-6 rounded-full transition-colors ${
-                            item.enabled ? "bg-[#037BFC]" : "bg-gray-300"
+                            enabled
+                              ? "bg-[#037BFC]"
+                              : "bg-gray-600 dark:bg-gray-600"
                           } relative`}
                         >
                           <div
                             className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                              item.enabled ? "right-1" : "left-1"
+                              enabled ? "right-1" : "left-1"
                             }`}
                           ></div>
-                        </div>
+                        </button>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {feature.tasks && (
+                {feature.type === "tasks" && (
                   <div className="space-y-3">
-                    {feature.tasks.map((task, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center space-x-3 p-4 bg-gray-700/30 rounded-xl border border-gray-700/30"
+                    {tasks.map((task) => (
+                      <button
+                        key={task.id}
+                        onClick={() => toggleTask(task.id)}
+                        className="w-full flex items-center space-x-3 p-4 bg-gray-900/50 dark:bg-gray-900/50 rounded-xl border border-gray-700/30 dark:border-gray-700/30 hover:border-[#037BFC] dark:hover:border-[#037BFC] transitio"
                       >
                         <div
                           className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                             task.completed
                               ? "bg-[#037BFC] border-[#037BFC]"
-                              : "border-gray-500"
+                              : "border-gray-500 dark:border-gray-500"
                           }`}
                         >
                           {task.completed && (
@@ -182,13 +216,13 @@ export default function FeaturesGrid() {
                         <span
                           className={`text-sm ${
                             task.completed
-                              ? "text-gray-500 line-through"
-                              : "text-gray-300"
+                              ? "text-gray-500 dark:text-gray-500 line-through"
+                              : "text-gray-300 dark:text-gray-300"
                           }`}
                         >
                           {task.label}
                         </span>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 )}

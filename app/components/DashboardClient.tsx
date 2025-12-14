@@ -124,7 +124,7 @@ export default function DashboardClient({
   const recentAnalysesLimited = recentAnalyses.slice(0, 5);
 
   return (
-    <div className="px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
       <div className="mx-auto max-w-7xl">
         {/* Welcome Section with Logo */}
         <div className="mb-8 flex items-center gap-4">

@@ -7,6 +7,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { showErrorToast } from "@/lib/toast";
+import { ThemeToggle } from "../components/ThemeToggle";
+import { useTheme } from "next-themes";
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -78,7 +80,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, user }: SidebarProps) {
             onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform animate-slide-in-left">
+          <div className="fixed inset-y-0 left-0 z-50 w-72 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50 transform transition-transform animate-slide-in-left shadow-2xl">
             <SidebarContent
               pathname={pathname}
               user={user}
@@ -92,7 +94,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, user }: SidebarProps) {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 px-6 pb-4">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50 px-6 pb-4 shadow-xl">
           <SidebarContent
             pathname={pathname}
             user={user}
@@ -249,6 +251,7 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (status === "loading") return; // Still loading
@@ -282,23 +285,122 @@ export default function DashboardLayout({
       />
 
       {/* Mobile menu button */}
-      <div className="sticky top-0 z-40 flex items-center gap-x-6 bg-white dark:bg-gray-800 px-4 py-4 shadow-sm sm:px-6 lg:hidden border-b border-gray-200 dark:border-gray-700">
+      <div className="sticky top-0 z-40 flex items-center gap-x-6 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 px-4 py-4 shadow-sm sm:px-6 lg:hidden border-b border-gray-200/50 dark:border-gray-700/50">
         <button
           type="button"
-          className="-m-2.5 p-2.5 text-gray-700 dark:text-gray-300 lg:hidden rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2"
+          className="p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg text-gray-700 dark:text-gray-300 lg:hidden focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2"
           onClick={() => setSidebarOpen(true)}
           aria-label="Open navigation menu"
         >
           <span className="sr-only">Open sidebar</span>
-          <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+          <Bars3Icon className="h-5 w-5" aria-hidden="true" />
         </button>
-        <div className="flex-1 text-sm font-semibold leading-6 text-gray-900 dark:text-white font-poppins">
+        <div className="flex-1 text-lg font-semibold leading-6 text-gray-900 dark:text-white font-poppins">
           Dashboard
+        </div>
+
+        {/* Mobile user avatar */}
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold text-sm shadow-lg">
+          {session?.user?.name
+            ? session.user.name.charAt(0).toUpperCase()
+            : session?.user?.email?.charAt(0).toUpperCase() || "U"}
         </div>
       </div>
 
       {/* Main content */}
       <main className="lg:pl-72">
+        {/* Top Navbar */}
+        <div className="sticky top-0 z-30 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="px-4 py-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+              {/* Left side - Page title and breadcrumb */}
+              <div className="flex items-center gap-4">
+                <div className="hidden lg:block">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-poppins">
+                    Dashboard
+                  </h1>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Welcome to your health analytics platform
+                  </p>
+                </div>
+              </div>
+
+              {/* Right side - Actions and user info */}
+              <div className="flex items-center gap-4">
+                {/* Notifications */}
+                <button className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                  <svg
+                    className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 17h5l-5 5v-5zM9 7h6m0 0V1m0 6l5-5M9 7L4 2v5h5z"
+                    />
+                  </svg>
+                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-pulse"></div>
+                </button>
+
+                {/* Search */}
+                <button className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                  <svg
+                    className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+
+                {/* Theme Toggle */}
+                <ThemeToggle />
+
+                {/* User Avatar */}
+                <div className="group relative">
+                  <button className="flex items-center gap-3 p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300">
+                      {session?.user?.name
+                        ? session.user.name.charAt(0).toUpperCase()
+                        : session?.user?.email?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                    <div className="hidden sm:block text-left">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
+                        {session?.user?.name || "User"}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Online
+                      </p>
+                    </div>
+                    <svg
+                      className="h-4 w-4 text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <ErrorBoundary>
           <div className="animate-fade-in-up">{children}</div>
         </ErrorBoundary>

@@ -261,6 +261,46 @@ html {
   background: rgba(17, 24, 39, 0.8);
 }
 
+/* Light mode enhancements for glass-morphism */
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+/* Custom light mode variables */
+:root {
+  --glass-bg-light: rgba(255, 255, 255, 0.7);
+  --glass-border-light: rgba(255, 255, 255, 0.2);
+  --glass-shadow-light: 0 8px 32px rgba(31, 38, 135, 0.15);
+}
+
+/* Enhanced glass-morphism for light mode */
+.glass-light {
+  background: var(--glass-bg-light);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border-light);
+  box-shadow: var(--glass-shadow-light);
+}
+
+/* Navbar glass effect */
+.navbar-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.1);
+}
+
+.dark .navbar-glass {
+  background: rgba(17, 24, 39, 0.8);
+  border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
 /* Dashboard tile animations */
 @keyframes progressFill {
   from {

@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "next-themes";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -138,7 +138,7 @@ export default function RegisterPage() {
             </Link>
           </div>
           <button
-            onClick={toggleTheme}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Toggle theme"
           >

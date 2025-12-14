@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { ThemeProvider } from "./context/ThemeContext";
+import { ThemeProvider } from "./components/ThemeProvider";
 import { SessionProvider } from "./components/SessionProvider";
 import { Toaster } from "react-hot-toast";
 import { validateEnvironmentOnStartup } from "@/lib/env-validation";
@@ -40,28 +40,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth dark">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                const theme = localStorage.getItem('theme') || 'dark';
-                document.documentElement.className = 'scroll-smooth' + (theme === 'dark' ? ' dark' : '');
-              } catch (e) {
-                document.documentElement.className = 'scroll-smooth dark';
-              }
-            `,
-          }}
-        />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <SessionProvider>
-          <ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={true}
+            disableTransitionOnChange={false}
+            storageKey="theme"
+          >
             {children}
             <Toaster
               position="top-right"

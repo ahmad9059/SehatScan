@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "next-themes";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <header className="absolute inset-x-0 top-0 z-50">
@@ -30,7 +30,7 @@ export default function Navbar() {
         <div className="flex lg:hidden gap-x-2">
           {/* Theme Toggle Mobile */}
           <button
-            onClick={toggleTheme}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700 dark:text-gray-200"
             aria-label="Toggle theme"
           >
@@ -118,7 +118,7 @@ export default function Navbar() {
         <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-x-4">
           {/* Theme Toggle Desktop */}
           <button
-            onClick={toggleTheme}
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Toggle theme"
           >

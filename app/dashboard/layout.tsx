@@ -125,8 +125,12 @@ function SidebarContent({
       {/* Header */}
       <div className="flex h-16 shrink-0 items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-x-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#037BFC]">
-            <span className="text-white font-bold text-sm">S</span>
+          <div className="flex h-8 w-8 items-center justify-center">
+            <img
+              src="/logo.svg"
+              alt="SehatScan Logo"
+              className="h-8 w-8 rounded-lg"
+            />
           </div>
           <span className="font-poppins font-bold text-xl text-gray-900 dark:text-white">
             SehatScan

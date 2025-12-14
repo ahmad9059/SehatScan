@@ -6,7 +6,6 @@ import { showErrorToast, showInfoToast } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import { CardSkeleton } from "@/app/components/SkeletonLoader";
 import EmptyState from "@/app/components/EmptyState";
-import LoadingSpinner from "@/app/components/LoadingSpinner";
 import {
   DocumentTextIcon,
   CameraIcon,
@@ -16,7 +15,6 @@ import {
   FunnelIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
 
 interface Analysis {
@@ -174,8 +172,12 @@ function HistoryPageContent() {
   const getAnalysisPreview = (analysis: Analysis) => {
     switch (analysis.type) {
       case "face":
-        if (analysis.visualMetrics) {
-          const metrics = analysis.visualMetrics;
+        if (
+          analysis.visualMetrics &&
+          Array.isArray(analysis.visualMetrics) &&
+          analysis.visualMetrics.length > 0
+        ) {
+          const metrics = analysis.visualMetrics[0]; // Get first face metrics
           return `Redness: ${metrics.redness_percentage || 0}%, Yellowness: ${
             metrics.yellowness_percentage || 0
           }%`;
@@ -434,7 +436,9 @@ function HistoryPageContent() {
 
                   {/* Analysis Content */}
                   {selectedAnalysis.type === "face" &&
-                    selectedAnalysis.visualMetrics && (
+                    selectedAnalysis.visualMetrics &&
+                    Array.isArray(selectedAnalysis.visualMetrics) &&
+                    selectedAnalysis.visualMetrics.length > 0 && (
                       <div>
                         <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
                           Visual Metrics
@@ -445,7 +449,7 @@ function HistoryPageContent() {
                               Redness Percentage:
                             </span>
                             <p className="text-2xl font-bold text-red-600">
-                              {selectedAnalysis.visualMetrics
+                              {selectedAnalysis.visualMetrics[0]
                                 .redness_percentage || 0}
                               %
                             </p>
@@ -455,12 +459,26 @@ function HistoryPageContent() {
                               Yellowness Percentage:
                             </span>
                             <p className="text-2xl font-bold text-yellow-600">
-                              {selectedAnalysis.visualMetrics
+                              {selectedAnalysis.visualMetrics[0]
                                 .yellowness_percentage || 0}
                               %
                             </p>
                           </div>
                         </div>
+                        {selectedAnalysis.visualMetrics[0]
+                          .skin_tone_analysis && (
+                          <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                            <h5 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                              Skin Tone Analysis:
+                            </h5>
+                            <p className="text-sm text-blue-800 dark:text-blue-200">
+                              {
+                                selectedAnalysis.visualMetrics[0]
+                                  .skin_tone_analysis
+                              }
+                            </p>
+                          </div>
+                        )}
                       </div>
                     )}
 

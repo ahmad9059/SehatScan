@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         }
 
         return NextResponse.json(
-          { error: `AI service error: ${geminiError.message}` },
+          { error: `AI service error: ${assessmentError.message}` },
           { status: 500 }
         );
       }

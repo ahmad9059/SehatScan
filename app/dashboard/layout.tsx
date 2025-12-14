@@ -148,19 +148,25 @@ function SidebarContent({
       </div>
 
       {/* User info */}
-      <div className="flex items-center gap-x-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 px-3 py-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#037BFC] text-white font-semibold">
-          {user?.name
-            ? user.name.charAt(0).toUpperCase()
-            : user?.email?.charAt(0).toUpperCase() || "U"}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-            {user?.name || "User"}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-            {user?.email}
-          </p>
+      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#037BFC]/5 via-transparent to-indigo-500/5"></div>
+        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#037BFC]/20 to-indigo-500/20 rounded-full blur-xl -translate-y-8 translate-x-8 group-hover:scale-125 transition-transform duration-500"></div>
+
+        <div className="relative z-10 flex items-center gap-x-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold shadow-lg group-hover:scale-110 transition-transform duration-300">
+            {user?.name
+              ? user.name.charAt(0).toUpperCase()
+              : user?.email?.charAt(0).toUpperCase() || "U"}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
+              {user?.name || "User"}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors duration-300">
+              {user?.email}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -182,22 +188,28 @@ function SidebarContent({
                       onClick={isMobile ? onClose : undefined}
                       className={classNames(
                         isActive
-                          ? "bg-[#037BFC]/10 text-[#037BFC] dark:bg-[#037BFC]/20"
-                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-[#037BFC]",
-                        "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 transition-all focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
+                          ? "bg-gradient-to-r from-[#037BFC]/10 to-indigo-500/10 text-[#037BFC] dark:text-blue-400 border-r-2 border-[#037BFC]"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-gray-100/50 hover:to-slate-100/50 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:text-[#037BFC] dark:hover:text-blue-400",
+                        "group flex gap-x-3 rounded-2xl p-3 text-sm font-semibold leading-6 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 hover:shadow-md hover:scale-105 backdrop-blur-sm border border-transparent hover:border-gray-200/50 dark:hover:border-gray-600/50"
                       )}
                       aria-current={isActive ? "page" : undefined}
                     >
-                      <item.icon
+                      <div
                         className={classNames(
                           isActive
-                            ? "text-[#037BFC]"
-                            : "text-gray-400 group-hover:text-[#037BFC]",
-                          "h-6 w-6 shrink-0 transition-colors"
+                            ? "bg-[#037BFC]/10 text-[#037BFC] dark:text-blue-400"
+                            : "bg-gray-100/50 dark:bg-gray-700/50 text-gray-400 group-hover:bg-[#037BFC]/10 group-hover:text-[#037BFC] dark:group-hover:text-blue-400",
+                          "p-2 rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
                         )}
-                        aria-hidden="true"
-                      />
-                      {item.name}
+                      >
+                        <item.icon
+                          className="h-5 w-5 shrink-0 transition-colors duration-300"
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        {item.name}
+                      </span>
                     </Link>
                   </li>
                 );
@@ -209,14 +221,18 @@ function SidebarContent({
           <li className="mt-auto">
             <button
               onClick={onLogout}
-              className="group flex w-full gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800"
+              className="group flex w-full gap-x-3 rounded-2xl p-3 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-red-50/50 hover:to-pink-50/50 dark:hover:from-red-900/20 dark:hover:to-pink-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 hover:shadow-md hover:scale-105 backdrop-blur-sm border border-transparent hover:border-red-200/50 dark:hover:border-red-600/50"
               aria-label="Sign out of your account"
             >
-              <ArrowRightOnRectangleIcon
-                className="h-6 w-6 shrink-0 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors"
-                aria-hidden="true"
-              />
-              Logout
+              <div className="p-2 rounded-xl bg-gray-100/50 dark:bg-gray-700/50 group-hover:bg-red-100/50 dark:group-hover:bg-red-900/30 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <ArrowRightOnRectangleIcon
+                  className="h-5 w-5 shrink-0 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300"
+                  aria-hidden="true"
+                />
+              </div>
+              <span className="group-hover:translate-x-1 transition-transform duration-300">
+                Logout
+              </span>
             </button>
           </li>
         </ul>

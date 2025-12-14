@@ -353,41 +353,6 @@ export default function DashboardClient({
           <DashboardCharts stats={stats} recentAnalyses={recentAnalyses} />
         </div>
 
-        {/* Quick Actions */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins mb-4">
-            Quick Actions
-          </h2>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Link
-              href="/dashboard/scan-report"
-              className="bg-[#037BFC] hover:bg-[#0260c9] text-white rounded-md px-6 py-4 transition-all transform hover:scale-105 text-center font-semibold flex items-center justify-center gap-2 animate-fade-in focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2"
-              aria-label="Upload medical report for analysis"
-            >
-              <DocumentTextIcon className="h-5 w-5" />
-              Upload Report
-            </Link>
-            <Link
-              href="/dashboard/scan-face"
-              className="bg-[#037BFC] hover:bg-[#0260c9] text-white rounded-md px-6 py-4 transition-all transform hover:scale-105 text-center font-semibold flex items-center justify-center gap-2 animate-fade-in focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2"
-              style={{ animationDelay: "0.1s" }}
-              aria-label="Upload photo for facial analysis"
-            >
-              <PhotoIcon className="h-5 w-5" />
-              Upload Photo
-            </Link>
-            <Link
-              href="/dashboard/risk-assessment"
-              className="bg-[#037BFC] hover:bg-[#0260c9] text-white rounded-md px-6 py-4 transition-all transform hover:scale-105 text-center font-semibold flex items-center justify-center gap-2 animate-fade-in focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2"
-              style={{ animationDelay: "0.2s" }}
-              aria-label="Generate comprehensive risk assessment"
-            >
-              <ChartBarIcon className="h-5 w-5" />
-              Generate Assessment
-            </Link>
-          </div>
-        </div>
-
         {/* Recent Analyses */}
         <div className="animate-fade-in">
           <div className="flex items-center justify-between mb-4">
@@ -405,49 +370,49 @@ export default function DashboardClient({
           </div>
 
           {recentAnalysesLimited.length > 0 ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="divide-y divide-gray-200 dark:divide-gray-700">
-                {recentAnalysesLimited.map((analysis, index) => (
-                  <div
-                    key={analysis.id}
-                    className="p-4 sm:p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all animate-fade-in-up border-l-4 border-transparent hover:border-[#037BFC]"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="space-y-4">
+              {recentAnalysesLimited.map((analysis, index) => (
+                <div
+                  key={analysis.id}
+                  className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in-up border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  onClick={() => setSelectedAnalysis(analysis)}
+                >
+                  {/* Animated Background Elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-gray-500/5"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-400/20 to-gray-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-300/10 to-slate-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
+
+                  <div className="relative z-10">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div className="flex items-center space-x-4 min-w-0 flex-1">
                         <div className="shrink-0">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#037BFC]/10">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#037BFC]/10 to-indigo-500/10 group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
                             {getAnalysisIcon(analysis.type)}
                           </div>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
                             {getAnalysisTypeLabel(analysis.type)}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
                             {getAnalysisPreview(analysis)}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors duration-300">
                             {formatDate(new Date(analysis.createdAt))}
                           </p>
                         </div>
                       </div>
                       <div className="shrink-0">
-                        <button
-                          onClick={() => setSelectedAnalysis(analysis)}
-                          className="inline-flex items-center gap-2 rounded-lg bg-[#037BFC] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0260c9] focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2 transition-all transform hover:scale-105"
-                          aria-label={`View details for ${getAnalysisTypeLabel(
-                            analysis.type
-                          )}`}
-                        >
-                          <EyeIcon className="h-4 w-4" />
+                        <div className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#037BFC]/10 to-indigo-500/10 px-4 py-2 text-sm font-semibold text-[#037BFC] dark:text-blue-400 group-hover:from-[#037BFC]/20 group-hover:to-indigo-500/20 transition-all duration-300">
+                          <EyeIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                           View Details
-                        </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           ) : (
             // Empty State
@@ -470,6 +435,85 @@ export default function DashboardClient({
               />
             </div>
           )}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8 mt-8 ">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins mb-4">
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <Link
+              href="/dashboard/scan-report"
+              className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+              aria-label="Upload medical report for analysis"
+            >
+              {/* Animated Background Elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-blue-300/10 to-blue-500/10 rounded-full blur-xl translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-700"></div>
+
+              <div className="relative z-10 text-center">
+                <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3 mx-auto w-fit mb-3">
+                  <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-300" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 mb-1">
+                  Upload Report
+                </h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                  Analyze medical reports with AI
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              href="/dashboard/scan-face"
+              className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+              style={{ animationDelay: "0.1s" }}
+              aria-label="Upload photo for facial analysis"
+            >
+              {/* Animated Background Elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5"></div>
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-full blur-2xl -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-purple-300/10 to-purple-500/10 rounded-full blur-xl translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-700"></div>
+
+              <div className="relative z-10 text-center">
+                <div className="p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3 mx-auto w-fit mb-3">
+                  <PhotoIcon className="h-6 w-6 text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors duration-300" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 mb-1">
+                  Upload Photo
+                </h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                  Facial health analysis
+                </p>
+              </div>
+            </Link>
+
+            <Link
+              href="/dashboard/risk-assessment"
+              className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+              style={{ animationDelay: "0.2s" }}
+              aria-label="Generate comprehensive risk assessment"
+            >
+              {/* Animated Background Elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5"></div>
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-400/20 to-teal-500/20 rounded-full blur-2xl -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
+              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-emerald-300/10 to-emerald-500/10 rounded-full blur-xl translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-700"></div>
+
+              <div className="relative z-10 text-center">
+                <div className="p-3 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3 mx-auto w-fit mb-3">
+                  <ChartBarIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300 mb-1">
+                  Generate Assessment
+                </h3>
+                <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                  Comprehensive risk analysis
+                </p>
+              </div>
+            </Link>
+          </div>
         </div>
 
         {/* Analysis Detail Modal */}

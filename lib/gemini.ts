@@ -42,9 +42,9 @@ export class GeminiAnalyzer {
     }
 
     this.genai = new GoogleGenerativeAI(key);
-    // Use gemini-pro model which should be available
+    // Try different model names that might be available
     this.model = this.genai.getGenerativeModel({
-      model: "gemini-pro",
+      model: "gemini-1.5-flash",
     });
   }
 
@@ -176,6 +176,38 @@ Keep the assessment professional, clear, and actionable.`;
       throw new Error("Unknown error occurred during risk assessment");
     }
   }
+
+  /**
+   * Generates personalized health insights for chatbot conversations
+   */
+  async generateHealthInsights(prompt: string): Promise<string> {
+    if (!prompt?.trim()) {
+      throw new Error("Prompt cannot be empty");
+    }
+
+    try {
+      const result = await this.model.generateContent(prompt, {
+        generationConfig: {
+          temperature: 0.4, // Balanced temperature for conversational responses
+          maxOutputTokens: 1000, // Reasonable response length
+        },
+      });
+
+      const response = await result.response;
+      const insights = response.text().trim();
+
+      if (!insights) {
+        throw new Error("Empty insights response received");
+      }
+
+      return insights;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(`Gemini API error: ${error.message}`);
+      }
+      throw new Error("Unknown error occurred during insights generation");
+    }
+  }
 }
 
 // Utility function to create analyzer instance with fallback
@@ -184,7 +216,22 @@ export function createGeminiAnalyzer(): GeminiAnalyzer {
     return new GeminiAnalyzer();
   } catch (error) {
     console.warn("Failed to initialize Gemini analyzer:", error);
-    // If initialization fails, you could fall back to mock here
+    // Re-throw the error so the calling function can handle fallback
     throw error;
+  }
+}
+
+// Standalone function for health insights (used by chatbot)
+export async function generateHealthInsights(prompt: string): Promise<string> {
+  try {
+    const analyzer = createGeminiAnalyzer();
+    return await analyzer.generateHealthInsights(prompt);
+  } catch (error) {
+    console.warn("Gemini API failed, falling back to mock:", error);
+
+    // Fall back to mock implementation
+    const { createMockGeminiAnalyzer } = await import("./gemini-mock");
+    const mockAnalyzer = createMockGeminiAnalyzer();
+    return await mockAnalyzer.generateHealthInsights(prompt);
   }
 }

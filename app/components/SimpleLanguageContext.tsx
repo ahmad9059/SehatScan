@@ -21,6 +21,7 @@ const translations = {
     "nav.scanReport": "Scan Report",
     "nav.scanFace": "Scan Face",
     "nav.riskAssessment": "Risk Assessment",
+    "nav.chatbot": "AI Assistant",
     "nav.history": "History",
     "nav.profile": "Profile",
 
@@ -91,6 +92,7 @@ const translations = {
     "nav.scanReport": "رپورٹ اسکین",
     "nav.scanFace": "چہرہ اسکین",
     "nav.riskAssessment": "خطرے کا جائزہ",
+    "nav.chatbot": "AI اسسٹنٹ",
     "nav.history": "تاریخ",
     "nav.profile": "پروفائل",
 

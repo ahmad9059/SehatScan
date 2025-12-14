@@ -24,6 +24,7 @@ import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
+  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 
 interface NavigationItem {
@@ -44,6 +45,11 @@ const navigationItems: NavigationItem[] = [
     nameKey: "nav.riskAssessment",
     href: "/dashboard/risk-assessment",
     icon: ExclamationTriangleIcon,
+  },
+  {
+    nameKey: "nav.chatbot",
+    href: "/dashboard/chatbot",
+    icon: ChatBubbleLeftRightIcon,
   },
   { nameKey: "nav.history", href: "/dashboard/history", icon: ClockIcon },
   { nameKey: "nav.profile", href: "/dashboard/profile", icon: UserIcon },

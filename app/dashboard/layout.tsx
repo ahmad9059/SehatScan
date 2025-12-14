@@ -8,6 +8,10 @@ import { usePathname } from "next/navigation";
 import ErrorBoundary from "../components/ErrorBoundary";
 import { showErrorToast } from "@/lib/toast";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { SearchModal } from "../components/SearchModal";
+import { ProfileDropdown } from "../components/ProfileDropdown";
+import { LanguageSelector } from "../components/LanguageSelector";
+import { NotificationsDropdown } from "../components/NotificationsDropdown";
 import { useTheme } from "next-themes";
 import {
   HomeIcon,
@@ -251,6 +255,7 @@ export default function DashboardLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -261,6 +266,21 @@ export default function DashboardLayout({
       return;
     }
   }, [session, status, router]);
+
+  // Keyboard shortcut for search (Cmd/Ctrl + K)
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   // Show loading state while checking authentication
   if (status === "loading") {
@@ -328,25 +348,13 @@ export default function DashboardLayout({
               {/* Right side - Actions and user info */}
               <div className="flex items-center gap-4">
                 {/* Notifications */}
-                <button className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                  <svg
-                    className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 17h5l-5 5v-5zM9 7h6m0 0V1m0 6l5-5M9 7L4 2v5h5z"
-                    />
-                  </svg>
-                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-pulse"></div>
-                </button>
+                <NotificationsDropdown />
 
                 {/* Search */}
-                <button className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                <button
+                  onClick={() => setSearchOpen(true)}
+                  className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                >
                   <svg
                     className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
                     fill="none"
@@ -362,40 +370,14 @@ export default function DashboardLayout({
                   </svg>
                 </button>
 
+                {/* Language Selector */}
+                <LanguageSelector />
+
                 {/* Theme Toggle */}
                 <ThemeToggle />
 
-                {/* User Avatar */}
-                <div className="group relative">
-                  <button className="flex items-center gap-3 p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      {session?.user?.name
-                        ? session.user.name.charAt(0).toUpperCase()
-                        : session?.user?.email?.charAt(0).toUpperCase() || "U"}
-                    </div>
-                    <div className="hidden sm:block text-left">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
-                        {session?.user?.name || "User"}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Online
-                      </p>
-                    </div>
-                    <svg
-                      className="h-4 w-4 text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                </div>
+                {/* Profile Dropdown */}
+                <ProfileDropdown user={session?.user || {}} />
               </div>
             </div>
           </div>
@@ -405,6 +387,9 @@ export default function DashboardLayout({
           <div className="animate-fade-in-up">{children}</div>
         </ErrorBoundary>
       </main>
+
+      {/* Search Modal */}
+      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 }

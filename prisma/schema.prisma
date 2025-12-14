@@ -1,13 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -20,13 +18,13 @@ model User {
 }
 
 model Analysis {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id])
-  type            String   // "face" or "report"
-  rawData         Json
-  structuredData  Json?
-  visualMetrics   Json?
-  riskAssessment  String?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  userId         String
+  type           String
+  rawData        Json
+  structuredData Json?
+  visualMetrics  Json?
+  riskAssessment String?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
 }

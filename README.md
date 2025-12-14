@@ -27,11 +27,37 @@ npm install
 ```
 
 2. Set up environment variables:
-   Create a `.env` file in the root directory:
+   Copy the example file and configure all required variables:
 
-```env
-DATABASE_URL="your-supabase-connection-string"
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file and set the following required variables:
+
+```bash
+# Database (Required)
+DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+
+# NextAuth (Required)
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="your-secret-key-here"
+
+# Python Engine (Required)
 PYTHON_ENGINE_URL="http://localhost:8000"
+
+# Supabase (Optional - for additional features)
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+```
+
+**Environment Validation:**
+The application will automatically validate all required environment variables on startup and display helpful error messages if any are missing or invalid.
+
+**Generating NextAuth Secret:**
+
+```bash
+openssl rand -base64 32
 ```
 
 3. Set up Prisma and database:

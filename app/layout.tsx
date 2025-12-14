@@ -26,6 +26,13 @@ export const metadata: Metadata = {
 
 import { ThemeProvider } from "./context/ThemeContext";
 import { SessionProvider } from "./components/SessionProvider";
+import { Toaster } from "react-hot-toast";
+import { validateEnvironmentOnStartup } from "@/lib/env-validation";
+
+// Validate environment variables on startup (server-side only)
+if (typeof window === "undefined") {
+  validateEnvironmentOnStartup();
+}
 
 export default function RootLayout({
   children,
@@ -33,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth dark">
       <head>
         <link
           rel="stylesheet"
@@ -44,19 +51,39 @@ export default function RootLayout({
             __html: `
               try {
                 const theme = localStorage.getItem('theme') || 'dark';
-                if (theme === 'dark') {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (e) {}
+                document.documentElement.className = 'scroll-smooth' + (theme === 'dark' ? ' dark' : '');
+              } catch (e) {
+                document.documentElement.className = 'scroll-smooth dark';
+              }
             `,
           }}
         />
       </head>
       <body className={`${inter.variable} ${poppins.variable} antialiased`}>
         <SessionProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: "#363636",
+                  color: "#fff",
+                },
+                success: {
+                  style: {
+                    background: "#10B981",
+                  },
+                },
+                error: {
+                  style: {
+                    background: "#EF4444",
+                  },
+                },
+              }}
+            />
+          </ThemeProvider>
         </SessionProvider>
       </body>
     </html>

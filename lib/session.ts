@@ -32,3 +32,5 @@ export async function requireAuth() {
   }
   return user;
 }
+
+export { auth };

@@ -15,6 +15,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 
 interface AnalysisStats {
   total: number;
@@ -39,18 +40,23 @@ export default function DashboardCharts({
   stats,
   recentAnalyses,
 }: DashboardChartsProps) {
+  const { t } = useSimpleLanguage();
   // Prepare data for pie chart
   const pieData = [
-    { name: "Reports", value: stats.reports, color: COLORS.report },
-    { name: "Face Analysis", value: stats.faces, color: COLORS.face },
-    { name: "Risk Assessments", value: stats.risks, color: COLORS.risk },
+    { name: t("charts.reports"), value: stats.reports, color: COLORS.report },
+    { name: t("charts.faceAnalysis"), value: stats.faces, color: COLORS.face },
+    {
+      name: t("charts.riskAssessment"),
+      value: stats.risks,
+      color: COLORS.risk,
+    },
   ].filter((item) => item.value > 0);
 
   // Prepare data for bar chart (analysis types)
   const barData = [
-    { name: "Reports", count: stats.reports, fill: COLORS.report },
-    { name: "Face Analysis", count: stats.faces, fill: COLORS.face },
-    { name: "Risk Assessments", count: stats.risks, fill: COLORS.risk },
+    { name: t("charts.reports"), count: stats.reports, fill: COLORS.report },
+    { name: t("charts.faceAnalysis"), count: stats.faces, fill: COLORS.face },
+    { name: t("charts.riskAssessment"), count: stats.risks, fill: COLORS.risk },
   ];
 
   // Prepare data for line chart (analyses over time - last 7 days)
@@ -126,10 +132,10 @@ export default function DashboardCharts({
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <h3 className="text-lg font-medium mb-2">No Data Available</h3>
-            <p className="text-sm">
-              Start analyzing to see your data visualized here
-            </p>
+            <h3 className="text-lg font-medium mb-2">
+              {t("common.noDataAvailable")}
+            </h3>
+            <p className="text-sm">{t("common.startAnalyzing")}</p>
           </div>
         </div>
       </div>
@@ -147,7 +153,7 @@ export default function DashboardCharts({
 
         <div className="relative z-10">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
-            Analysis Distribution
+            {t("charts.analysisDistribution")}
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -193,7 +199,7 @@ export default function DashboardCharts({
 
         <div className="relative z-10">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
-            Analysis Types
+            {t("charts.analysisTypes")}
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -228,7 +234,7 @@ export default function DashboardCharts({
 
         <div className="relative z-10">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-            Activity (Last 7 Days)
+            {t("charts.activityLast7Days")}
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { LanguageIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { useSimpleLanguage } from "./SimpleLanguageContext";
 
 interface Language {
   code: string;
@@ -12,34 +13,16 @@ interface Language {
 
 const languages: Language[] = [
   { code: "en", name: "English", nativeName: "English", flag: "🇺🇸" },
-  { code: "es", name: "Spanish", nativeName: "Español", flag: "🇪🇸" },
-  { code: "fr", name: "French", nativeName: "Français", flag: "🇫🇷" },
-  { code: "de", name: "German", nativeName: "Deutsch", flag: "🇩🇪" },
-  { code: "it", name: "Italian", nativeName: "Italiano", flag: "🇮🇹" },
-  { code: "pt", name: "Portuguese", nativeName: "Português", flag: "🇵🇹" },
-  { code: "ru", name: "Russian", nativeName: "Русский", flag: "🇷🇺" },
-  { code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳" },
-  { code: "ja", name: "Japanese", nativeName: "日本語", flag: "🇯🇵" },
-  { code: "ko", name: "Korean", nativeName: "한국어", flag: "🇰🇷" },
-  { code: "ar", name: "Arabic", nativeName: "العربية", flag: "🇸🇦" },
-  { code: "hi", name: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳" },
+  { code: "ur", name: "Urdu", nativeName: "اردو", flag: "🇵🇰" },
 ];
 
 export function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState(languages[0]); // Default to English
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { language, setLanguage, t } = useSimpleLanguage();
 
-  useEffect(() => {
-    // Load saved language from localStorage
-    const savedLanguage = localStorage.getItem("selectedLanguage");
-    if (savedLanguage) {
-      const language = languages.find((lang) => lang.code === savedLanguage);
-      if (language) {
-        setSelectedLanguage(language);
-      }
-    }
-  }, []);
+  const selectedLanguage =
+    languages.find((lang) => lang.code === language) || languages[0];
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -57,16 +40,12 @@ export function LanguageSelector() {
     };
   }, []);
 
-  const handleLanguageSelect = (language: Language) => {
-    setSelectedLanguage(language);
-    localStorage.setItem("selectedLanguage", language.code);
+  const handleLanguageSelect = (selectedLang: Language) => {
+    setLanguage(selectedLang.code);
     setIsOpen(false);
-
-    // Here you would typically trigger a language change in your i18n system
-    console.log(`Language changed to: ${language.name} (${language.code})`);
-
-    // For now, we'll just show a notification
-    // In a real app, you'd integrate with react-i18next or similar
+    console.log(
+      `Language changed to: ${selectedLang.name} (${selectedLang.code})`
+    );
   };
 
   return (
@@ -89,10 +68,10 @@ export function LanguageSelector() {
           {/* Header */}
           <div className="px-4 py-3 border-b border-gray-200/50 dark:border-gray-700/50">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-              Select Language
+              {t("language.select")}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Choose your preferred language
+              {t("language.choose")}
             </p>
           </div>
 
@@ -125,7 +104,7 @@ export function LanguageSelector() {
           {/* Footer */}
           <div className="px-4 py-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Language settings are saved locally
+              {t("language.saved")}
             </p>
           </div>
         </div>

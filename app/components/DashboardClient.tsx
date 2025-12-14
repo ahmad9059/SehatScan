@@ -6,6 +6,7 @@ import Link from "next/link";
 import DashboardCharts from "@/app/components/DashboardCharts";
 import AnalysisDetailModal from "@/app/components/AnalysisDetailModal";
 import EmptyState from "@/app/components/EmptyState";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 import {
   DocumentTextIcon,
   FaceSmileIcon,
@@ -102,6 +103,7 @@ export default function DashboardClient({
   hasError,
 }: DashboardClientProps) {
   const [selectedAnalysis, setSelectedAnalysis] = useState<any>(null);
+  const { t } = useSimpleLanguage();
 
   if (!user) {
     return (
@@ -110,10 +112,10 @@ export default function DashboardClient({
           <div className="text-center">
             <ExclamationCircleIcon className="h-12 w-12 text-amber-500 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Authentication Required
+              {t("auth.required")}
             </h1>
             <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Please log in to access your dashboard
+              {t("auth.pleaseLogin")}
             </p>
           </div>
         </div>
@@ -139,10 +141,10 @@ export default function DashboardClient({
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
-              Welcome back, {user.name || "User"}!
+              {t("dashboard.welcome").replace("{{name}}", user.name || "User")}
             </h1>
             <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Your health analysis platform powered by AI
+              {t("dashboard.welcomeSubtitle")}
             </p>
           </div>
         </div>
@@ -191,7 +193,7 @@ export default function DashboardClient({
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
-                  Total Analyses
+                  {t("analytics.totalAnalyses")}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -236,7 +238,7 @@ export default function DashboardClient({
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
-                  Reports Scanned
+                  {t("analytics.reportsScanned")}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -281,7 +283,7 @@ export default function DashboardClient({
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
-                  Faces Analyzed
+                  {t("analytics.facesAnalyzed")}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -326,7 +328,7 @@ export default function DashboardClient({
 
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
-                  Risk Assessments
+                  {t("analytics.riskAssessments")}
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -348,7 +350,7 @@ export default function DashboardClient({
         {/* Charts Section */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins mb-4">
-            Analytics Overview
+            {t("analytics.overview")}
           </h2>
           <DashboardCharts stats={stats} recentAnalyses={recentAnalyses} />
         </div>
@@ -357,14 +359,14 @@ export default function DashboardClient({
         <div className="animate-fade-in">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins">
-              Recent Analyses
+              {t("recent.analyses")}
             </h2>
             {recentAnalyses.length > 0 && (
               <Link
                 href="/dashboard/history"
                 className="text-[#037BFC] hover:text-[#0260c9] font-medium text-sm transition-colors"
               >
-                View all →
+                {t("recent.viewAll")} →
               </Link>
             )}
           </div>
@@ -406,7 +408,7 @@ export default function DashboardClient({
                       <div className="shrink-0">
                         <div className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#037BFC]/10 to-indigo-500/10 px-4 py-2 text-sm font-semibold text-[#037BFC] dark:text-blue-400 group-hover:from-[#037BFC]/20 group-hover:to-indigo-500/20 transition-all duration-300">
                           <EyeIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                          View Details
+                          {t("common.viewDetails")}
                         </div>
                       </div>
                     </div>
@@ -440,7 +442,7 @@ export default function DashboardClient({
         {/* Quick Actions */}
         <div className="mb-8 mt-8 ">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins mb-4">
-            Quick Actions
+            {t("actions.quickActions")}
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <Link
@@ -458,10 +460,10 @@ export default function DashboardClient({
                   <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-300" />
                 </div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 mb-1">
-                  Upload Report
+                  {t("actions.uploadReport")}
                 </h3>
                 <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
-                  Analyze medical reports with AI
+                  {t("actions.uploadReportDesc")}
                 </p>
               </div>
             </Link>
@@ -482,10 +484,10 @@ export default function DashboardClient({
                   <PhotoIcon className="h-6 w-6 text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors duration-300" />
                 </div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 mb-1">
-                  Upload Photo
+                  {t("actions.scanFace")}
                 </h3>
                 <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
-                  Facial health analysis
+                  {t("actions.scanFaceDesc")}
                 </p>
               </div>
             </Link>
@@ -506,10 +508,10 @@ export default function DashboardClient({
                   <ChartBarIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300" />
                 </div>
                 <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300 mb-1">
-                  Generate Assessment
+                  {t("actions.riskAssessment")}
                 </h3>
                 <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
-                  Comprehensive risk analysis
+                  {t("actions.riskAssessmentDesc")}
                 </p>
               </div>
             </Link>

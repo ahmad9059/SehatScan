@@ -11,6 +11,7 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
         poppins: ["var(--font-poppins)", "system-ui", "sans-serif"],
+        urdu: ["var(--font-urdu)", "system-ui", "sans-serif"],
       },
       colors: {
         primary: {

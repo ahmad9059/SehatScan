@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Inter, Poppins, Noto_Nastaliq_Urdu } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,6 +15,13 @@ const poppins = Poppins({
   display: "swap",
 });
 
+const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
+  variable: "--font-urdu",
+  weight: ["400", "500", "600", "700"],
+  subsets: ["arabic"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "SehatScan - AI-Powered Health Risk Assessment",
   description:
@@ -26,6 +33,7 @@ export const metadata: Metadata = {
 
 import { ThemeProvider } from "./components/ThemeProvider";
 import { SessionProvider } from "./components/SessionProvider";
+import { SimpleLanguageProvider } from "./components/SimpleLanguageContext";
 import { Toaster } from "react-hot-toast";
 import { validateEnvironmentOnStartup } from "@/lib/env-validation";
 
@@ -47,37 +55,41 @@ export default function RootLayout({
           href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
         />
       </head>
-      <body className={`${inter.variable} ${poppins.variable} antialiased`}>
+      <body
+        className={`${inter.variable} ${poppins.variable} ${notoNastaliqUrdu.variable} antialiased`}
+      >
         <SessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem={true}
-            disableTransitionOnChange={false}
-            storageKey="theme"
-          >
-            {children}
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: "#363636",
-                  color: "#fff",
-                },
-                success: {
+          <SimpleLanguageProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem={true}
+              disableTransitionOnChange={false}
+              storageKey="theme"
+            >
+              {children}
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 4000,
                   style: {
-                    background: "#10B981",
+                    background: "#363636",
+                    color: "#fff",
                   },
-                },
-                error: {
-                  style: {
-                    background: "#EF4444",
+                  success: {
+                    style: {
+                      background: "#10B981",
+                    },
                   },
-                },
-              }}
-            />
-          </ThemeProvider>
+                  error: {
+                    style: {
+                      background: "#EF4444",
+                    },
+                  },
+                }}
+              />
+            </ThemeProvider>
+          </SimpleLanguageProvider>
         </SessionProvider>
       </body>
     </html>

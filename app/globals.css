@@ -408,3 +408,35 @@ body {
     rgba(217, 119, 6, 0.1) 100%
   );
 }
+/* Urdu Font Styles */
+.font-urdu {
+  font-family: var(--font-urdu), system-ui, sans-serif;
+}
+
+/* Apply Urdu font when language is Urdu */
+[data-language="ur"] {
+  font-family: var(--font-urdu), system-ui, sans-serif;
+}
+
+[data-language="ur"] h1,
+[data-language="ur"] h2,
+[data-language="ur"] h3,
+[data-language="ur"] h4,
+[data-language="ur"] h5,
+[data-language="ur"] h6 {
+  font-family: var(--font-urdu), system-ui, sans-serif;
+}
+
+/* Specific Urdu text styling */
+.urdu-text {
+  font-family: var(--font-urdu), system-ui, sans-serif;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Override for mixed content - keep LTR for numbers and English words */
+.urdu-mixed {
+  font-family: var(--font-urdu), system-ui, sans-serif;
+  direction: ltr;
+  text-align: left;
+}

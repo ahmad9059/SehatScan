@@ -13,6 +13,7 @@ import { ProfileDropdown } from "../components/ProfileDropdown";
 import { LanguageSelector } from "../components/LanguageSelector";
 import { NotificationsDropdown } from "../components/NotificationsDropdown";
 import { useTheme } from "next-themes";
+import { useSimpleLanguage } from "../components/SimpleLanguageContext";
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -26,26 +27,26 @@ import {
 } from "@heroicons/react/24/outline";
 
 interface NavigationItem {
-  name: string;
+  nameKey: string;
   href: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-const navigation: NavigationItem[] = [
-  { name: "Dashboard Home", href: "/dashboard", icon: HomeIcon },
+const navigationItems: NavigationItem[] = [
+  { nameKey: "nav.dashboard", href: "/dashboard", icon: HomeIcon },
   {
-    name: "Scan Report",
+    nameKey: "nav.scanReport",
     href: "/dashboard/scan-report",
     icon: DocumentTextIcon,
   },
-  { name: "Scan Face", href: "/dashboard/scan-face", icon: CameraIcon },
+  { nameKey: "nav.scanFace", href: "/dashboard/scan-face", icon: CameraIcon },
   {
-    name: "Risk Assessment",
+    nameKey: "nav.riskAssessment",
     href: "/dashboard/risk-assessment",
     icon: ExclamationTriangleIcon,
   },
-  { name: "History", href: "/dashboard/history", icon: ClockIcon },
-  { name: "Profile", href: "/dashboard/profile", icon: UserIcon },
+  { nameKey: "nav.history", href: "/dashboard/history", icon: ClockIcon },
+  { nameKey: "nav.profile", href: "/dashboard/profile", icon: UserIcon },
 ];
 
 function classNames(...classes: string[]) {
@@ -60,6 +61,7 @@ interface SidebarProps {
 
 function Sidebar({ sidebarOpen, setSidebarOpen, user }: SidebarProps) {
   const pathname = usePathname();
+  const { t } = useSimpleLanguage();
 
   const handleLogout = async () => {
     try {
@@ -126,6 +128,8 @@ function SidebarContent({
   onClose,
   isMobile = false,
 }: SidebarContentProps) {
+  const { t } = useSimpleLanguage();
+
   return (
     <>
       {/* Header */}
@@ -181,11 +185,11 @@ function SidebarContent({
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
           <li>
             <ul role="list" className="-mx-2 space-y-1">
-              {navigation.map((item, index) => {
+              {navigationItems.map((item, index) => {
                 const isActive = pathname === item.href;
                 return (
                   <li
-                    key={item.name}
+                    key={item.nameKey}
                     className="animate-slide-in-left"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
@@ -214,7 +218,7 @@ function SidebarContent({
                         />
                       </div>
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
-                        {item.name}
+                        {t(item.nameKey)}
                       </span>
                     </Link>
                   </li>
@@ -257,6 +261,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { theme } = useTheme();
+  const { t } = useSimpleLanguage();
 
   useEffect(() => {
     if (status === "loading") return; // Still loading
@@ -316,7 +321,7 @@ export default function DashboardLayout({
           <Bars3Icon className="h-5 w-5" aria-hidden="true" />
         </button>
         <div className="flex-1 text-lg font-semibold leading-6 text-gray-900 dark:text-white font-poppins">
-          Dashboard
+          {t("dashboard.title")}
         </div>
 
         {/* Mobile user avatar */}
@@ -337,10 +342,10 @@ export default function DashboardLayout({
               <div className="flex items-center gap-4">
                 <div className="hidden lg:block">
                   <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-poppins">
-                    Dashboard
+                    {t("dashboard.title")}
                   </h1>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Welcome to your health analytics platform
+                    {t("dashboard.subtitle")}
                   </p>
                 </div>
               </div>

@@ -10,7 +10,7 @@ export async function POST() {
     // Test creating a sample analysis
     const testAnalysisData = {
       userId: user.id,
-      type: "test",
+      type: "face" as const, // Use valid analysis type
       rawData: {
         test: true,
         message: "This is a test analysis to verify database integration",

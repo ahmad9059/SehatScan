@@ -4,6 +4,9 @@ import { prisma } from "@/lib/db";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import DashboardClient from "@/app/components/DashboardClient";
 
+// Force dynamic rendering for authentication
+export const dynamic = "force-dynamic";
+
 interface AnalysisStats {
   total: number;
   reports: number;

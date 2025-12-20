@@ -123,7 +123,7 @@ export default function AnalysisDetailModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-5xl max-h-[92vh] transform overflow-hidden rounded-3xl bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-2xl transition-all overflow-y-auto border border-gray-100 dark:border-gray-700/50">
+              <Dialog.Panel className="w-full max-w-6xl max-h-[92vh] transform overflow-hidden rounded-3xl bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-2xl transition-all overflow-y-auto border border-gray-100 dark:border-gray-700/50">
                 {/* Header with gradient background */}
                 <div className="relative bg-gradient-to-r from-slate-700 via-slate-600 to-slate-500 rounded-t-3xl p-4 text-white sticky top-0 z-10 overflow-hidden">
                   {/* Animated Background Elements */}
@@ -457,6 +457,209 @@ export default function AnalysisDetailModal({
                       </div>
                     )}
 
+                  {/* Problems Detected */}
+                  {analysis.type === "face" &&
+                    analysis.problemsDetected &&
+                    analysis.problemsDetected.length > 0 && (
+                      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform   animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+                        {/* Animated Background Elements */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-orange-500/5"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-400/20 to-orange-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-red-300/10 to-red-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
+
+                        <div className="relative z-10">
+                          <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300">
+                            <svg
+                              className="h-5 w-5 text-red-600 dark:text-red-400"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Detected Skin Conditions
+                          </h4>
+                          <div className="space-y-4">
+                            {analysis.problemsDetected.map(
+                              (problem: any, index: number) => (
+                                <div
+                                  key={index}
+                                  className={`rounded-xl p-4 border ${
+                                    problem.severity === "severe"
+                                      ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                                      : problem.severity === "moderate"
+                                      ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+                                      : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-3">
+                                      <div
+                                        className={`w-4 h-4 rounded-full ${
+                                          problem.severity === "severe"
+                                            ? "bg-red-500"
+                                            : problem.severity === "moderate"
+                                            ? "bg-yellow-500"
+                                            : "bg-green-500"
+                                        }`}
+                                      />
+                                      <h5 className="font-semibold text-gray-900 dark:text-white text-lg">
+                                        {problem.type}
+                                      </h5>
+                                    </div>
+                                    <span
+                                      className={`text-xs px-3 py-1 rounded-full font-medium ${
+                                        problem.severity === "severe"
+                                          ? "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
+                                          : problem.severity === "moderate"
+                                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
+                                          : "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
+                                      }`}
+                                    >
+                                      {problem.severity}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
+                                    {problem.description}
+                                  </p>
+                                  <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                    <span>Confidence:</span>
+                                    <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 max-w-24">
+                                      <div
+                                        className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                                        style={{
+                                          width: `${problem.confidence * 100}%`,
+                                        }}
+                                      />
+                                    </div>
+                                    <span className="font-medium">
+                                      {Math.round(problem.confidence * 100)}%
+                                    </span>
+                                  </div>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Treatment Recommendations */}
+                  {analysis.type === "face" &&
+                    analysis.treatments &&
+                    analysis.treatments.length > 0 && (
+                      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform  animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+                        {/* Animated Background Elements */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-emerald-500/5"></div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+                        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-300/10 to-green-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
+
+                        <div className="relative z-10">
+                          <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300">
+                            <HeartIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            Treatment Recommendations
+                          </h4>
+                          <div className="space-y-4">
+                            {analysis.treatments
+                              .sort((a: any, b: any) => {
+                                const priorityOrder: { [key: string]: number } =
+                                  {
+                                    high: 3,
+                                    medium: 2,
+                                    low: 1,
+                                  };
+                                return (
+                                  priorityOrder[b.priority] -
+                                  priorityOrder[a.priority]
+                                );
+                              })
+                              .map((treatment: any, index: number) => (
+                                <div
+                                  key={index}
+                                  className={`rounded-xl p-4 border ${
+                                    treatment.priority === "high"
+                                      ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                                      : treatment.priority === "medium"
+                                      ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+                                      : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                                  }`}
+                                >
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-3">
+                                      <div
+                                        className={`w-3 h-3 rounded-full ${
+                                          treatment.priority === "high"
+                                            ? "bg-red-500"
+                                            : treatment.priority === "medium"
+                                            ? "bg-yellow-500"
+                                            : "bg-blue-500"
+                                        }`}
+                                      />
+                                      <h5 className="font-semibold text-gray-900 dark:text-white text-lg">
+                                        {treatment.category}
+                                      </h5>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className={`text-xs px-3 py-1 rounded-full font-medium ${
+                                          treatment.priority === "high"
+                                            ? "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
+                                            : treatment.priority === "medium"
+                                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
+                                            : "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100"
+                                        }`}
+                                      >
+                                        {treatment.priority} priority
+                                      </span>
+                                      <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                        {treatment.timeframe}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                    {treatment.recommendation}
+                                  </p>
+                                </div>
+                              ))}
+                          </div>
+
+                          {/* Medical Disclaimer */}
+                          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                            <div className="flex items-start gap-3">
+                              <svg
+                                className="h-5 w-5 text-blue-500 shrink-0 mt-0.5"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              <div>
+                                <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                  Important Medical Disclaimer
+                                </p>
+                                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                                  These recommendations are for informational
+                                  purposes only and should not replace
+                                  professional medical advice. Always consult
+                                  with a qualified healthcare provider or
+                                  dermatologist for proper diagnosis and
+                                  treatment, especially for severe or persistent
+                                  symptoms.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                   {/* Health Metrics Dashboard */}
                   {analysis.type === "report" && healthMetrics.length > 0 && (
                     <div className="space-y-6">
@@ -630,7 +833,7 @@ export default function AnalysisDetailModal({
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-500/5 via-transparent to-slate-500/5"></div>
 
                     <details className="group/details">
-                      <summary className="cursor-pointer p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-600/50 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-600/50 dark:hover:to-gray-500/50 transition-colors relative z-10">
+                      <summary className="cursor-pointer p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700/50 dark:to-gray-600/50 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-600/50 dark:hover:to-gray-500/50 transition-colors relative z-10 list-none [&::-webkit-details-marker]:hidden">
                         <div className="flex items-center gap-3">
                           <svg
                             className="w-5 h-5 transition-transform group-open/details:rotate-90 text-gray-600 dark:text-gray-400"

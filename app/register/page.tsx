@@ -8,7 +8,7 @@ export default function RegisterPage() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -35,15 +35,15 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Clerk SignUp Component */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
+        {/* Clerk SignUp Component - No outer wrapper */}
+        <div className="w-full max-w-md">
           <SignUp
             routing="hash"
             appearance={{
               elements: {
                 formButtonPrimary:
                   "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-sm normal-case",
-                card: "bg-transparent shadow-none",
+                card: "shadow-xl border-0 bg-white dark:bg-gray-800",
                 headerTitle: "hidden",
                 headerSubtitle: "hidden",
                 socialButtonsBlockButton:
@@ -51,6 +51,7 @@ export default function RegisterPage() {
                 formFieldInput:
                   "bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white",
                 footerActionLink: "text-emerald-600 hover:text-emerald-500",
+                rootBox: "mx-auto",
               },
             }}
             fallbackRedirectUrl="/dashboard"

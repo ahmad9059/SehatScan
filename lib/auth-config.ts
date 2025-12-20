@@ -54,7 +54,11 @@ export const authConfig: NextAuthConfig = {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.createdAt = user.createdAt;
+        // Convert Date to string for JWT
+        token.createdAt =
+          user.createdAt instanceof Date
+            ? user.createdAt.toISOString()
+            : user.createdAt;
       }
       return token;
     },
@@ -62,7 +66,7 @@ export const authConfig: NextAuthConfig = {
       if (session.user && token) {
         session.user.id = token.id as string;
         session.user.email = token.email as string;
-        session.user.name = token.name as string;
+        session.user.name = token.name as string | null;
         session.user.createdAt = token.createdAt as string;
       }
       return session;

@@ -3,19 +3,22 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Skip middleware for API routes, static files, and NextAuth
+  if (
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/_next/") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
+
   try {
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
-      secureCookie: process.env.NODE_ENV === "production",
     });
-
-    const { pathname } = request.nextUrl;
-
-    // Allow NextAuth.js API routes
-    if (pathname.startsWith("/api/auth")) {
-      return NextResponse.next();
-    }
 
     // Protect dashboard routes
     if (pathname.startsWith("/dashboard")) {
@@ -46,14 +49,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api/auth (NextAuth.js API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!api/auth|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/dashboard/:path*", "/login", "/register"],
 };

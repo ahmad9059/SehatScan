@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { useClerk } from "@clerk/nextjs";
 import {
   UserIcon,
   Cog6ToothIcon,
@@ -24,6 +24,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { signOut } = useClerk();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -43,7 +44,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
 
   const handleLogout = async () => {
     try {
-      await signOut({ callbackUrl: "/" });
+      await signOut({ redirectUrl: "/" });
     } catch (error) {
       console.error("Logout error:", error);
     }

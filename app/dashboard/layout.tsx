@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -68,10 +68,11 @@ interface SidebarProps {
 function Sidebar({ sidebarOpen, setSidebarOpen, user }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useSimpleLanguage();
+  const { signOut } = useClerk();
 
   const handleLogout = async () => {
     try {
-      await signOut({ callbackUrl: "/" });
+      await signOut({ redirectUrl: "/" });
     } catch (error) {
       console.error("Logout error:", error);
       showErrorToast("Failed to log out. Please try again.");
@@ -262,7 +263,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { data: session, status } = useSession();
+  const { user, isLoaded } = useUser();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -270,13 +271,13 @@ export default function DashboardLayout({
   const { t } = useSimpleLanguage();
 
   useEffect(() => {
-    if (status === "loading") return; // Still loading
+    if (!isLoaded) return; // Still loading
 
-    if (!session) {
+    if (!user) {
       router.push("/login");
       return;
     }
-  }, [session, status, router]);
+  }, [user, isLoaded, router]);
 
   // Keyboard shortcut for search (Cmd/Ctrl + K)
   useEffect(() => {
@@ -294,7 +295,7 @@ export default function DashboardLayout({
   }, []);
 
   // Show loading state while checking authentication
-  if (status === "loading") {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#037BFC]"></div>
@@ -303,16 +304,26 @@ export default function DashboardLayout({
   }
 
   // Don't render anything if not authenticated (will redirect)
-  if (!session) {
+  if (!user) {
     return null;
   }
+
+  // Convert Clerk user to expected format
+  const userForComponents = {
+    name:
+      user.firstName && user.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : user.firstName || user.username || "User",
+    email: user.emailAddresses[0]?.emailAddress || "",
+    image: user.imageUrl || null,
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
-        user={session.user}
+        user={userForComponents}
       />
 
       {/* Mobile menu button */}
@@ -332,9 +343,9 @@ export default function DashboardLayout({
 
         {/* Mobile user avatar */}
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold text-sm shadow-lg">
-          {session?.user?.name
-            ? session.user.name.charAt(0).toUpperCase()
-            : session?.user?.email?.charAt(0).toUpperCase() || "U"}
+          {userForComponents?.name
+            ? userForComponents.name.charAt(0).toUpperCase()
+            : userForComponents?.email?.charAt(0).toUpperCase() || "U"}
         </div>
       </div>
 
@@ -388,7 +399,7 @@ export default function DashboardLayout({
                 <ThemeToggle />
 
                 {/* Profile Dropdown */}
-                <ProfileDropdown user={session?.user || {}} />
+                <ProfileDropdown user={userForComponents || {}} />
               </div>
             </div>
           </div>

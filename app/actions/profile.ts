@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
-import { getCurrentUser } from "@/lib/session";
+import { requireAuth } from "@/lib/clerk-session";
 
 interface UpdateProfileResult {
   success: boolean;
@@ -27,7 +27,7 @@ export async function updateProfile(
   formData: FormData
 ): Promise<UpdateProfileResult> {
   try {
-    const user = await getCurrentUser();
+    const user = await requireAuth(); // This ensures user exists in database
     if (!user?.id) {
       return { success: false, error: "Authentication required" };
     }
@@ -74,7 +74,7 @@ export async function changePassword(
   formData: FormData
 ): Promise<ChangePasswordResult> {
   try {
-    const user = await getCurrentUser();
+    const user = await requireAuth(); // This ensures user exists in database
     if (!user?.id) {
       return { success: false, error: "Authentication required" };
     }
@@ -142,7 +142,7 @@ export async function changePassword(
  */
 export async function getUserStats() {
   try {
-    const user = await getCurrentUser();
+    const user = await requireAuth(); // This ensures user exists in database
     if (!user?.id) {
       return { totalAnalyses: 0 };
     }

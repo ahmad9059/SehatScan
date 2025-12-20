@@ -7,9 +7,9 @@ interface EnvConfig {
   // Database
   DATABASE_URL: string;
 
-  // NextAuth
-  NEXTAUTH_URL: string;
-  NEXTAUTH_SECRET: string;
+  // Clerk
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: string;
+  CLERK_SECRET_KEY: string;
 
   // Gemini AI
   GEMINI_API_KEY: string;
@@ -35,8 +35,9 @@ export function validateEnvironment(): ValidationResult {
   // Required environment variables
   const requiredVars = {
     DATABASE_URL: "Supabase PostgreSQL connection string",
-    NEXTAUTH_URL: "NextAuth.js application URL",
-    NEXTAUTH_SECRET: "NextAuth.js secret key for JWT encryption",
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      "Clerk publishable key for client-side authentication",
+    CLERK_SECRET_KEY: "Clerk secret key for server-side authentication",
     GEMINI_API_KEY: "Google Gemini API key for AI analysis",
   };
 
@@ -59,28 +60,26 @@ export function validateEnvironment(): ValidationResult {
           }
           break;
 
-        case "NEXTAUTH_URL":
-          try {
-            new URL(value);
-          } catch {
+        case "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY":
+          if (!value.startsWith("pk_")) {
             errors.push(
-              `NEXTAUTH_URL must be a valid URL (e.g., http://localhost:3000)`
+              `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY must start with 'pk_'`
+            );
+          }
+          if (value === "YOUR_PUBLISHABLE_KEY") {
+            errors.push(
+              `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY must be changed from the placeholder value`
             );
           }
           break;
 
-        case "NEXTAUTH_SECRET":
-          if (value.length < 32) {
-            warnings.push(
-              `NEXTAUTH_SECRET should be at least 32 characters long for security`
-            );
+        case "CLERK_SECRET_KEY":
+          if (!value.startsWith("sk_")) {
+            errors.push(`CLERK_SECRET_KEY must start with 'sk_'`);
           }
-          if (
-            value ===
-            "your-secret-key-here-generate-with-openssl-rand-base64-32"
-          ) {
+          if (value === "YOUR_SECRET_KEY") {
             errors.push(
-              `NEXTAUTH_SECRET must be changed from the default example value`
+              `CLERK_SECRET_KEY must be changed from the placeholder value`
             );
           }
           break;
@@ -131,7 +130,7 @@ export function getEnvConfig(): EnvConfig {
       ...validation.errors.map((error) => `  - ${error}`),
       "",
       "Please check your .env file and ensure all required variables are set.",
-      "See .env.example for reference.",
+      "Get your Clerk keys from: https://dashboard.clerk.com",
     ].join("\n");
 
     throw new Error(errorMessage);
@@ -145,8 +144,9 @@ export function getEnvConfig(): EnvConfig {
 
   return {
     DATABASE_URL: process.env.DATABASE_URL!,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL!,
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET!,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!,
+    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY!,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY!,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -168,14 +168,16 @@ export function validateEnvironmentOnStartup(): void {
           : "✅ PostgreSQL"
       }`
     );
-    console.log(`   - NextAuth URL: ${config.NEXTAUTH_URL}`);
+    console.log(
+      `   - Clerk Publishable Key: ${
+        config.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ? "✅ Set" : "❌ Missing"
+      }`
+    );
     console.log(
       `   - Gemini API: ${config.GEMINI_API_KEY ? "✅ Set" : "❌ Missing"}`
     );
     console.log(
-      `   - NextAuth Secret: ${
-        config.NEXTAUTH_SECRET ? "✅ Set" : "❌ Missing"
-      }`
+      `   - Clerk Secret: ${config.CLERK_SECRET_KEY ? "✅ Set" : "❌ Missing"}`
     );
 
     if (config.NEXT_PUBLIC_SUPABASE_URL) {

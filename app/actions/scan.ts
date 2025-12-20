@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/session";
+import { requireAuth } from "@/lib/clerk-session";
 import { saveAnalysis } from "@/lib/analysis";
 
 // Enhanced error logging utility
@@ -91,7 +91,9 @@ export async function analyzeFace(formData: FormData) {
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       // Get the base URL for server-side requests
-      const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+      const baseUrl = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000";
 
       response = await fetch(`${baseUrl}/api/analyze/face`, {
         method: "POST",
@@ -290,7 +292,9 @@ export async function analyzeReport(formData: FormData) {
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for OCR
 
       // Get the base URL for server-side requests
-      const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+      const baseUrl = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000";
 
       response = await fetch(`${baseUrl}/api/analyze/report`, {
         method: "POST",
@@ -584,7 +588,9 @@ export async function generateRiskAssessment(
       const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for AI processing
 
       // Get the base URL for server-side requests
-      const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+      const baseUrl = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000";
 
       response = await fetch(`${baseUrl}/api/analyze/risk`, {
         method: "POST",

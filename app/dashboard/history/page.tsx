@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { showErrorToast, showInfoToast } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import { CardSkeleton } from "@/app/components/SkeletonLoader";
@@ -50,7 +50,7 @@ interface AnalysisHistoryResponse {
 const ITEMS_PER_PAGE = 10;
 
 function HistoryPageContent() {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +63,7 @@ function HistoryPageContent() {
   const [total, setTotal] = useState(0);
 
   const fetchAnalyses = async (page: number = 1, type: string = "all") => {
-    if (!session?.user?.id) {
+    if (!user?.id) {
       setLoading(false);
       return;
     }
@@ -145,7 +145,7 @@ function HistoryPageContent() {
 
   useEffect(() => {
     fetchAnalyses(currentPage, filterType);
-  }, [session, currentPage, filterType]);
+  }, [user, currentPage, filterType]);
 
   const handleFilterChange = (type: string) => {
     setFilterType(type);

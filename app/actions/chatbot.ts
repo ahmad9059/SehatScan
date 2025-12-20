@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/session";
+import { requireAuth } from "@/lib/clerk-session";
 import { getUserAnalyses } from "@/lib/analysis";
 
 // Enhanced error logging utility

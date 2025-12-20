@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { getUserAnalyses } from "@/lib/analysis";
 import { showErrorToast } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
@@ -40,7 +40,7 @@ interface Analysis {
 }
 
 function ChatbotPageContent() {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,7 +52,7 @@ function ChatbotPageContent() {
   // Load user analyses for RAG context
   useEffect(() => {
     const loadUserData = async () => {
-      if (!session?.user?.id) {
+      if (!user?.id) {
         setLoadingAnalyses(false);
         return;
       }
@@ -60,9 +60,9 @@ function ChatbotPageContent() {
       try {
         setLoadingAnalyses(true);
         const [reports, faces, risks] = await Promise.all([
-          getUserAnalyses(session.user.id, "report"),
-          getUserAnalyses(session.user.id, "face"),
-          getUserAnalyses(session.user.id, "risk"),
+          getUserAnalyses(user.id, "report"),
+          getUserAnalyses(user.id, "face"),
+          getUserAnalyses(user.id, "risk"),
         ]);
 
         setUserAnalyses([...reports, ...faces, ...risks]);
@@ -75,7 +75,7 @@ function ChatbotPageContent() {
     };
 
     loadUserData();
-  }, [session]);
+  }, [user]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

@@ -28,7 +28,7 @@ vi.mock("next/cache", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/clerk-session";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 
 describe("Profile Actions", () => {

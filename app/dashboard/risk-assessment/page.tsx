@@ -7,7 +7,7 @@ import {
   analyzeFace,
 } from "@/app/actions/scan";
 import { getUserAnalyses } from "@/lib/analysis";
-import { useSession } from "next-auth/react";
+import { useUser } from "@clerk/nextjs";
 import { validateRiskAssessmentForm } from "@/lib/validation";
 import {
   showSuccessToast,
@@ -41,7 +41,7 @@ interface Analysis {
 }
 
 function RiskAssessmentPageContent() {
-  const { data: session } = useSession();
+  const { user } = useUser();
   const router = useRouter();
   const [reportAnalyses, setReportAnalyses] = useState<Analysis[]>([]);
   const [faceAnalyses, setFaceAnalyses] = useState<Analysis[]>([]);
@@ -73,7 +73,7 @@ function RiskAssessmentPageContent() {
   // Load user's past analyses
   useEffect(() => {
     const loadAnalyses = async () => {
-      if (!session?.user?.id) {
+      if (!user?.id) {
         setLoadingAnalyses(false);
         return;
       }
@@ -81,8 +81,8 @@ function RiskAssessmentPageContent() {
       try {
         setLoadingAnalyses(true);
         const [reports, faces] = await Promise.all([
-          getUserAnalyses(session.user.id, "report"),
-          getUserAnalyses(session.user.id, "face"),
+          getUserAnalyses(user.id, "report"),
+          getUserAnalyses(user.id, "face"),
         ]);
 
         setReportAnalyses(reports);
@@ -98,7 +98,7 @@ function RiskAssessmentPageContent() {
     };
 
     loadAnalyses();
-  }, [session]);
+  }, [user]);
 
   const handleSymptomChange = (symptom: string, checked: boolean) => {
     setUserFormData((prev) => ({
@@ -111,7 +111,7 @@ function RiskAssessmentPageContent() {
 
   // File upload handlers
   const handleReportUpload = async (file: File) => {
-    if (!session?.user?.id) {
+    if (!user?.id) {
       showErrorToast("Please log in to upload files");
       return;
     }
@@ -167,7 +167,7 @@ function RiskAssessmentPageContent() {
   };
 
   const handleFaceUpload = async (file: File) => {
-    if (!session?.user?.id) {
+    if (!user?.id) {
       showErrorToast("Please log in to upload files");
       return;
     }

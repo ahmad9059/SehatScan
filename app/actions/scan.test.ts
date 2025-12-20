@@ -15,7 +15,7 @@ vi.mock("@/lib/analysis", () => ({
   saveAnalysis: vi.fn(),
 }));
 
-import { requireAuth } from "@/lib/session";
+import { requireAuth } from "@/lib/clerk-session";
 import { saveAnalysis } from "@/lib/analysis";
 
 describe("Server Actions Property-Based Tests", () => {

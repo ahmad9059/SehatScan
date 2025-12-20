@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/clerk-session";
+import { requireAuth } from "@/lib/clerk-session";
 import { getUserAnalyses } from "@/lib/analysis";
 import { prisma } from "@/lib/db";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
@@ -29,7 +29,7 @@ async function getAnalysisStats(userId: string): Promise<AnalysisStats> {
 }
 
 async function DashboardPageContent() {
-  const user = await getCurrentUser();
+  const user = await requireAuth(); // This will ensure user exists in database
 
   let stats: AnalysisStats = { total: 0, reports: 0, faces: 0, risks: 0 };
   let recentAnalyses: any[] = [];

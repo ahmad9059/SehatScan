@@ -38,6 +38,7 @@ export default function LoginPage() {
         {/* Clerk SignIn Component */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
           <SignIn
+            routing="hash"
             appearance={{
               elements: {
                 formButtonPrimary:
@@ -52,7 +53,7 @@ export default function LoginPage() {
                 footerActionLink: "text-blue-600 hover:text-blue-500",
               },
             }}
-            redirectUrl="/dashboard"
+            fallbackRedirectUrl="/dashboard"
             signUpUrl="/register"
           />
         </div>

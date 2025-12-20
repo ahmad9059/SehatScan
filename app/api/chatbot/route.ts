@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/session";
+import { requireAuth } from "@/lib/clerk-session";
 import { generateHealthInsights } from "@/lib/gemini";
 
 // Enhanced error logging utility

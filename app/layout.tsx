@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Poppins, Noto_Nastaliq_Urdu } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 const inter = Inter({
@@ -32,7 +33,6 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "./components/ThemeProvider";
-import { SessionProvider } from "./components/SessionProvider";
 import { SimpleLanguageProvider } from "./components/SimpleLanguageContext";
 import { Toaster } from "react-hot-toast";
 import { validateEnvironmentOnStartup } from "@/lib/env-validation";
@@ -48,17 +48,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
-        />
-      </head>
-      <body
-        className={`${inter.variable} ${poppins.variable} ${notoNastaliqUrdu.variable} antialiased`}
-      >
-        <SessionProvider>
+    <ClerkProvider>
+      <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+        <head>
+          <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css"
+          />
+        </head>
+        <body
+          className={`${inter.variable} ${poppins.variable} ${notoNastaliqUrdu.variable} antialiased`}
+        >
           <SimpleLanguageProvider>
             <ThemeProvider
               attribute="class"
@@ -90,8 +90,8 @@ export default function RootLayout({
               />
             </ThemeProvider>
           </SimpleLanguageProvider>
-        </SessionProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

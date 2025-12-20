@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser } from "@/lib/clerk-session";
 import { getUserAnalyses } from "@/lib/analysis";
 import { prisma } from "@/lib/db";
 import ErrorBoundary from "@/app/components/ErrorBoundary";

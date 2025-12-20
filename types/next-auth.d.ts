@@ -14,12 +14,15 @@ declare module "next-auth" {
     id: string;
     email: string;
     name?: string | null;
-    createdAt?: string;
+    createdAt?: string | Date;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
+    email: string;
+    name?: string | null;
+    createdAt?: string | Date;
   }
 }

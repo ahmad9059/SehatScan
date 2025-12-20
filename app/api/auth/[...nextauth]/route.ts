@@ -1,5 +1,12 @@
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth-config";
 
-const { handlers } = NextAuth(authConfig);
-export const { GET, POST } = handlers;
+const handler = NextAuth({
+  ...authConfig,
+  // Ensure proper URL configuration for Vercel
+  ...(process.env.NEXTAUTH_URL && {
+    url: process.env.NEXTAUTH_URL,
+  }),
+});
+
+export const { GET, POST } = handler;

@@ -15,27 +15,33 @@ export const authConfig: NextAuthConfig = {
           return null;
         }
 
-        const user = await getUserByEmail(credentials.email as string);
+        try {
+          const user = await getUserByEmail(credentials.email as string);
 
-        if (!user) {
+          if (!user) {
+            return null;
+          }
+
+          const isValid = await verifyPassword(
+            credentials.password as string,
+            user.password
+          );
+
+          if (!isValid) {
+            return null;
+          }
+
+          // Return user without password
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            createdAt: user.createdAt,
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
           return null;
         }
-
-        const isValid = await verifyPassword(
-          credentials.password as string,
-          user.password
-        );
-
-        if (!isValid) {
-          return null;
-        }
-
-        // Return user without password
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
       },
     }),
   ],
@@ -46,18 +52,27 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.createdAt = user.createdAt;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.createdAt = token.createdAt as string;
       }
       return session;
     },
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
+  trustHost: true, // Important for Vercel deployment
+  debug: process.env.NODE_ENV === "development",
 };

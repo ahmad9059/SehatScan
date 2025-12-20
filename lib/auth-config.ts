@@ -12,13 +12,16 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.log("Missing credentials");
           return null;
         }
 
         try {
+          console.log("Attempting to authenticate user:", credentials.email);
           const user = await getUserByEmail(credentials.email as string);
 
           if (!user) {
+            console.log("User not found:", credentials.email);
             return null;
           }
 
@@ -28,9 +31,11 @@ export const authConfig: NextAuthConfig = {
           );
 
           if (!isValid) {
+            console.log("Invalid password for user:", credentials.email);
             return null;
           }
 
+          console.log("User authenticated successfully:", user.id);
           // Return user without password
           return {
             id: user.id,
@@ -49,8 +54,9 @@ export const authConfig: NextAuthConfig = {
     signIn: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, trigger }) {
+      if (trigger === "signIn" && user) {
+        console.log("JWT callback - signing in user:", user.id);
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
@@ -71,6 +77,13 @@ export const authConfig: NextAuthConfig = {
       }
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
   },
   session: {
     strategy: "jwt",
@@ -78,5 +91,5 @@ export const authConfig: NextAuthConfig = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   trustHost: true, // Important for Vercel deployment
-  debug: process.env.NODE_ENV === "development",
+  debug: true, // Enable debug for both dev and production to see what's happening
 };

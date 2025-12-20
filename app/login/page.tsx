@@ -52,20 +52,32 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
+      console.log("Attempting login for:", formData.email);
+
       const result = await signIn("credentials", {
         email: formData.email,
         password: formData.password,
         redirect: false,
       });
 
+      console.log("SignIn result:", result);
+
       if (result?.error) {
+        console.error("SignIn error:", result.error);
         setErrors({
           general: "Invalid email or password. Please try again.",
         });
         setIsLoading(false);
       } else if (result?.ok) {
+        console.log("Login successful, redirecting to dashboard");
         // Redirect to dashboard on successful login
         router.push("/dashboard");
+      } else {
+        console.error("Unexpected signin result:", result);
+        setErrors({
+          general: "Login failed. Please try again.",
+        });
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Login error:", error);

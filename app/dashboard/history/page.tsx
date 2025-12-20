@@ -24,6 +24,18 @@ interface Analysis {
   structuredData?: any;
   visualMetrics?: any;
   riskAssessment?: string;
+  problemsDetected?: Array<{
+    type: string;
+    severity: "mild" | "moderate" | "severe";
+    description: string;
+    confidence: number;
+  }>;
+  treatments?: Array<{
+    category: string;
+    recommendation: string;
+    priority: "low" | "medium" | "high";
+    timeframe: string;
+  }>;
   createdAt: string;
 }
 
@@ -172,6 +184,17 @@ function HistoryPageContent() {
   const getAnalysisPreview = (analysis: Analysis) => {
     switch (analysis.type) {
       case "face":
+        if (analysis.problemsDetected && analysis.problemsDetected.length > 0) {
+          const severeProblem = analysis.problemsDetected.find(
+            (p) => p.severity === "severe"
+          );
+          const moderateProblem = analysis.problemsDetected.find(
+            (p) => p.severity === "moderate"
+          );
+          const mainProblem =
+            severeProblem || moderateProblem || analysis.problemsDetected[0];
+          return `${mainProblem.type} (${mainProblem.severity})`;
+        }
         if (
           analysis.visualMetrics &&
           Array.isArray(analysis.visualMetrics) &&
@@ -479,6 +502,151 @@ function HistoryPageContent() {
                             </p>
                           </div>
                         )}
+                      </div>
+                    )}
+
+                  {/* Problems Detected */}
+                  {selectedAnalysis.type === "face" &&
+                    selectedAnalysis.problemsDetected &&
+                    selectedAnalysis.problemsDetected.length > 0 && (
+                      <div>
+                        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                          Detected Skin Conditions
+                        </h4>
+                        <div className="space-y-3">
+                          {selectedAnalysis.problemsDetected.map(
+                            (problem, index) => (
+                              <div
+                                key={index}
+                                className={`rounded-lg p-4 border ${
+                                  problem.severity === "severe"
+                                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                                    : problem.severity === "moderate"
+                                    ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+                                    : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className={`w-3 h-3 rounded-full ${
+                                        problem.severity === "severe"
+                                          ? "bg-red-500"
+                                          : problem.severity === "moderate"
+                                          ? "bg-yellow-500"
+                                          : "bg-green-500"
+                                      }`}
+                                    />
+                                    <h5 className="font-semibold text-gray-900 dark:text-white">
+                                      {problem.type}
+                                    </h5>
+                                  </div>
+                                  <span
+                                    className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                      problem.severity === "severe"
+                                        ? "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
+                                        : problem.severity === "moderate"
+                                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
+                                        : "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
+                                    }`}
+                                  >
+                                    {problem.severity}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                                  {problem.description}
+                                </p>
+                                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                  <span>Confidence:</span>
+                                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 max-w-20">
+                                    <div
+                                      className="bg-blue-500 h-1.5 rounded-full"
+                                      style={{
+                                        width: `${problem.confidence * 100}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span>
+                                    {Math.round(problem.confidence * 100)}%
+                                  </span>
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Treatment Recommendations */}
+                  {selectedAnalysis.type === "face" &&
+                    selectedAnalysis.treatments &&
+                    selectedAnalysis.treatments.length > 0 && (
+                      <div>
+                        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
+                          Treatment Recommendations
+                        </h4>
+                        <div className="space-y-3">
+                          {selectedAnalysis.treatments
+                            .sort((a, b) => {
+                              const priorityOrder = {
+                                high: 3,
+                                medium: 2,
+                                low: 1,
+                              };
+                              return (
+                                priorityOrder[b.priority] -
+                                priorityOrder[a.priority]
+                              );
+                            })
+                            .map((treatment, index) => (
+                              <div
+                                key={index}
+                                className={`rounded-lg p-4 border ${
+                                  treatment.priority === "high"
+                                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
+                                    : treatment.priority === "medium"
+                                    ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
+                                    : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className={`w-2 h-2 rounded-full ${
+                                        treatment.priority === "high"
+                                          ? "bg-red-500"
+                                          : treatment.priority === "medium"
+                                          ? "bg-yellow-500"
+                                          : "bg-blue-500"
+                                      }`}
+                                    />
+                                    <h5 className="font-semibold text-gray-900 dark:text-white">
+                                      {treatment.category}
+                                    </h5>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={`text-xs px-2 py-1 rounded-full font-medium ${
+                                        treatment.priority === "high"
+                                          ? "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
+                                          : treatment.priority === "medium"
+                                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
+                                          : "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100"
+                                      }`}
+                                    >
+                                      {treatment.priority} priority
+                                    </span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                      {treatment.timeframe}
+                                    </span>
+                                  </div>
+                                </div>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                  {treatment.recommendation}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
                       </div>
                     )}
 

@@ -1,20 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/session";
-import { prisma } from "@/lib/db";
+import { requireAuth } from "@/lib/session";
+import { getUserAnalysesPaginated } from "@/lib/analysis";
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Get authenticated user
+    let user;
+    try {
+      user = await requireAuth();
+    } catch (authError) {
+      return NextResponse.json(
+        { error: "Authentication required. Please log in again." },
+        { status: 401 }
+      );
     }
 
+    // Parse query parameters
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const type = searchParams.get("type");
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const type = searchParams.get("type") || undefined;
 
-    // Validate pagination parameters
+    // Validate parameters
     if (page < 1 || limit < 1 || limit > 100) {
       return NextResponse.json(
         { error: "Invalid pagination parameters" },
@@ -22,49 +29,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const skip = (page - 1) * limit;
-
-    // Build where clause
-    const where: any = {
-      userId: user.id,
-    };
-
-    if (type && type !== "all") {
-      where.type = type;
+    if (type && !["face", "report", "risk"].includes(type)) {
+      return NextResponse.json(
+        { error: "Invalid analysis type" },
+        { status: 400 }
+      );
     }
 
-    // Get total count for pagination
-    const total = await prisma.analysis.count({ where });
+    try {
+      const result = await getUserAnalysesPaginated(user.id!, {
+        page,
+        limit,
+        type: type as "face" | "report" | "risk" | undefined,
+      });
 
-    // Get analyses with pagination
-    const analyses = await prisma.analysis.findMany({
-      where,
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        type: true,
-        rawData: true,
-        structuredData: true,
-        visualMetrics: true,
-        riskAssessment: true,
-        createdAt: true,
-      },
-    });
-
-    const totalPages = Math.ceil(total / limit);
-
-    return NextResponse.json({
-      analyses,
-      total,
-      page,
-      totalPages,
-    });
+      return NextResponse.json(result);
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      return NextResponse.json(
+        { error: "Failed to fetch analyses" },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error("Error fetching analyses:", error);
+    console.error("Analyses API error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -7,6 +7,8 @@ export interface CreateAnalysisData {
   structuredData?: any;
   visualMetrics?: any;
   riskAssessment?: string;
+  problemsDetected?: any[];
+  treatments?: any[];
 }
 
 /**
@@ -24,6 +26,8 @@ export async function saveAnalysis(data: CreateAnalysisData) {
         structuredData: data.structuredData,
         visualMetrics: data.visualMetrics,
         riskAssessment: data.riskAssessment,
+        problemsDetected: data.problemsDetected,
+        treatments: data.treatments,
       },
     });
 
@@ -131,6 +135,8 @@ export async function getUserAnalysesPaginated(
         structuredData: true,
         visualMetrics: true,
         riskAssessment: true,
+        problemsDetected: true,
+        treatments: true,
         createdAt: true,
       },
     });

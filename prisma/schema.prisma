@@ -18,13 +18,15 @@ model User {
 }
 
 model Analysis {
-  id             String   @id @default(cuid())
-  userId         String
-  type           String
-  rawData        Json
-  structuredData Json?
-  visualMetrics  Json?
-  riskAssessment String?
-  createdAt      DateTime @default(now())
-  user           User     @relation(fields: [userId], references: [id])
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  rawData           Json
+  structuredData    Json?
+  visualMetrics     Json?
+  riskAssessment    String?
+  problemsDetected  Json?    // Array of detected problems with descriptions
+  treatments        Json?    // Array of treatment recommendations
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id])
 }

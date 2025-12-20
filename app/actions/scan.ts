@@ -189,6 +189,8 @@ export async function analyzeFace(formData: FormData) {
         type: "face",
         rawData: data,
         visualMetrics: data.visual_metrics,
+        problemsDetected: data.problems_detected,
+        treatments: data.treatments,
       });
     } catch (saveError) {
       logError("analyzeFace - Database save failed", saveError, {

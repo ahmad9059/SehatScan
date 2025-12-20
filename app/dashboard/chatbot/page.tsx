@@ -16,6 +16,10 @@ import {
   CameraIcon,
   ExclamationTriangleIcon,
   ChatBubbleLeftRightIcon,
+  HeartIcon,
+  ChartBarIcon,
+  LightBulbIcon,
+  RocketLaunchIcon,
 } from "@heroicons/react/24/outline";
 
 interface Message {
@@ -219,29 +223,48 @@ How can I help you today?`,
 
   if (loadingAnalyses) {
     return (
-      <div className="flex flex-col bg-gray-900 min-h-[calc(100vh-120px)] max-h-[calc(100vh-120px)] overflow-hidden">
-        <div className="shrink-0 h-16 px-4 py-3 bg-gray-900 border-b border-gray-700 flex items-center">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-[#037BFC] to-indigo-500 rounded-xl">
-              <ChatBubbleLeftRightIcon className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-white font-poppins">
-                AI Health Assistant
-              </h1>
-              <p className="text-sm text-gray-300">
-                Loading your health data...
-              </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 flex flex-col animate-fade-in-up">
+        {/* Header */}
+        <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-100 dark:border-gray-700/50 overflow-hidden">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16"></div>
+
+          <div className="relative z-10 px-6 py-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl">
+                <ChatBubbleLeftRightIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-poppins">
+                  AI Health Assistant
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Loading your health data...
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center bg-gray-800">
-          <div className="flex items-center">
-            <LoadingSpinner size="lg" />
-            <span className="ml-4 text-lg text-gray-400">
-              Preparing your AI assistant...
-            </span>
+        {/* Loading Content */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-12 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5"></div>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-full blur-xl -translate-y-12 translate-x-12"></div>
+
+            <div className="relative z-10 text-center">
+              <div className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl mx-auto w-fit mb-6">
+                <LoadingSpinner size="lg" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Preparing your AI assistant...
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Setting up personalized health insights
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -249,145 +272,194 @@ How can I help you today?`,
   }
 
   return (
-    <div className="flex flex-col bg-gray-900 min-h-[calc(100vh-120px)] max-h-[calc(100vh-120px)] overflow-hidden">
-      {/* Header Section - Fixed Height */}
-      <div className="shrink-0 h-16 px-4 py-10 bg-gray-900 border-b border-gray-700 flex items-center">
-        <div className="flex items-center gap-3 w-full">
-          <div className="p-2 bg-gradient-to-br from-[#037BFC] to-indigo-500 rounded-xl">
-            <ChatBubbleLeftRightIcon className="h-6 w-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-white font-poppins">
-              AI Health Assistant
-            </h1>
-            <p className="text-sm text-gray-300">
-              Get personalized insights from your health data
-            </p>
-          </div>
-          {userAnalyses.length > 0 && (
-            <div className="flex gap-2">
-              {["report", "face", "risk"].map((type) => {
-                const count = userAnalyses.filter(
-                  (a) => a.type === type
-                ).length;
-                const Icon = getAnalysisIcon(type);
-                return (
-                  <div
-                    key={type}
-                    className="flex items-center gap-1 bg-gray-800 px-2 py-1 rounded-lg"
-                  >
-                    <Icon className="h-4 w-4 text-[#037BFC]" />
-                    <span className="text-xs text-gray-300">{count}</span>
-                  </div>
-                );
-              })}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 flex flex-col animate-fade-in-up">
+      {/* Header Section */}
+      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-100 dark:border-gray-700/50 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-300/10 to-blue-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
+
+        <div className="relative z-10 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
+                <ChatBubbleLeftRightIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-poppins group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                  AI Health Assistant
+                </h1>
+                <p className="text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                  Get personalized insights from your health data
+                </p>
+              </div>
             </div>
-          )}
+
+            {userAnalyses.length > 0 && (
+              <div className="flex gap-3">
+                {["report", "face", "risk"].map((type) => {
+                  const count = userAnalyses.filter(
+                    (a) => a.type === type
+                  ).length;
+                  const Icon = getAnalysisIcon(type);
+                  return (
+                    <div
+                      key={type}
+                      className="group/stat relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-xl p-3 hover:shadow-lg transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+                    >
+                      {/* Animated Background Elements */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/5"></div>
+
+                      <div className="relative z-10 flex items-center gap-2">
+                        <div className="p-1 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-lg group-hover/stat:scale-110 transition-transform duration-300">
+                          <Icon className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 dark:text-white group-hover/stat:text-emerald-600 dark:group-hover/stat:text-emerald-400 transition-colors duration-300">
+                          {count}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Chat Messages Area - Flexible Height */}
-      <div className="flex-1 bg-[#0F172A] overflow-y-auto p-4 space-y-3">
-        {messages.map((message) => (
+      {/* Chat Messages Area */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {messages.map((message, index) => (
           <div
             key={message.id}
             className={`flex gap-4 animate-fade-in-up ${
               message.role === "user" ? "justify-end" : "justify-start"
             }`}
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
             {message.role === "assistant" && (
               <div className="shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#037BFC] to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
-                  <SparklesIcon className="h-5 w-5 text-white" />
+                <div className="group relative w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 hover:rotate-3 overflow-hidden">
+                  {/* Animated Background Elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+
+                  <div className="relative z-10">
+                    <SparklesIcon className="h-6 w-6 text-white group-hover:scale-110 transition-transform duration-300" />
+                  </div>
                 </div>
               </div>
             )}
 
             <div
-              className={`max-w-2xl ${
+              className={`group relative max-w-2xl backdrop-blur-sm border overflow-hidden ${
                 message.role === "user"
-                  ? "bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white rounded-2xl rounded-br-md"
-                  : "bg-gray-700 text-gray-100 rounded-2xl rounded-bl-md"
-              } px-4 py-3`}
+                  ? "bg-gradient-to-br from-blue-500 to-indigo-500 text-white rounded-3xl rounded-br-lg border-blue-400/20 shadow-lg hover:shadow-xl"
+                  : "bg-white dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 rounded-3xl rounded-bl-lg border-gray-100 dark:border-gray-700/50 shadow-lg hover:shadow-xl"
+              } px-6 py-4 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1`}
             >
-              {message.isLoading ? (
-                <div className="flex items-center gap-3">
-                  <LoadingSpinner size="sm" />
-                  <span className="text-gray-600 dark:text-gray-300">
-                    Thinking...
-                  </span>
-                </div>
-              ) : (
-                <div className="prose prose-sm max-w-none dark:prose-invert">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      h1: ({ children }) => (
-                        <h1 className="text-xl font-bold mb-3">{children}</h1>
-                      ),
-                      h2: ({ children }) => (
-                        <h2 className="text-lg font-semibold mb-2">
-                          {children}
-                        </h2>
-                      ),
-                      h3: ({ children }) => (
-                        <h3 className="text-base font-medium mb-2">
-                          {children}
-                        </h3>
-                      ),
-                      p: ({ children }) => (
-                        <p className="mb-2 leading-relaxed">{children}</p>
-                      ),
-                      ul: ({ children }) => (
-                        <ul className="list-disc list-inside mb-2 space-y-1">
-                          {children}
-                        </ul>
-                      ),
-                      ol: ({ children }) => (
-                        <ol className="list-decimal list-inside mb-2 space-y-1">
-                          {children}
-                        </ol>
-                      ),
-                      li: ({ children }) => (
-                        <li className="leading-relaxed">{children}</li>
-                      ),
-                      strong: ({ children }) => (
-                        <strong className="font-semibold">{children}</strong>
-                      ),
-                      em: ({ children }) => (
-                        <em className="italic">{children}</em>
-                      ),
-                      code: ({ children }) => (
-                        <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm">
-                          {children}
-                        </code>
-                      ),
-                      blockquote: ({ children }) => (
-                        <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic">
-                          {children}
-                        </blockquote>
-                      ),
-                    }}
-                  >
-                    {message.content}
-                  </ReactMarkdown>
-                </div>
+              {/* Animated Background Elements for Assistant Messages */}
+              {message.role === "assistant" && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5"></div>
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-purple-400/10 to-pink-500/10 rounded-full blur-lg -translate-y-8 translate-x-8 group-hover:scale-125 transition-transform duration-500"></div>
+                </>
               )}
-              <div
-                className={`text-xs mt-2 ${
-                  message.role === "user"
-                    ? "text-blue-100"
-                    : "text-gray-500 dark:text-gray-400"
-                }`}
-              >
-                {formatTimestamp(message.timestamp)}
+
+              <div className="relative z-10">
+                {message.isLoading ? (
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg">
+                      <LoadingSpinner size="sm" />
+                    </div>
+                    <span className="text-gray-600 dark:text-gray-300 font-medium">
+                      Analyzing your health data...
+                    </span>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h1: ({ children }) => (
+                          <h1 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">
+                            {children}
+                          </h1>
+                        ),
+                        h2: ({ children }) => (
+                          <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+                            {children}
+                          </h2>
+                        ),
+                        h3: ({ children }) => (
+                          <h3 className="text-base font-medium mb-2 text-gray-900 dark:text-white">
+                            {children}
+                          </h3>
+                        ),
+                        p: ({ children }) => (
+                          <p className="mb-2 leading-relaxed text-gray-800 dark:text-gray-200">
+                            {children}
+                          </p>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="list-disc list-inside mb-2 space-y-1 text-gray-800 dark:text-gray-200">
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="list-decimal list-inside mb-2 space-y-1 text-gray-800 dark:text-gray-200">
+                            {children}
+                          </ol>
+                        ),
+                        li: ({ children }) => (
+                          <li className="leading-relaxed">{children}</li>
+                        ),
+                        strong: ({ children }) => (
+                          <strong className="font-semibold text-gray-900 dark:text-white">
+                            {children}
+                          </strong>
+                        ),
+                        em: ({ children }) => (
+                          <em className="italic">{children}</em>
+                        ),
+                        code: ({ children }) => (
+                          <code className="bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm font-mono">
+                            {children}
+                          </code>
+                        ),
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-4 border-blue-500 pl-4 italic bg-blue-50 dark:bg-blue-900/20 py-2 rounded-r-lg">
+                            {children}
+                          </blockquote>
+                        ),
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+                <div
+                  className={`text-xs mt-3 flex items-center gap-1 ${
+                    message.role === "user"
+                      ? "text-blue-100"
+                      : "text-gray-500 dark:text-gray-400"
+                  }`}
+                >
+                  <div className="w-1 h-1 bg-current rounded-full"></div>
+                  {formatTimestamp(message.timestamp)}
+                </div>
               </div>
             </div>
 
             {message.role === "user" && (
               <div className="shrink-0">
-                <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg">
-                  <UserIcon className="h-5 w-5 text-gray-200" />
+                <div className="group relative w-12 h-12 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 hover:rotate-3 overflow-hidden">
+                  {/* Animated Background Elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-500/20 to-gray-600/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+
+                  <div className="relative z-10">
+                    <UserIcon className="h-6 w-6 text-gray-200 group-hover:scale-110 transition-transform duration-300" />
+                  </div>
                 </div>
               </div>
             )}
@@ -396,65 +468,116 @@ How can I help you today?`,
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested Questions - Fixed Height */}
+      {/* Suggested Questions */}
       {messages.length <= 1 && (
-        <div className="shrink-0 px-4 py-3 bg-gray-800 border-t border-gray-700">
-          <p className="text-sm text-gray-400 mb-2">
-            {userAnalyses.length > 0
-              ? "💡 Suggested questions:"
-              : "🚀 Try asking:"}
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {(userAnalyses.length > 0
-              ? suggestedQuestions.slice(0, 4)
-              : [
-                  "What can you help me with?",
-                  "How does this health assistant work?",
-                  "What should I upload first?",
-                  "Tell me about health monitoring",
-                ]
-            ).map((question, index) => (
-              <button
-                key={index}
-                onClick={() => setInputMessage(question)}
-                className="text-sm bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-2 rounded-lg transition-colors text-left"
-              >
-                {question}
-              </button>
-            ))}
+        <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm border-t border-gray-100 dark:border-gray-700/50 overflow-hidden">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/5"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-green-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+
+          <div className="relative z-10 px-6 py-4">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-lg">
+                {userAnalyses.length > 0 ? (
+                  <LightBulbIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                ) : (
+                  <RocketLaunchIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                )}
+              </div>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                {userAnalyses.length > 0
+                  ? "💡 Suggested questions:"
+                  : "🚀 Try asking:"}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {(userAnalyses.length > 0
+                ? suggestedQuestions.slice(0, 4)
+                : [
+                    "What can you help me with?",
+                    "How does this health assistant work?",
+                    "What should I upload first?",
+                    "Tell me about health monitoring",
+                  ]
+              ).map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => setInputMessage(question)}
+                  className="group/question relative bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-xl transition-all duration-300 text-left text-sm font-medium transform hover:scale-105 hover:-translate-y-1 border border-gray-200 dark:border-gray-600 hover:border-emerald-300 dark:hover:border-emerald-600 overflow-hidden"
+                >
+                  {/* Animated Background Elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-green-500/5 opacity-0 group-hover/question:opacity-100 transition-opacity duration-300"></div>
+
+                  <div className="relative z-10 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full opacity-0 group-hover/question:opacity-100 transition-opacity duration-300"></div>
+                    {question}
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Input Area - Fixed at Bottom */}
-      <div className="shrink-0 border-t border-gray-700  p-4 bg-gray-900 min-h-20">
-        <div className="flex gap-3 items-end">
-          <textarea
-            ref={inputRef}
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Ask me about your health data..."
-            className="flex-1 bg-gray-700 text-white placeholder-gray-400 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:border-transparent resize-none text-base"
-            rows={1}
-            style={{
-              minHeight: "48px",
-              maxHeight: "96px",
-            }}
-            onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = "48px";
-              target.style.height = target.scrollHeight + "px";
-            }}
-          />
-          <button
-            onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isLoading}
-            className="bg-[#037BFC] hover:bg-[#0260c9] disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-colors flex items-center justify-center shrink-0"
-            style={{ minHeight: "48px", minWidth: "48px" }}
-          >
-            <PaperAirplaneIcon className="h-5 w-5" />
-          </button>
+      {/* Input Area */}
+      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm border-t border-gray-100 dark:border-gray-700/50 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
+        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/15 to-indigo-500/15 rounded-full blur-xl -translate-y-12 translate-x-12 group-hover:scale-125 transition-transform duration-500"></div>
+
+        <div className="relative z-10 p-6">
+          <div className="flex gap-4 items-end">
+            <div className="flex-1 relative">
+              <textarea
+                ref={inputRef}
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Ask me about your health data..."
+                className="w-full bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border border-gray-200 dark:border-gray-600 rounded-2xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base transition-all duration-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                rows={1}
+                style={{
+                  minHeight: "56px",
+                  maxHeight: "120px",
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = "56px";
+                  target.style.height = target.scrollHeight + "px";
+                }}
+              />
+            </div>
+
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputMessage.trim() || isLoading}
+              className="group/send relative bg-gradient-to-br from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white p-4 rounded-2xl transition-all duration-300 flex items-center justify-center shrink-0 transform hover:scale-110 hover:rotate-3 disabled:transform-none shadow-lg hover:shadow-xl overflow-hidden"
+              style={{ minHeight: "56px", minWidth: "56px" }}
+            >
+              {/* Button Background Animation */}
+              {!(!inputMessage.trim() || isLoading) && (
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-indigo-400/20 translate-x-[-100%] group-hover/send:translate-x-[100%] transition-transform duration-700"></div>
+              )}
+
+              <div className="relative z-10">
+                <PaperAirplaneIcon className="h-6 w-6 group-hover/send:scale-110 transition-transform duration-300" />
+              </div>
+            </button>
+          </div>
+
+          {/* Input Helper Text */}
+          <div className="flex items-center justify-between mt-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Press Enter to send, Shift+Enter for new line
+            </p>
+            {userAnalyses.length > 0 && (
+              <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
+                <HeartIcon className="h-3 w-3" />
+                <span>Personalized insights ready</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

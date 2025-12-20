@@ -20,7 +20,16 @@ import EmptyState from "@/app/components/EmptyState";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import ProgressBar from "@/app/components/ProgressBar";
 import { useRouter } from "next/navigation";
-import { DocumentTextIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import {
+  DocumentTextIcon,
+  PhotoIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  ChartBarIcon,
+  HeartIcon,
+  EyeIcon,
+  CloudArrowUpIcon,
+} from "@heroicons/react/24/outline";
 
 interface Analysis {
   id: string;
@@ -329,26 +338,32 @@ function RiskAssessmentPageContent() {
 
   if (loadingAnalyses) {
     return (
-      <div className="px-4 py-10 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
         <div className="mx-auto max-w-4xl">
           {/* Header */}
           <div className="mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold text-white font-poppins">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
               Risk Assessment
             </h1>
-            <p className="mt-2 text-gray-300">
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
               Combine your lab report and facial analysis for a comprehensive
               health risk assessment
             </p>
           </div>
 
           {/* Loading State */}
-          <div className="bg-gray-900 rounded-lg shadow-sm border border-gray-700 p-6">
-            <div className="flex items-center justify-center py-12">
-              <LoadingSpinner size="lg" />
-              <span className="ml-3 text-gray-400">
-                Loading your analyses...
-              </span>
+          <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16"></div>
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-center py-12">
+                <LoadingSpinner size="lg" />
+                <span className="ml-3 text-gray-600 dark:text-gray-400">
+                  Loading your analyses...
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -357,410 +372,514 @@ function RiskAssessmentPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
+      <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-white font-poppins">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
             Risk Assessment
           </h1>
-          <p className="mt-2 text-gray-300">
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
             Combine your lab report and facial analysis for a comprehensive
             health risk assessment
           </p>
         </div>
 
         {/* Selection Form */}
-        <div className="bg-gray-900 rounded-lg shadow-sm border border-gray-700 p-6 mb-6 animate-fade-in-up">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Analysis Selection */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Report Selection */}
-              <div className="bg-gray-800 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  Select Report Analysis
-                </h3>
+        <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden mb-8">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-300/10 to-amber-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
 
-                {isUploadingReport ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-center py-8">
-                      <DocumentTextIcon className="h-12 w-12 text-gray-400" />
+          <div className="relative z-10">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Analysis Selection */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Report Selection */}
+                <div className="group/report relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+                  {/* Animated Background Elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/15 to-indigo-500/15 rounded-full blur-xl -translate-y-10 translate-x-10 group-hover/report:scale-125 transition-transform duration-500"></div>
+
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl group-hover/report:scale-110 transition-transform duration-300 group-hover/report:rotate-3">
+                        <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover/report:text-blue-600 dark:group-hover/report:text-blue-400 transition-colors duration-300">
+                        Select Report Analysis
+                      </h3>
                     </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-300">
-                        Uploading: {reportFile?.name}
-                      </p>
-                      <ProgressBar
-                        progress={reportUploadProgress}
-                        label="Analyzing report..."
-                        size="sm"
-                      />
-                    </div>
-                  </div>
-                ) : reportAnalyses.length === 0 ? (
-                  <div className="text-center py-8">
-                    <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-white mb-2">
-                      No report analyses found
-                    </h4>
-                    <p className="text-gray-400 mb-6">
-                      Upload a medical report first to generate a risk
-                      assessment.
-                    </p>
-                    <button
-                      onClick={() => handleFileSelect("report")}
-                      disabled={isUploadingReport || isUploadingFace}
-                      className="bg-[#037BFC] hover:bg-[#0260c9] text-white px-6 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Upload Report
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {reportAnalyses.map((analysis) => (
-                      <label
-                        key={analysis.id}
-                        className={`block p-3 rounded-md border cursor-pointer transition-colors ${
-                          selectedReport === analysis.id
-                            ? "border-[#037BFC] bg-[#037BFC]/10"
-                            : "border-gray-600 hover:border-gray-500"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="report"
-                          value={analysis.id}
-                          checked={selectedReport === analysis.id}
-                          onChange={(e) => {
-                            setSelectedReport(e.target.value);
-                            if (validationErrors.reportAnalysisId) {
-                              setValidationErrors((prev) => {
-                                const { reportAnalysisId, ...rest } = prev;
-                                return rest;
-                              });
-                            }
-                          }}
-                          className="sr-only"
-                        />
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-medium text-white">
-                              Report Analysis
-                            </p>
-                            <p className="text-sm text-gray-300">
-                              {getAnalysisPreview(analysis)}
-                            </p>
+
+                    {isUploadingReport ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center py-8">
+                          <div className="p-4 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl">
+                            <DocumentTextIcon className="h-12 w-12 text-blue-600 dark:text-blue-400" />
                           </div>
-                          <span className="text-xs text-gray-400">
-                            {formatAnalysisDate(analysis.createdAt)}
-                          </span>
                         </div>
-                      </label>
-                    ))}
-                    <button
-                      onClick={() => handleFileSelect("report")}
-                      disabled={isUploadingReport || isUploadingFace}
-                      className="w-full bg-[#037BFC] hover:bg-[#0260c9] text-white px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-3"
-                    >
-                      Upload New Report
-                    </button>
-                  </div>
-                )}
-
-                {validationErrors.reportAnalysisId && (
-                  <p className="mt-2 text-sm text-red-400">
-                    {validationErrors.reportAnalysisId}
-                  </p>
-                )}
-              </div>
-
-              {/* Face Selection */}
-              <div className="bg-gray-800 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  Select Face Analysis
-                </h3>
-
-                {isUploadingFace ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-center py-8">
-                      <PhotoIcon className="h-12 w-12 text-gray-400" />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm text-gray-300">
-                        Uploading: {faceFile?.name}
-                      </p>
-                      <ProgressBar
-                        progress={faceUploadProgress}
-                        label="Analyzing photo..."
-                        size="sm"
-                      />
-                    </div>
-                  </div>
-                ) : faceAnalyses.length === 0 ? (
-                  <div className="text-center py-8">
-                    <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-white mb-2">
-                      No face analyses found
-                    </h4>
-                    <p className="text-gray-400 mb-6">
-                      Upload a photo first to generate a risk assessment.
-                    </p>
-                    <button
-                      onClick={() => handleFileSelect("face")}
-                      disabled={isUploadingReport || isUploadingFace}
-                      className="bg-[#037BFC] hover:bg-[#0260c9] text-white px-6 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Upload Photo
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {faceAnalyses.map((analysis) => (
-                      <label
-                        key={analysis.id}
-                        className={`block p-3 rounded-md border cursor-pointer transition-colors ${
-                          selectedFace === analysis.id
-                            ? "border-[#037BFC] bg-[#037BFC]/10"
-                            : "border-gray-600 hover:border-gray-500"
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="face"
-                          value={analysis.id}
-                          checked={selectedFace === analysis.id}
-                          onChange={(e) => {
-                            setSelectedFace(e.target.value);
-                            if (validationErrors.faceAnalysisId) {
-                              setValidationErrors((prev) => {
-                                const { faceAnalysisId, ...rest } = prev;
-                                return rest;
-                              });
-                            }
-                          }}
-                          className="sr-only"
-                        />
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <p className="font-medium text-white">
-                              Face Analysis
-                            </p>
-                            <p className="text-sm text-gray-300">
-                              {getAnalysisPreview(analysis)}
-                            </p>
-                          </div>
-                          <span className="text-xs text-gray-400">
-                            {formatAnalysisDate(analysis.createdAt)}
-                          </span>
+                        <div className="space-y-2">
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Uploading: {reportFile?.name}
+                          </p>
+                          <ProgressBar
+                            progress={reportUploadProgress}
+                            label="Analyzing report..."
+                            size="sm"
+                          />
                         </div>
-                      </label>
-                    ))}
-                    <button
-                      onClick={() => handleFileSelect("face")}
-                      disabled={isUploadingReport || isUploadingFace}
-                      className="w-full bg-[#037BFC] hover:bg-[#0260c9] text-white px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-3"
-                    >
-                      Upload New Photo
-                    </button>
+                      </div>
+                    ) : reportAnalyses.length === 0 ? (
+                      <div className="text-center py-8">
+                        <div className="p-4 bg-gradient-to-br from-gray-500/10 to-slate-500/10 rounded-2xl mx-auto w-fit mb-4">
+                          <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto" />
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          No report analyses found
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                          Upload a medical report first to generate a risk
+                          assessment.
+                        </p>
+                        <button
+                          onClick={() => handleFileSelect("report")}
+                          disabled={isUploadingReport || isUploadingFace}
+                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                          Upload Report
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {reportAnalyses.map((analysis) => (
+                          <label
+                            key={analysis.id}
+                            className={`block p-4 rounded-xl border cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${
+                              selectedReport === analysis.id
+                                ? "border-[#037BFC] bg-[#037BFC]/10 shadow-lg"
+                                : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="report"
+                              value={analysis.id}
+                              checked={selectedReport === analysis.id}
+                              onChange={(e) => {
+                                setSelectedReport(e.target.value);
+                                if (validationErrors.reportAnalysisId) {
+                                  setValidationErrors((prev) => {
+                                    const { reportAnalysisId, ...rest } = prev;
+                                    return rest;
+                                  });
+                                }
+                              }}
+                              className="sr-only"
+                            />
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">
+                                  Report Analysis
+                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {getAnalysisPreview(analysis)}
+                                </p>
+                              </div>
+                              <span className="text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
+                                {formatAnalysisDate(analysis.createdAt)}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                        <button
+                          onClick={() => handleFileSelect("report")}
+                          disabled={isUploadingReport || isUploadingFace}
+                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+                        >
+                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                          Upload New Report
+                        </button>
+                      </div>
+                    )}
+
+                    {validationErrors.reportAnalysisId && (
+                      <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-sm text-red-700 dark:text-red-400">
+                          {validationErrors.reportAnalysisId}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
-
-                {validationErrors.faceAnalysisId && (
-                  <p className="mt-2 text-sm text-red-400">
-                    {validationErrors.faceAnalysisId}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* User Information Form */}
-            <div className="border-t border-gray-700 pt-6">
-              <h3 className="text-lg font-semibold text-white mb-4">
-                Additional Information
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Age *
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="120"
-                    value={userFormData.age}
-                    onChange={(e) => {
-                      setUserFormData((prev) => ({
-                        ...prev,
-                        age: e.target.value,
-                      }));
-                      if (validationErrors.age) {
-                        setValidationErrors((prev) => {
-                          const { age, ...rest } = prev;
-                          return rest;
-                        });
-                      }
-                    }}
-                    className={`block w-full rounded-md border-0 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-gray-800 sm:text-sm ${
-                      validationErrors.age ? "ring-red-400" : "ring-gray-600"
-                    }`}
-                    placeholder="Enter your age"
-                    required
-                  />
-                  {validationErrors.age && (
-                    <p className="mt-1 text-sm text-red-400">
-                      {validationErrors.age}
-                    </p>
-                  )}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Gender *
-                  </label>
-                  <select
-                    value={userFormData.gender}
-                    onChange={(e) => {
-                      setUserFormData((prev) => ({
-                        ...prev,
-                        gender: e.target.value,
-                      }));
-                      if (validationErrors.gender) {
-                        setValidationErrors((prev) => {
-                          const { gender, ...rest } = prev;
-                          return rest;
-                        });
-                      }
-                    }}
-                    className={`block w-full rounded-md border-0 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-gray-800 sm:text-sm ${
-                      validationErrors.gender ? "ring-red-400" : "ring-gray-600"
-                    }`}
-                    required
-                  >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
-                  {validationErrors.gender && (
-                    <p className="mt-1 text-sm text-red-400">
-                      {validationErrors.gender}
-                    </p>
-                  )}
+                {/* Face Selection */}
+                <div className="group/face relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+                  {/* Animated Background Elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5"></div>
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-400/15 to-pink-500/15 rounded-full blur-xl -translate-y-10 translate-x-10 group-hover/face:scale-125 transition-transform duration-500"></div>
+
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl group-hover/face:scale-110 transition-transform duration-300 group-hover/face:rotate-3">
+                        <PhotoIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover/face:text-purple-600 dark:group-hover/face:text-purple-400 transition-colors duration-300">
+                        Select Face Analysis
+                      </h3>
+                    </div>
+
+                    {isUploadingFace ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center py-8">
+                          <div className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl">
+                            <PhotoIcon className="h-12 w-12 text-purple-600 dark:text-purple-400" />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Uploading: {faceFile?.name}
+                          </p>
+                          <ProgressBar
+                            progress={faceUploadProgress}
+                            label="Analyzing photo..."
+                            size="sm"
+                          />
+                        </div>
+                      </div>
+                    ) : faceAnalyses.length === 0 ? (
+                      <div className="text-center py-8">
+                        <div className="p-4 bg-gradient-to-br from-gray-500/10 to-slate-500/10 rounded-2xl mx-auto w-fit mb-4">
+                          <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto" />
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                          No face analyses found
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
+                          Upload a photo first to generate a risk assessment.
+                        </p>
+                        <button
+                          onClick={() => handleFileSelect("face")}
+                          disabled={isUploadingReport || isUploadingFace}
+                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-2xl overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                          Upload Photo
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {faceAnalyses.map((analysis) => (
+                          <label
+                            key={analysis.id}
+                            className={`block p-4 rounded-xl border cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${
+                              selectedFace === analysis.id
+                                ? "border-[#037BFC] bg-[#037BFC]/10 shadow-lg"
+                                : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="face"
+                              value={analysis.id}
+                              checked={selectedFace === analysis.id}
+                              onChange={(e) => {
+                                setSelectedFace(e.target.value);
+                                if (validationErrors.faceAnalysisId) {
+                                  setValidationErrors((prev) => {
+                                    const { faceAnalysisId, ...rest } = prev;
+                                    return rest;
+                                  });
+                                }
+                              }}
+                              className="sr-only"
+                            />
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-semibold text-gray-900 dark:text-white">
+                                  Face Analysis
+                                </p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {getAnalysisPreview(analysis)}
+                                </p>
+                              </div>
+                              <span className="text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
+                                {formatAnalysisDate(analysis.createdAt)}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
+                        <button
+                          onClick={() => handleFileSelect("face")}
+                          disabled={isUploadingReport || isUploadingFace}
+                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-xl overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+                        >
+                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                          Upload New Photo
+                        </button>
+                      </div>
+                    )}
+
+                    {validationErrors.faceAnalysisId && (
+                      <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <p className="text-sm text-red-700 dark:text-red-400">
+                          {validationErrors.faceAnalysisId}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Symptoms */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Current Symptoms (optional)
-                </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {commonSymptoms.map((symptom) => (
-                    <label key={symptom} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={userFormData.symptoms.includes(symptom)}
-                        onChange={(e) =>
-                          handleSymptomChange(symptom, e.target.checked)
-                        }
-                        className="rounded border-gray-600 text-[#037BFC] focus:ring-[#037BFC] focus:ring-offset-0 bg-gray-800"
-                      />
-                      <span className="ml-2 text-sm text-gray-300">
-                        {symptom}
-                      </span>
+              {/* User Information Form */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl">
+                    <HeartIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Additional Information
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Age *
                     </label>
-                  ))}
+                    <input
+                      type="number"
+                      min="1"
+                      max="120"
+                      value={userFormData.age}
+                      onChange={(e) => {
+                        setUserFormData((prev) => ({
+                          ...prev,
+                          age: e.target.value,
+                        }));
+                        if (validationErrors.age) {
+                          setValidationErrors((prev) => {
+                            const { age, ...rest } = prev;
+                            return rest;
+                          });
+                        }
+                      }}
+                      className={`block w-full rounded-xl border-0 px-4 py-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-white dark:bg-gray-800 sm:text-sm transition-all duration-300 ${
+                        validationErrors.age
+                          ? "ring-red-400"
+                          : "ring-gray-300 dark:ring-gray-600"
+                      }`}
+                      placeholder="Enter your age"
+                      required
+                    />
+                    {validationErrors.age && (
+                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                        {validationErrors.age}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Gender *
+                    </label>
+                    <select
+                      value={userFormData.gender}
+                      onChange={(e) => {
+                        setUserFormData((prev) => ({
+                          ...prev,
+                          gender: e.target.value,
+                        }));
+                        if (validationErrors.gender) {
+                          setValidationErrors((prev) => {
+                            const { gender, ...rest } = prev;
+                            return rest;
+                          });
+                        }
+                      }}
+                      className={`block w-full rounded-xl border-0 px-4 py-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-white dark:bg-gray-800 sm:text-sm transition-all duration-300 ${
+                        validationErrors.gender
+                          ? "ring-red-400"
+                          : "ring-gray-300 dark:ring-gray-600"
+                      }`}
+                      required
+                    >
+                      <option value="">Select gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                    {validationErrors.gender && (
+                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                        {validationErrors.gender}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Symptoms */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                    Current Symptoms (optional)
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {commonSymptoms.map((symptom) => (
+                      <label
+                        key={symptom}
+                        className="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={userFormData.symptoms.includes(symptom)}
+                          onChange={(e) =>
+                            handleSymptomChange(symptom, e.target.checked)
+                          }
+                          className="rounded border-gray-300 dark:border-gray-600 text-[#037BFC] focus:ring-[#037BFC] focus:ring-offset-0 bg-white dark:bg-gray-800"
+                        />
+                        <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {symptom}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Medical History */}
+                <div className="mb-6">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                    Medical History (optional)
+                  </label>
+                  <textarea
+                    value={userFormData.medicalHistory}
+                    onChange={(e) =>
+                      setUserFormData((prev) => ({
+                        ...prev,
+                        medicalHistory: e.target.value,
+                      }))
+                    }
+                    rows={4}
+                    className="block w-full rounded-xl border-0 px-4 py-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-white dark:bg-gray-800 sm:text-sm transition-all duration-300"
+                    placeholder="Any relevant medical history, chronic conditions, etc."
+                  />
                 </div>
               </div>
 
-              {/* Medical History */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Medical History (optional)
-                </label>
-                <textarea
-                  value={userFormData.medicalHistory}
-                  onChange={(e) =>
-                    setUserFormData((prev) => ({
-                      ...prev,
-                      medicalHistory: e.target.value,
-                    }))
+              {/* Submit Button */}
+              <div className="flex justify-center pt-6">
+                <button
+                  type="submit"
+                  disabled={
+                    isLoading ||
+                    isUploadingReport ||
+                    isUploadingFace ||
+                    !selectedReport ||
+                    !selectedFace ||
+                    !userFormData.age ||
+                    !userFormData.gender
                   }
-                  rows={3}
-                  className="block w-full rounded-md border-0 px-3.5 py-2 text-white shadow-sm ring-1 ring-inset ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-gray-800 sm:text-sm"
-                  placeholder="Any relevant medical history, chronic conditions, etc."
-                />
-              </div>
-            </div>
+                  className="group relative inline-flex items-center gap-3 px-8 py-4 text-base font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-2xl overflow-hidden bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  aria-label="Generate comprehensive risk assessment"
+                >
+                  {/* Button Background Animation */}
+                  {!(
+                    isLoading ||
+                    isUploadingReport ||
+                    isUploadingFace ||
+                    !selectedReport ||
+                    !selectedFace ||
+                    !userFormData.age ||
+                    !userFormData.gender
+                  ) && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                  )}
 
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <button
-                type="submit"
-                disabled={
-                  isLoading ||
-                  isUploadingReport ||
-                  isUploadingFace ||
-                  !selectedReport ||
-                  !selectedFace ||
-                  !userFormData.age ||
-                  !userFormData.gender
-                }
-                className="rounded-md bg-[#037BFC] px-6 py-3 text-sm font-semibold text-white shadow-xs hover:bg-[#0260c9] focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                aria-label="Generate comprehensive risk assessment"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <LoadingSpinner size="sm" color="white" className="mr-2" />
-                    Generating Assessment...
+                  <div className="relative z-10 flex items-center gap-3">
+                    {isLoading ? (
+                      <>
+                        <LoadingSpinner size="sm" color="white" />
+                        <span>Generating Assessment...</span>
+                      </>
+                    ) : isUploadingReport || isUploadingFace ? (
+                      <>
+                        <LoadingSpinner size="sm" color="white" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ExclamationTriangleIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                        <span>Generate Risk Assessment</span>
+                      </>
+                    )}
                   </div>
-                ) : isUploadingReport || isUploadingFace ? (
-                  <div className="flex items-center">
-                    <LoadingSpinner size="sm" color="white" className="mr-2" />
-                    Uploading...
-                  </div>
-                ) : (
-                  "Generate Risk Assessment"
-                )}
-              </button>
-            </div>
-          </form>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         {/* Risk Assessment Results */}
         {riskAssessment && (
-          <div className="bg-gray-900 rounded-lg shadow-sm border border-gray-700 p-6 animate-fade-in-up">
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="text-xl font-semibold text-white font-poppins">
-                Health Risk Assessment
-              </h2>
-              <div className="flex space-x-2">
+          <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-emerald-500/5"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-300/10 to-green-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
+
+            <div className="relative z-10">
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
+                    <ChartBarIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300">
+                    Health Risk Assessment
+                  </h2>
+                </div>
                 <button
                   onClick={() => router.push("/dashboard/history")}
-                  className="text-sm text-[#037BFC] hover:text-[#0260c9] font-medium"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-[#037BFC] hover:text-[#0260c9] transition-colors duration-300"
                 >
-                  View in History →
+                  View in History
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
                 </button>
               </div>
-            </div>
 
-            <div className="prose prose-invert max-w-none">
-              <div className="bg-gray-800 rounded-md p-4 border border-gray-600">
-                <p className="text-white whitespace-pre-wrap leading-relaxed">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600 mb-6">
+                <p className="text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed">
                   {riskAssessment}
                 </p>
               </div>
-            </div>
 
-            <div className="mt-4 p-3 bg-blue-900/20 rounded-md border border-blue-800">
-              <p className="text-sm text-blue-200">
-                <strong>Disclaimer:</strong> This assessment is generated by AI
-                and is for informational purposes only. It should not replace
-                professional medical advice, diagnosis, or treatment. Always
-                consult with a qualified healthcare provider for medical
-                concerns.
-              </p>
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <ExclamationTriangleIcon className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                      Important Medical Disclaimer
+                    </p>
+                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                      This assessment is generated by AI and is for
+                      informational purposes only. It should not replace
+                      professional medical advice, diagnosis, or treatment.
+                      Always consult with a qualified healthcare provider for
+                      medical concerns.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

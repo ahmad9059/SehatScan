@@ -6,6 +6,7 @@ import { showErrorToast, showInfoToast } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import { CardSkeleton } from "@/app/components/SkeletonLoader";
 import EmptyState from "@/app/components/EmptyState";
+import AnalysisDetailModal from "@/app/components/AnalysisDetailModal";
 import {
   DocumentTextIcon,
   CameraIcon,
@@ -331,41 +332,42 @@ function HistoryPageContent() {
               return (
                 <div
                   key={analysis.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 hover:shadow-md transition-all animate-fade-in-up"
+                  className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in-up border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
                   style={{ animationDelay: `${index * 0.1}s` }}
+                  onClick={() => setSelectedAnalysis(analysis)}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex items-center gap-4 min-w-0 flex-1">
-                      <div className="shrink-0">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#037BFC]/10">
-                          <IconComponent className="h-6 w-6 text-[#037BFC]" />
+                  {/* Animated Background Elements */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-gray-500/5"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-400/20 to-gray-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-300/10 to-slate-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
+
+                  <div className="relative z-10">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                      <div className="flex items-center space-x-4 min-w-0 flex-1">
+                        <div className="shrink-0">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#037BFC]/10 to-indigo-500/10 group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
+                            <IconComponent className="h-6 w-6 text-[#037BFC]" />
+                          </div>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
+                            {getAnalysisTypeLabel(analysis.type)}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                            {getAnalysisPreview(analysis)}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors duration-300">
+                            {formatDate(analysis.createdAt)}
+                          </p>
                         </div>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white font-poppins truncate">
-                          {getAnalysisTypeLabel(analysis.type)}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {getAnalysisPreview(analysis)}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <CalendarIcon className="h-4 w-4 text-gray-400" />
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {formatDate(analysis.createdAt)}
-                          </span>
+                      <div className="shrink-0">
+                        <div className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#037BFC]/10 to-indigo-500/10 px-4 py-2 text-sm font-semibold text-[#037BFC] dark:text-blue-400 group-hover:from-[#037BFC]/20 group-hover:to-indigo-500/20 transition-all duration-300">
+                          <EyeIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
+                          View Details
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={() => setSelectedAnalysis(analysis)}
-                      className="flex items-center justify-center gap-2 rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2 w-full sm:w-auto"
-                      aria-label={`View details for ${getAnalysisTypeLabel(
-                        analysis.type
-                      )}`}
-                    >
-                      <EyeIcon className="h-4 w-4" />
-                      View Details
-                    </button>
                   </div>
                 </div>
               );
@@ -402,318 +404,10 @@ function HistoryPageContent() {
 
         {/* Analysis Detail Modal */}
         {selectedAnalysis && (
-          <div className="fixed inset-0 z-50 overflow-y-auto">
-            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-              <div
-                className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-                onClick={() => setSelectedAnalysis(null)}
-              />
-              <div className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl sm:p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white font-poppins">
-                    {getAnalysisTypeLabel(selectedAnalysis.type)} Details
-                  </h3>
-                  <button
-                    onClick={() => setSelectedAnalysis(null)}
-                    className="rounded-md bg-gray-100 dark:bg-gray-700 p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
-                  >
-                    <span className="sr-only">Close</span>
-                    <svg
-                      className="h-6 w-6"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Analysis Info */}
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          Type:
-                        </span>
-                        <p className="text-sm text-gray-900 dark:text-white">
-                          {getAnalysisTypeLabel(selectedAnalysis.type)}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                          Date:
-                        </span>
-                        <p className="text-sm text-gray-900 dark:text-white">
-                          {formatDate(selectedAnalysis.createdAt)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Analysis Content */}
-                  {selectedAnalysis.type === "face" &&
-                    selectedAnalysis.visualMetrics &&
-                    Array.isArray(selectedAnalysis.visualMetrics) &&
-                    selectedAnalysis.visualMetrics.length > 0 && (
-                      <div>
-                        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                          Visual Metrics
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                              Redness Percentage:
-                            </span>
-                            <p className="text-2xl font-bold text-red-600">
-                              {selectedAnalysis.visualMetrics[0]
-                                .redness_percentage || 0}
-                              %
-                            </p>
-                          </div>
-                          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                            <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                              Yellowness Percentage:
-                            </span>
-                            <p className="text-2xl font-bold text-yellow-600">
-                              {selectedAnalysis.visualMetrics[0]
-                                .yellowness_percentage || 0}
-                              %
-                            </p>
-                          </div>
-                        </div>
-                        {selectedAnalysis.visualMetrics[0]
-                          .skin_tone_analysis && (
-                          <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                            <h5 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-                              Skin Tone Analysis:
-                            </h5>
-                            <p className="text-sm text-blue-800 dark:text-blue-200">
-                              {
-                                selectedAnalysis.visualMetrics[0]
-                                  .skin_tone_analysis
-                              }
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                  {/* Problems Detected */}
-                  {selectedAnalysis.type === "face" &&
-                    selectedAnalysis.problemsDetected &&
-                    selectedAnalysis.problemsDetected.length > 0 && (
-                      <div>
-                        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                          Detected Skin Conditions
-                        </h4>
-                        <div className="space-y-3">
-                          {selectedAnalysis.problemsDetected.map(
-                            (problem, index) => (
-                              <div
-                                key={index}
-                                className={`rounded-lg p-4 border ${
-                                  problem.severity === "severe"
-                                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-                                    : problem.severity === "moderate"
-                                    ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
-                                    : "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-                                }`}
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      className={`w-3 h-3 rounded-full ${
-                                        problem.severity === "severe"
-                                          ? "bg-red-500"
-                                          : problem.severity === "moderate"
-                                          ? "bg-yellow-500"
-                                          : "bg-green-500"
-                                      }`}
-                                    />
-                                    <h5 className="font-semibold text-gray-900 dark:text-white">
-                                      {problem.type}
-                                    </h5>
-                                  </div>
-                                  <span
-                                    className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                      problem.severity === "severe"
-                                        ? "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
-                                        : problem.severity === "moderate"
-                                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
-                                        : "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100"
-                                    }`}
-                                  >
-                                    {problem.severity}
-                                  </span>
-                                </div>
-                                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                                  {problem.description}
-                                </p>
-                                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                  <span>Confidence:</span>
-                                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 max-w-20">
-                                    <div
-                                      className="bg-blue-500 h-1.5 rounded-full"
-                                      style={{
-                                        width: `${problem.confidence * 100}%`,
-                                      }}
-                                    />
-                                  </div>
-                                  <span>
-                                    {Math.round(problem.confidence * 100)}%
-                                  </span>
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                  {/* Treatment Recommendations */}
-                  {selectedAnalysis.type === "face" &&
-                    selectedAnalysis.treatments &&
-                    selectedAnalysis.treatments.length > 0 && (
-                      <div>
-                        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                          Treatment Recommendations
-                        </h4>
-                        <div className="space-y-3">
-                          {selectedAnalysis.treatments
-                            .sort((a, b) => {
-                              const priorityOrder = {
-                                high: 3,
-                                medium: 2,
-                                low: 1,
-                              };
-                              return (
-                                priorityOrder[b.priority] -
-                                priorityOrder[a.priority]
-                              );
-                            })
-                            .map((treatment, index) => (
-                              <div
-                                key={index}
-                                className={`rounded-lg p-4 border ${
-                                  treatment.priority === "high"
-                                    ? "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800"
-                                    : treatment.priority === "medium"
-                                    ? "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800"
-                                    : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800"
-                                }`}
-                              >
-                                <div className="flex items-start justify-between mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <div
-                                      className={`w-2 h-2 rounded-full ${
-                                        treatment.priority === "high"
-                                          ? "bg-red-500"
-                                          : treatment.priority === "medium"
-                                          ? "bg-yellow-500"
-                                          : "bg-blue-500"
-                                      }`}
-                                    />
-                                    <h5 className="font-semibold text-gray-900 dark:text-white">
-                                      {treatment.category}
-                                    </h5>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span
-                                      className={`text-xs px-2 py-1 rounded-full font-medium ${
-                                        treatment.priority === "high"
-                                          ? "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100"
-                                          : treatment.priority === "medium"
-                                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100"
-                                          : "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100"
-                                      }`}
-                                    >
-                                      {treatment.priority} priority
-                                    </span>
-                                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                                      {treatment.timeframe}
-                                    </span>
-                                  </div>
-                                </div>
-                                <p className="text-sm text-gray-700 dark:text-gray-300">
-                                  {treatment.recommendation}
-                                </p>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-
-                  {selectedAnalysis.type === "report" &&
-                    selectedAnalysis.structuredData && (
-                      <div>
-                        <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                          Health Metrics
-                        </h4>
-                        {selectedAnalysis.structuredData.metrics &&
-                        selectedAnalysis.structuredData.metrics.length > 0 ? (
-                          <div className="space-y-2">
-                            {selectedAnalysis.structuredData.metrics.map(
-                              (metric: any, index: number) => (
-                                <div
-                                  key={index}
-                                  className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3"
-                                >
-                                  <div className="flex justify-between items-center">
-                                    <span className="font-medium text-gray-900 dark:text-white">
-                                      {metric.name}
-                                    </span>
-                                    <span className="text-gray-600 dark:text-gray-400">
-                                      {metric.value}{" "}
-                                      {metric.unit && metric.unit}
-                                    </span>
-                                  </div>
-                                </div>
-                              )
-                            )}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500 dark:text-gray-400">
-                            No structured metrics available
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                  {selectedAnalysis.riskAssessment && (
-                    <div>
-                      <h4 className="text-md font-semibold text-gray-900 dark:text-white mb-3">
-                        Risk Assessment
-                      </h4>
-                      <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
-                        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                          {selectedAnalysis.riskAssessment}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Raw Data (collapsed by default) */}
-                  <details className="group">
-                    <summary className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                      View Raw Data
-                    </summary>
-                    <div className="mt-2 bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
-                      <pre className="text-xs text-gray-600 dark:text-gray-400 overflow-auto">
-                        {JSON.stringify(selectedAnalysis.rawData, null, 2)}
-                      </pre>
-                    </div>
-                  </details>
-                </div>
-              </div>
-            </div>
-          </div>
+          <AnalysisDetailModal
+            analysis={selectedAnalysis}
+            onClose={() => setSelectedAnalysis(null)}
+          />
         )}
       </div>
     </div>

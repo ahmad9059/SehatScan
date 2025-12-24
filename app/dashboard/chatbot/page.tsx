@@ -12,9 +12,7 @@ import {
   UserIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import {
-  mutedText,
-} from "@/app/components/dashboardStyles";
+import { mutedText } from "@/app/components/dashboardStyles";
 
 interface Message {
   id: string;
@@ -33,8 +31,7 @@ interface Analysis {
   riskAssessment?: string | null;
 }
 
-const assistantBubble =
-  "max-w-3xl rounded-2xl p-4";
+const assistantBubble = "max-w-3xl rounded-2xl p-4";
 const userBubble =
   "max-w-3xl rounded-2xl bg-[var(--color-surface)] text-[var(--color-foreground)] p-4";
 
@@ -45,7 +42,6 @@ function ChatbotPageContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [userAnalyses, setUserAnalyses] = useState<Analysis[]>([]);
   const [loadingAnalyses, setLoadingAnalyses] = useState(true);
-  const [hasStartedChat, setHasStartedChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -86,11 +82,6 @@ function ChatbotPageContent() {
   const handleSendMessage = async (overrideMessage?: string) => {
     const messageToSend = (overrideMessage ?? inputMessage).trim();
     if (!messageToSend || isLoading) return;
-
-    // Trigger the animation to move input to bottom
-    if (!hasStartedChat) {
-      setHasStartedChat(true);
-    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -195,166 +186,128 @@ function ChatbotPageContent() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)] bg-[var(--color-bg)] relative overflow-hidden">
-      {/* Centered state - before chat starts */}
-      <div
-        className={`absolute inset-0 flex flex-col items-center justify-center px-4 transition-all duration-500 ease-in-out ${
-          hasStartedChat
-            ? "opacity-0 pointer-events-none translate-y-20"
-            : "opacity-100"
-        }`}
-      >
-        <h1 className="text-3xl sm:text-4xl font-medium text-[var(--color-heading)] mb-8">
-          What can I help with?
-        </h1>
-        {!hasStartedChat && (
-          <div className="flex items-center gap-2 w-full max-w-2xl mx-auto rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
-            <textarea
-              ref={inputRef}
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={handleKeyPress}
-              rows={1}
-              autoFocus
-              className="flex-1 min-h-[24px] max-h-32 resize-none bg-transparent text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none text-base"
-              placeholder="Ask anything..."
-            />
-            <button
-              type="button"
-              onClick={() => handleSendMessage()}
-              disabled={!inputMessage.trim() || isLoading}
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
-                inputMessage.trim()
-                  ? "bg-[var(--color-foreground)] text-[var(--color-bg)]"
-                  : "bg-transparent text-[var(--color-subtle)]"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-              aria-label="Send message"
+    <div className="flex flex-col h-[calc(100dvh-80px)] bg-[var(--color-bg)] overflow-hidden">
+      {/* Chat messages container with scroll - hidden scrollbar */}
+      <div className="flex-1 min-h-0 overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        <div className="w-full max-w-3xl mx-auto px-4 py-6 space-y-6">
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <SparklesIcon className="h-12 w-12 text-[var(--color-primary)] mb-4" />
+              <h2 className="text-2xl font-medium text-[var(--color-heading)] mb-2">
+                What can I help with?
+              </h2>
+              <p className="text-[var(--color-subtle)] max-w-md">
+                Ask me anything about your health data, reports, or general health questions.
+              </p>
+            </div>
+          )}
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex gap-3 ${
+                message.role === "user" ? "justify-end" : "justify-start"
+              }`}
             >
-              <PaperAirplaneIcon className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Chat state - after first message */}
-      <div
-        className={`flex flex-col h-full transition-all duration-500 ease-in-out ${
-          hasStartedChat
-            ? "opacity-100"
-            : "opacity-0 pointer-events-none"
-        }`}
-      >
-        {/* Chat messages container with scroll */}
-        <div className="flex-1 overflow-y-auto">
-          <div className="w-full max-w-3xl mx-auto px-4 py-6 space-y-6">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-3 ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                {message.role === "assistant" && (
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                    <SparklesIcon className="h-4 w-4" />
-                  </div>
-                )}
-
-                <div
-                  className={
-                    message.role === "user" ? userBubble : assistantBubble
-                  }
-                >
-                  {message.isLoading ? (
-                    <div className="flex items-center gap-3">
-                      <LoadingSpinner size="sm" />
-                      <span className={mutedText}>Thinking...</span>
-                    </div>
-                  ) : (
-                    <div className="prose prose-sm max-w-none text-[var(--color-foreground)] dark:prose-invert">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          p: ({ children }) => (
-                            <p className="text-[var(--color-foreground)] leading-relaxed mb-2 last:mb-0">
-                              {children}
-                            </p>
-                          ),
-                          strong: ({ children }) => (
-                            <strong className="font-semibold text-[var(--color-heading)]">
-                              {children}
-                            </strong>
-                          ),
-                          em: ({ children }) => (
-                            <em className="italic text-[var(--color-foreground)]">
-                              {children}
-                            </em>
-                          ),
-                          code: ({ children }) => (
-                            <code className="rounded-md bg-[var(--color-surface)] px-1.5 py-0.5 text-sm text-[var(--color-heading)]">
-                              {children}
-                            </code>
-                          ),
-                          ul: ({ children }) => (
-                            <ul className="list-disc pl-4 text-[var(--color-foreground)]">
-                              {children}
-                            </ul>
-                          ),
-                          ol: ({ children }) => (
-                            <ol className="list-decimal pl-4 text-[var(--color-foreground)]">
-                              {children}
-                            </ol>
-                          ),
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
-                  )}
+              {message.role === "assistant" && (
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                  <SparklesIcon className="h-4 w-4" />
                 </div>
+              )}
 
-                {message.role === "user" && (
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface)] text-[var(--color-foreground)]">
-                    <UserIcon className="h-4 w-4" />
+              <div
+                className={
+                  message.role === "user" ? userBubble : assistantBubble
+                }
+              >
+                {message.isLoading ? (
+                  <div className="flex items-center gap-3">
+                    <LoadingSpinner size="sm" />
+                    <span className={mutedText}>Thinking...</span>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none text-[var(--color-foreground)] dark:prose-invert">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => (
+                          <p className="text-[var(--color-foreground)] leading-relaxed mb-2 last:mb-0">
+                            {children}
+                          </p>
+                        ),
+                        strong: ({ children }) => (
+                          <strong className="font-semibold text-[var(--color-heading)]">
+                            {children}
+                          </strong>
+                        ),
+                        em: ({ children }) => (
+                          <em className="italic text-[var(--color-foreground)]">
+                            {children}
+                          </em>
+                        ),
+                        code: ({ children }) => (
+                          <code className="rounded-md bg-[var(--color-surface)] px-1.5 py-0.5 text-sm text-[var(--color-heading)]">
+                            {children}
+                          </code>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="list-disc pl-4 text-[var(--color-foreground)]">
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="list-decimal pl-4 text-[var(--color-foreground)]">
+                            {children}
+                          </ol>
+                        ),
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
                   </div>
                 )}
               </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
 
-        {/* Bottom input area */}
-        <div className="bg-[var(--color-bg)] py-3 px-4">
-          <div className="flex items-center gap-2 w-full max-w-2xl mx-auto rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
-            <textarea
-              ref={hasStartedChat ? inputRef : undefined}
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              onKeyDown={handleKeyPress}
-              rows={1}
-              autoFocus={hasStartedChat}
-              className="flex-1 min-h-[24px] max-h-32 resize-none bg-transparent text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none text-base"
-              placeholder="Ask anything..."
-            />
-            <button
-              type="button"
-              onClick={() => handleSendMessage()}
-              disabled={!inputMessage.trim() || isLoading}
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
-                inputMessage.trim()
-                  ? "bg-[var(--color-foreground)] text-[var(--color-bg)]"
-                  : "bg-transparent text-[var(--color-subtle)]"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-              aria-label="Send message"
-            >
-              <PaperAirplaneIcon className="h-4 w-4" />
-            </button>
-          </div>
-          <p className="text-center text-xs text-[var(--color-subtle)] mt-2">
-            AI can make mistakes. Verify important health information with a professional.
-          </p>
+              {message.role === "user" && (
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface)] text-[var(--color-foreground)]">
+                  <UserIcon className="h-4 w-4" />
+                </div>
+              )}
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
         </div>
+      </div>
+
+      {/* Bottom input area - always at bottom */}
+      <div className="shrink-0 bg-[var(--color-bg)] py-2 px-4">
+        <div className="flex items-center gap-2 w-full max-w-2xl mx-auto rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
+          <textarea
+            ref={inputRef}
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            rows={1}
+            autoFocus
+            className="flex-1 min-h-[24px] max-h-32 resize-none bg-transparent text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none text-base"
+            placeholder="Ask anything..."
+          />
+          <button
+            type="button"
+            onClick={() => handleSendMessage()}
+            disabled={!inputMessage.trim() || isLoading}
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+              inputMessage.trim()
+                ? "bg-[var(--color-foreground)] text-[var(--color-bg)]"
+                : "bg-transparent text-[var(--color-subtle)]"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            aria-label="Send message"
+          >
+            <PaperAirplaneIcon className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="text-center text-[10px] text-[var(--color-subtle)] py-1">
+          AI can make mistakes. Verify important health information with a professional.
+        </p>
       </div>
     </div>
   );

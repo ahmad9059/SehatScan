@@ -24,8 +24,7 @@ import {
   Bars3Icon,
   XMarkIcon,
   ChatBubbleLeftRightIcon,
-  ChevronDoubleLeftIcon,
-  ChevronDoubleRightIcon,
+  ArrowLeftStartOnRectangleIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 
@@ -117,7 +116,7 @@ function Sidebar({
       <div
         className={classNames(
           "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300 lg:overflow-hidden",
-          compact ? "lg:w-20" : "lg:w-72"
+          compact ? "lg:w-16" : "lg:w-72"
         )}
       >
         <div
@@ -168,7 +167,12 @@ function SidebarContent({
   return (
     <>
       {/* Header */}
-      <div className="flex h-16 shrink-0 items-center w-full gap-2">
+      <div
+        className={classNames(
+          "flex h-16 shrink-0 items-center w-full",
+          compact ? "justify-center" : "gap-2"
+        )}
+      >
         <Link
           href="/dashboard"
           className={classNames(
@@ -191,10 +195,10 @@ function SidebarContent({
             <button
               type="button"
               onClick={onToggleCompact}
-              className="hidden lg:inline-flex flex-none items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
+              className="hidden lg:inline-flex flex-none items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
               aria-label="Collapse sidebar"
             >
-              <ChevronDoubleLeftIcon className="h-5 w-5" />
+              <ArrowLeftStartOnRectangleIcon className="h-5 w-5" />
             </button>
           )}
           {isMobile && (
@@ -402,7 +406,7 @@ export default function DashboardLayout({
       <main
         className={classNames(
           "transition-[padding] duration-300",
-          compactSidebar ? "lg:pl-20" : "lg:pl-72"
+          compactSidebar ? "lg:pl-16" : "lg:pl-72"
         )}
       >
         {/* Top Navbar */}

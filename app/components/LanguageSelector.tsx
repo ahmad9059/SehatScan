@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { LanguageIcon, CheckIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 import { useSimpleLanguage } from "./SimpleLanguageContext";
 
 interface Language {
@@ -12,9 +13,32 @@ interface Language {
 }
 
 const languages: Language[] = [
-  { code: "en", name: "English", nativeName: "English", flag: "🇺🇸" },
-  { code: "ur", name: "Urdu", nativeName: "اردو", flag: "🇵🇰" },
+  {
+    code: "en",
+    name: "English",
+    nativeName: "English",
+    flag: "/flag-usa-icon.svg",
+  },
+  {
+    code: "ur",
+    name: "Urdu",
+    nativeName: "اردو",
+    flag: "/flag-pak-icon.svg",
+  },
 ];
+
+const FlagIcon = ({ src, alt }: { src: string; alt: string }) => (
+  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]">
+    <Image
+      src={src}
+      alt={alt}
+      width={28}
+      height={28}
+      className="h-7 w-7 rounded-full object-contain"
+      priority
+    />
+  </span>
+);
 
 export function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,7 +81,10 @@ export function LanguageSelector() {
         title={`Current language: ${selectedLanguage.name}`}
       >
         <div className="flex items-center gap-2">
-          <span className="text-lg">{selectedLanguage.flag}</span>
+          <FlagIcon
+            src={selectedLanguage.flag}
+            alt={`${selectedLanguage.name} flag`}
+          />
           <LanguageIcon className="h-4 w-4 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-150" />
         </div>
       </button>
@@ -84,7 +111,7 @@ export function LanguageSelector() {
                 className="w-full px-4 py-3 text-left hover:bg-[var(--color-surface)] transition-colors flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-lg">{language.flag}</span>
+                  <FlagIcon src={language.flag} alt={`${language.name} flag`} />
                   <div>
                     <p className="text-sm font-medium text-[var(--color-foreground)]">
                       {language.name}

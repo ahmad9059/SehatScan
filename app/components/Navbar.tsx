@@ -11,7 +11,7 @@ export default function Navbar() {
     <header className="absolute inset-x-0 top-0 z-50">
       <nav
         aria-label="Global"
-        className="flex items-center justify-between p-6 lg:px-8"
+        className="flex items-center justify-between p-6 lg:px-8 text-[var(--color-foreground)]"
       >
         <div className="flex lg:flex-1">
           <Link
@@ -19,7 +19,7 @@ export default function Navbar() {
             className="-m-1.5 p-1.5 flex items-center space-x-3 group"
           >
             <img src="/logo.svg" alt="SehatScan" className="h-10 w-auto" />
-            <span className="text-2xl font-bold text-gray-900 dark:text-white">
+            <span className="text-2xl font-bold text-[var(--color-foreground)]">
               Sehat<span className="text-[#037BFC]">Scan</span>
             </span>
           </Link>
@@ -51,28 +51,28 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex lg:gap-x-12">
+        <div className="hidden lg:flex lg:gap-x-12 text-[var(--color-foreground)]">
           <Link
             href="#features"
-            className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+            className="text-sm/6 font-semibold hover:text-[var(--color-primary)]"
           >
             Features
           </Link>
           <Link
             href="#how-it-works"
-            className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+            className="text-sm/6 font-semibold hover:text-[var(--color-primary)]"
           >
             How It Works
           </Link>
           <Link
             href="#integrations"
-            className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+            className="text-sm/6 font-semibold hover:text-[var(--color-primary)]"
           >
             Integrations
           </Link>
           <Link
             href="#about"
-            className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+            className="text-sm/6 font-semibold hover:text-[var(--color-primary)]"
           >
             About
           </Link>
@@ -83,7 +83,7 @@ export default function Navbar() {
           <ThemeToggle />
           <Link
             href="/login"
-            className="text-sm/6 font-semibold text-gray-900 dark:text-white"
+            className="text-sm/6 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-primary)]"
           >
             Log in <span aria-hidden="true">&rarr;</span>
           </Link>
@@ -101,7 +101,7 @@ export default function Navbar() {
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center space-x-3">
                 <img src="/logo.svg" alt="SehatScan" className="h-10 w-auto" />
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                <span className="text-2xl font-bold text-[var(--color-foreground)]">
                   Sehat<span className="text-[#037BFC]">Scan</span>
                 </span>
               </Link>
@@ -131,28 +131,28 @@ export default function Navbar() {
                 <div className="space-y-2 py-6">
                   <Link
                     href="#features"
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Features
                   </Link>
                   <Link
                     href="#how-it-works"
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     How It Works
                   </Link>
                   <Link
                     href="#integrations"
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Integrations
                   </Link>
                   <Link
                     href="#about"
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     About
@@ -161,7 +161,7 @@ export default function Navbar() {
                 <div className="py-6">
                   <Link
                     href="/login"
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 dark:text-white dark:hover:bg-white/5"
+                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
                   >
                     Log in
                   </Link>

@@ -22,10 +22,10 @@ export default function ProgressBar({
   };
 
   const colorClasses = {
-    primary: "bg-[#037BFC]",
-    success: "bg-green-500",
-    warning: "bg-amber-500",
-    error: "bg-red-500",
+    primary: "bg-[var(--color-primary)]",
+    success: "bg-[var(--color-success)]",
+    warning: "bg-[var(--color-warning)]",
+    error: "bg-[var(--color-danger)]",
   };
 
   const clampedProgress = Math.min(100, Math.max(0, progress));
@@ -35,19 +35,19 @@ export default function ProgressBar({
       {(label || showPercentage) && (
         <div className="flex justify-between items-center mb-2">
           {label && (
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-medium text-[var(--color-foreground)]">
               {label}
             </span>
           )}
           {showPercentage && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">
+            <span className="text-sm text-[var(--color-subtle)]">
               {Math.round(clampedProgress)}%
             </span>
           )}
         </div>
       )}
       <div
-        className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full ${sizeClasses[size]}`}
+        className={`w-full bg-[var(--color-surface)] rounded-full ${sizeClasses[size]}`}
       >
         <div
           className={`${sizeClasses[size]} rounded-full transition-all duration-300 ease-out ${colorClasses[color]}`}

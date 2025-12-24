@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   generateRiskAssessment,
   analyzeReport,
@@ -10,13 +10,11 @@ import { getUserAnalyses } from "@/lib/analysis";
 import { useUser } from "@clerk/nextjs";
 import { validateRiskAssessmentForm } from "@/lib/validation";
 import {
-  showSuccessToast,
   showErrorToast,
   showValidationErrors,
   handleServerActionResponse,
 } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
-import EmptyState from "@/app/components/EmptyState";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import ProgressBar from "@/app/components/ProgressBar";
 import { useRouter } from "next/navigation";
@@ -24,21 +22,62 @@ import {
   DocumentTextIcon,
   PhotoIcon,
   ExclamationTriangleIcon,
-  CheckCircleIcon,
   ChartBarIcon,
   HeartIcon,
-  EyeIcon,
   CloudArrowUpIcon,
 } from "@heroicons/react/24/outline";
+import {
+  card,
+  chip,
+  contentWidth,
+  heading,
+  interactiveCard,
+  mutedText,
+  pageContainer,
+  pill,
+  primaryButton,
+  secondaryButton,
+  sectionTitle,
+  subheading,
+} from "@/app/components/dashboardStyles";
+
+interface StructuredMetric {
+  name?: string;
+  value?: string;
+  unit?: string;
+}
+
+interface StructuredData {
+  metrics?: StructuredMetric[];
+  [key: string]: unknown;
+}
+
+interface VisualMetric {
+  redness_percentage?: number;
+  yellowness_percentage?: number;
+  [key: string]: unknown;
+}
 
 interface Analysis {
   id: string;
   type: string;
   createdAt: Date | string;
-  structuredData?: any;
-  visualMetrics?: any;
-  rawData?: any;
+  structuredData?: StructuredData;
+  visualMetrics?: VisualMetric[];
+  rawData?: unknown;
 }
+
+const commonSymptoms = [
+  "Fatigue",
+  "Headache",
+  "Nausea",
+  "Dizziness",
+  "Fever",
+  "Joint pain",
+  "Muscle weakness",
+  "Sleep issues",
+  "Appetite changes",
+];
 
 function RiskAssessmentPageContent() {
   const { user } = useUser();
@@ -62,7 +101,6 @@ function RiskAssessmentPageContent() {
     Record<string, string>
   >({});
 
-  // File upload states
   const [reportFile, setReportFile] = useState<File | null>(null);
   const [faceFile, setFaceFile] = useState<File | null>(null);
   const [reportUploadProgress, setReportUploadProgress] = useState(0);
@@ -70,7 +108,6 @@ function RiskAssessmentPageContent() {
   const [isUploadingReport, setIsUploadingReport] = useState(false);
   const [isUploadingFace, setIsUploadingFace] = useState(false);
 
-  // Load user's past analyses
   useEffect(() => {
     const loadAnalyses = async () => {
       if (!user?.id) {
@@ -109,7 +146,6 @@ function RiskAssessmentPageContent() {
     }));
   };
 
-  // File upload handlers
   const handleReportUpload = async (file: File) => {
     if (!user?.id) {
       showErrorToast("Please log in to upload files");
@@ -121,7 +157,6 @@ function RiskAssessmentPageContent() {
     setReportUploadProgress(0);
 
     try {
-      // Simulate progress
       const progressInterval = setInterval(() => {
         setReportUploadProgress((prev) => {
           if (prev >= 90) {
@@ -141,7 +176,6 @@ function RiskAssessmentPageContent() {
       const success = handleServerActionResponse(result, {
         successMessage: "Report uploaded and analyzed successfully!",
         onSuccess: (data) => {
-          // Add the new analysis to the list and select it
           const newAnalysis: Analysis = {
             id: data.analysisId,
             type: "report",
@@ -162,7 +196,7 @@ function RiskAssessmentPageContent() {
       setReportFile(null);
     } finally {
       setIsUploadingReport(false);
-      setTimeout(() => setReportUploadProgress(0), 1000);
+      setTimeout(() => setReportUploadProgress(0), 800);
     }
   };
 
@@ -177,7 +211,6 @@ function RiskAssessmentPageContent() {
     setFaceUploadProgress(0);
 
     try {
-      // Simulate progress
       const progressInterval = setInterval(() => {
         setFaceUploadProgress((prev) => {
           if (prev >= 90) {
@@ -197,7 +230,6 @@ function RiskAssessmentPageContent() {
       const success = handleServerActionResponse(result, {
         successMessage: "Photo uploaded and analyzed successfully!",
         onSuccess: (data) => {
-          // Add the new analysis to the list and select it
           const newAnalysis: Analysis = {
             id: data.analysisId,
             type: "face",
@@ -218,7 +250,7 @@ function RiskAssessmentPageContent() {
       setFaceFile(null);
     } finally {
       setIsUploadingFace(false);
-      setTimeout(() => setFaceUploadProgress(0), 1000);
+      setTimeout(() => setFaceUploadProgress(0), 800);
     }
   };
 
@@ -240,13 +272,35 @@ function RiskAssessmentPageContent() {
     input.click();
   };
 
+  const formatAnalysisDate = (date: Date | string) => {
+    const dateObj = typeof date === "string" ? new Date(date) : date;
+    return dateObj.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getAnalysisPreview = (analysis: Analysis) => {
+    if (analysis.type === "report" && analysis.structuredData?.metrics) {
+      const metricCount = analysis.structuredData.metrics.length;
+      return `${metricCount} health metrics detected`;
+    } else if (analysis.type === "face" && analysis.visualMetrics) {
+      const metrics = analysis.visualMetrics[0] || {};
+      return `Redness: ${metrics.redness_percentage || 0}%, Yellowness: ${
+        metrics.yellowness_percentage || 0
+      }%`;
+    }
+    return "Analysis completed";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Clear previous validation errors
     setValidationErrors({});
 
-    // Validate form data
     const formValidation = validateRiskAssessmentForm({
       reportAnalysisId: selectedReport,
       faceAnalysisId: selectedFace,
@@ -282,9 +336,6 @@ function RiskAssessmentPageContent() {
           setRiskAssessment(data.risk_assessment);
           setAnalysisId(result.analysisId || "");
         },
-        onError: (error) => {
-          console.error("Risk assessment generation failed:", error);
-        },
       });
 
       if (!success && result.error) {
@@ -300,71 +351,15 @@ function RiskAssessmentPageContent() {
     }
   };
 
-  const formatAnalysisDate = (date: Date | string) => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateObj.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const getAnalysisPreview = (analysis: Analysis) => {
-    if (analysis.type === "report" && analysis.structuredData?.metrics) {
-      const metricCount = analysis.structuredData.metrics.length;
-      return `${metricCount} health metrics detected`;
-    } else if (analysis.type === "face" && analysis.visualMetrics) {
-      const metrics = analysis.visualMetrics[0] || {};
-      return `Redness: ${metrics.redness_percentage || 0}%, Yellowness: ${
-        metrics.yellowness_percentage || 0
-      }%`;
-    }
-    return "Analysis completed";
-  };
-
-  const commonSymptoms = [
-    "Fatigue",
-    "Headache",
-    "Nausea",
-    "Dizziness",
-    "Fever",
-    "Joint pain",
-    "Muscle weakness",
-    "Sleep issues",
-    "Appetite changes",
-  ];
-
   if (loadingAnalyses) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
-        <div className="mx-auto max-w-4xl">
-          {/* Header */}
-          <div className="mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
-              Risk Assessment
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              Combine your lab report and facial analysis for a comprehensive
-              health risk assessment
+      <div className={pageContainer}>
+        <div className={`${contentWidth} space-y-6`}>
+          <div className={`${card} p-6 lg:p-7 flex items-center gap-3`}>
+            <LoadingSpinner size="lg" />
+            <p className={`${mutedText} text-sm`}>
+              Loading your report and face analyses...
             </p>
-          </div>
-
-          {/* Loading State */}
-          <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16"></div>
-
-            <div className="relative z-10">
-              <div className="flex items-center justify-center py-12">
-                <LoadingSpinner size="lg" />
-                <span className="ml-3 text-gray-600 dark:text-gray-400">
-                  Loading your analyses...
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -372,495 +367,461 @@ function RiskAssessmentPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
-      <div className="mx-auto max-w-4xl">
-        {/* Header */}
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
-            Risk Assessment
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Combine your lab report and facial analysis for a comprehensive
-            health risk assessment
-          </p>
-        </div>
-
-        {/* Selection Form */}
-        <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden mb-8">
-          {/* Animated Background Elements */}
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-300/10 to-amber-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
-          <div className="relative z-10">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Analysis Selection */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Report Selection */}
-                <div className="group/report relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-                  {/* Animated Background Elements */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-blue-400/15 to-indigo-500/15 rounded-full blur-xl -translate-y-10 translate-x-10 group-hover/report:scale-125 transition-transform duration-500"></div>
-
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl group-hover/report:scale-110 transition-transform duration-300 group-hover/report:rotate-3">
-                        <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover/report:text-blue-600 dark:group-hover/report:text-blue-400 transition-colors duration-300">
-                        Select Report Analysis
-                      </h3>
-                    </div>
-
-                    {isUploadingReport ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-center py-8">
-                          <div className="p-4 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl">
-                            <DocumentTextIcon className="h-12 w-12 text-blue-600 dark:text-blue-400" />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Uploading: {reportFile?.name}
-                          </p>
-                          <ProgressBar
-                            progress={reportUploadProgress}
-                            label="Analyzing report..."
-                            size="sm"
-                          />
-                        </div>
-                      </div>
-                    ) : reportAnalyses.length === 0 ? (
-                      <div className="text-center py-8">
-                        <div className="p-4 bg-[var(--color-surface)] rounded-2xl mx-auto w-fit mb-4">
-                          <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto" />
-                        </div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                          No report analyses found
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                          Upload a medical report first to generate a risk
-                          assessment.
-                        </p>
-                        <button
-                          onClick={() => handleFileSelect("report")}
-                          disabled={isUploadingReport || isUploadingFace}
-                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-2xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                          Upload Report
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {reportAnalyses.map((analysis) => (
-                          <label
-                            key={analysis.id}
-                            className={`block p-4 rounded-xl border cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${
-                              selectedReport === analysis.id
-                                ? "border-[#037BFC] bg-[#037BFC]/10 shadow-lg"
-                                : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name="report"
-                              value={analysis.id}
-                              checked={selectedReport === analysis.id}
-                              onChange={(e) => {
-                                setSelectedReport(e.target.value);
-                                if (validationErrors.reportAnalysisId) {
-                                  setValidationErrors((prev) => {
-                                    const { reportAnalysisId, ...rest } = prev;
-                                    return rest;
-                                  });
-                                }
-                              }}
-                              className="sr-only"
-                            />
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <p className="font-semibold text-gray-900 dark:text-white">
-                                  Report Analysis
-                                </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                  {getAnalysisPreview(analysis)}
-                                </p>
-                              </div>
-                              <span className="text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
-                                {formatAnalysisDate(analysis.createdAt)}
-                              </span>
-                            </div>
-                          </label>
-                        ))}
-                        <button
-                          onClick={() => handleFileSelect("report")}
-                          disabled={isUploadingReport || isUploadingFace}
-                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed mt-3"
-                        >
-                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                          Upload New Report
-                        </button>
-                      </div>
-                    )}
-
-                    {validationErrors.reportAnalysisId && (
-                      <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-sm text-red-700 dark:text-red-400">
-                          {validationErrors.reportAnalysisId}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Face Selection */}
-                <div className="group/face relative bg-[var(--color-card)] rounded-2xl p-6 hover:shadow-[var(--shadow-strong)] transition-all duration-300 transform hover:-translate-y-1 border border-[var(--color-border)] overflow-hidden">
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 bg-[var(--color-primary-soft)] rounded-2xl group-hover/face:scale-105 transition-transform duration-300">
-                        <PhotoIcon className="h-6 w-6 text-[var(--color-primary)]" />
-                      </div>
-                      <h3 className="text-lg font-bold text-[var(--color-heading)] group-hover/face:text-[var(--color-primary)] transition-colors duration-300">
-                        Select Face Analysis
-                      </h3>
-                    </div>
-
-                    {isUploadingFace ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-center py-8">
-                          <div className="p-4 bg-[var(--color-surface)] rounded-2xl">
-                            <PhotoIcon className="h-12 w-12 text-[var(--color-primary)]" />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Uploading: {faceFile?.name}
-                          </p>
-                          <ProgressBar
-                            progress={faceUploadProgress}
-                            label="Analyzing photo..."
-                            size="sm"
-                          />
-                        </div>
-                      </div>
-                    ) : faceAnalyses.length === 0 ? (
-                      <div className="text-center py-8">
-                        <div className="p-4 bg-[var(--color-surface)] rounded-2xl mx-auto w-fit mb-4">
-                          <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto" />
-                        </div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                          No face analyses found
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6">
-                          Upload a photo first to generate a risk assessment.
-                        </p>
-                        <button
-                          onClick={() => handleFileSelect("face")}
-                          disabled={isUploadingReport || isUploadingFace}
-                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-2xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                          Upload Photo
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {faceAnalyses.map((analysis) => (
-                          <label
-                            key={analysis.id}
-                            className={`block p-4 rounded-xl border cursor-pointer transition-all duration-300 hover:scale-105 hover:-translate-y-1 ${
-                              selectedFace === analysis.id
-                                ? "border-[#037BFC] bg-[#037BFC]/10 shadow-lg"
-                                : "border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500"
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name="face"
-                              value={analysis.id}
-                              checked={selectedFace === analysis.id}
-                              onChange={(e) => {
-                                setSelectedFace(e.target.value);
-                                if (validationErrors.faceAnalysisId) {
-                                  setValidationErrors((prev) => {
-                                    const { faceAnalysisId, ...rest } = prev;
-                                    return rest;
-                                  });
-                                }
-                              }}
-                              className="sr-only"
-                            />
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <p className="font-semibold text-gray-900 dark:text-white">
-                                  Face Analysis
-                                </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                  {getAnalysisPreview(analysis)}
-                                </p>
-                              </div>
-                              <span className="text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full">
-                                {formatAnalysisDate(analysis.createdAt)}
-                              </span>
-                            </div>
-                          </label>
-                        ))}
-                        <button
-                          onClick={() => handleFileSelect("face")}
-                          disabled={isUploadingReport || isUploadingFace}
-                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed mt-3"
-                        >
-                          <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
-                          Upload New Photo
-                        </button>
-                      </div>
-                    )}
-
-                    {validationErrors.faceAnalysisId && (
-                      <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                        <p className="text-sm text-red-700 dark:text-red-400">
-                          {validationErrors.faceAnalysisId}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+    <div className={pageContainer}>
+      <div className={`${contentWidth} space-y-6`}>
+        <div className={`${card} p-6 lg:p-7`}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <ExclamationTriangleIcon className="h-7 w-7" />
+              </div>
+              <div>
+                <h1 className={heading}>Risk Assessment</h1>
+                <p className={`${subheading} mt-2 text-sm sm:text-base`}>
+                  Combine lab reports and facial analysis to generate a
+                  comprehensive health risk profile with consistent dashboard
+                  styling.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className={pill}>Report + Face required</span>
+                  <span className={pill}>Save to history</span>
+                  <span className={pill}>Adaptive recommendations</span>
                 </div>
               </div>
-
-              {/* User Information Form */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl">
-                    <HeartIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    Additional Information
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Age *
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="120"
-                      value={userFormData.age}
-                      onChange={(e) => {
-                        setUserFormData((prev) => ({
-                          ...prev,
-                          age: e.target.value,
-                        }));
-                        if (validationErrors.age) {
-                          setValidationErrors((prev) => {
-                            const { age, ...rest } = prev;
-                            return rest;
-                          });
-                        }
-                      }}
-                      className={`block w-full rounded-xl border-0 px-4 py-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-white dark:bg-gray-800 sm:text-sm transition-all duration-300 ${
-                        validationErrors.age
-                          ? "ring-red-400"
-                          : "ring-gray-300 dark:ring-gray-600"
-                      }`}
-                      placeholder="Enter your age"
-                      required
-                    />
-                    {validationErrors.age && (
-                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                        {validationErrors.age}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Gender *
-                    </label>
-                    <select
-                      value={userFormData.gender}
-                      onChange={(e) => {
-                        setUserFormData((prev) => ({
-                          ...prev,
-                          gender: e.target.value,
-                        }));
-                        if (validationErrors.gender) {
-                          setValidationErrors((prev) => {
-                            const { gender, ...rest } = prev;
-                            return rest;
-                          });
-                        }
-                      }}
-                      className={`block w-full rounded-xl border-0 px-4 py-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-white dark:bg-gray-800 sm:text-sm transition-all duration-300 ${
-                        validationErrors.gender
-                          ? "ring-red-400"
-                          : "ring-gray-300 dark:ring-gray-600"
-                      }`}
-                      required
-                    >
-                      <option value="">Select gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                    {validationErrors.gender && (
-                      <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                        {validationErrors.gender}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Symptoms */}
-                <div className="mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                    Current Symptoms (optional)
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {commonSymptoms.map((symptom) => (
-                      <label
-                        key={symptom}
-                        className="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={userFormData.symptoms.includes(symptom)}
-                          onChange={(e) =>
-                            handleSymptomChange(symptom, e.target.checked)
-                          }
-                          className="rounded border-gray-300 dark:border-gray-600 text-[#037BFC] focus:ring-[#037BFC] focus:ring-offset-0 bg-white dark:bg-gray-800"
-                        />
-                        <span className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                          {symptom}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Medical History */}
-                <div className="mb-6">
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                    Medical History (optional)
-                  </label>
-                  <textarea
-                    value={userFormData.medicalHistory}
-                    onChange={(e) =>
-                      setUserFormData((prev) => ({
-                        ...prev,
-                        medicalHistory: e.target.value,
-                      }))
-                    }
-                    rows={4}
-                    className="block w-full rounded-xl border-0 px-4 py-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#037BFC] bg-white dark:bg-gray-800 sm:text-sm transition-all duration-300"
-                    placeholder="Any relevant medical history, chronic conditions, etc."
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-center pt-6">
-                <button
-                  type="submit"
-                  disabled={
-                    isLoading ||
-                    isUploadingReport ||
-                    isUploadingFace ||
-                    !selectedReport ||
-                    !selectedFace ||
-                    !userFormData.age ||
-                    !userFormData.gender
-                  }
-                  className="group relative inline-flex items-center gap-3 px-8 py-4 text-base font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-2xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  aria-label="Generate comprehensive risk assessment"
-                >
-                  <div className="relative z-10 flex items-center gap-3">
-                    {isLoading ? (
-                      <>
-                        <LoadingSpinner size="sm" color="white" />
-                        <span>Generating Assessment...</span>
-                      </>
-                    ) : isUploadingReport || isUploadingFace ? (
-                      <>
-                        <LoadingSpinner size="sm" color="white" />
-                        <span>Uploading...</span>
-                      </>
-                    ) : (
-                      <>
-                        <ExclamationTriangleIcon className="h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                        <span>Generate Risk Assessment</span>
-                      </>
-                    )}
-                  </div>
-                </button>
-              </div>
-            </form>
+            </div>
+            {analysisId && (
+              <span className={chip}>Saved ID: {analysisId}</span>
+            )}
           </div>
         </div>
 
-        {/* Risk Assessment Results */}
-        {riskAssessment && (
-          <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-emerald-500/5"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-green-300/10 to-green-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Report selection */}
+            <div className={`${interactiveCard} p-6 lg:p-7 space-y-4`}>
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
-                    <ChartBarIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                    <DocumentTextIcon className="h-6 w-6" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-300">
-                    Health Risk Assessment
-                  </h2>
+                  <div>
+                    <h3 className={sectionTitle}>Select report analysis</h3>
+                    <p className={`${subheading} text-sm`}>
+                      Choose an existing report or upload a new one.
+                    </p>
+                  </div>
                 </div>
                 <button
-                  onClick={() => router.push("/dashboard/history")}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-[#037BFC] hover:text-[#0260c9] transition-colors duration-300"
+                  type="button"
+                  onClick={() => handleFileSelect("report")}
+                  disabled={isUploadingReport || isUploadingFace || isLoading}
+                  className={secondaryButton}
                 >
-                  View in History
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+                  <CloudArrowUpIcon className="h-4 w-4" />
+                  Upload report
                 </button>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 border border-gray-200 dark:border-gray-600 mb-6">
-                <p className="text-gray-900 dark:text-white whitespace-pre-wrap leading-relaxed">
-                  {riskAssessment}
-                </p>
-              </div>
-
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                <div className="flex items-start gap-3">
-                  <ExclamationTriangleIcon className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                      Important Medical Disclaimer
-                    </p>
-                    <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                      This assessment is generated by AI and is for
-                      informational purposes only. It should not replace
-                      professional medical advice, diagnosis, or treatment.
-                      Always consult with a qualified healthcare provider for
-                      medical concerns.
+              {isUploadingReport ? (
+                <div className="space-y-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+                  <div className="flex items-center gap-2">
+                    <LoadingSpinner size="sm" />
+                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                      Uploading {reportFile?.name}
                     </p>
                   </div>
+                  <ProgressBar
+                    progress={reportUploadProgress}
+                    label="Analyzing report"
+                    size="sm"
+                  />
+                </div>
+              ) : reportAnalyses.length === 0 ? (
+                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-center">
+                  <p className="text-sm font-semibold text-[var(--color-heading)]">
+                    No report analyses yet
+                  </p>
+                  <p className={`${subheading} mt-1 text-sm`}>
+                    Upload a medical report to begin a risk assessment.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {reportAnalyses.map((analysis) => (
+                    <label
+                      key={analysis.id}
+                      className={`flex cursor-pointer items-start justify-between rounded-xl border p-4 transition-all duration-200 ${
+                        selectedReport === analysis.id
+                          ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
+                          : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]"
+                      }`}
+                    >
+                      <div className="flex flex-1 items-start gap-3">
+                        <input
+                          type="radio"
+                          name="report"
+                          value={analysis.id}
+                          checked={selectedReport === analysis.id}
+                          onChange={(e) => {
+                            setSelectedReport(e.target.value);
+                            if (validationErrors.reportAnalysisId) {
+                              setValidationErrors((prev) => {
+                                const { reportAnalysisId: _reportAnalysisId, ...rest } =
+                                  prev;
+                                return rest;
+                              });
+                            }
+                          }}
+                          className="mt-1 h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--color-heading)]">
+                            Report analysis
+                          </p>
+                          <p className={`${subheading} text-sm`}>
+                            {getAnalysisPreview(analysis)}
+                          </p>
+                        </div>
+                      </div>
+                      <span className={`${chip} whitespace-nowrap`}>
+                        {formatAnalysisDate(analysis.createdAt)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {validationErrors.reportAnalysisId && (
+                <p className="text-sm text-[var(--color-danger)]">
+                  {validationErrors.reportAnalysisId}
+                </p>
+              )}
+            </div>
+
+            {/* Face selection */}
+            <div className={`${interactiveCard} p-6 lg:p-7 space-y-4`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                    <PhotoIcon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className={sectionTitle}>Select face analysis</h3>
+                    <p className={`${subheading} text-sm`}>
+                      Pair a facial analysis with your report.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleFileSelect("face")}
+                  disabled={isUploadingReport || isUploadingFace || isLoading}
+                  className={secondaryButton}
+                >
+                  <CloudArrowUpIcon className="h-4 w-4" />
+                  Upload photo
+                </button>
+              </div>
+
+              {isUploadingFace ? (
+                <div className="space-y-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+                  <div className="flex items-center gap-2">
+                    <LoadingSpinner size="sm" />
+                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                      Uploading {faceFile?.name}
+                    </p>
+                  </div>
+                  <ProgressBar
+                    progress={faceUploadProgress}
+                    label="Analyzing photo"
+                    size="sm"
+                  />
+                </div>
+              ) : faceAnalyses.length === 0 ? (
+                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-center">
+                  <p className="text-sm font-semibold text-[var(--color-heading)]">
+                    No face analyses yet
+                  </p>
+                  <p className={`${subheading} mt-1 text-sm`}>
+                    Upload a clear portrait to generate a risk assessment.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {faceAnalyses.map((analysis) => (
+                    <label
+                      key={analysis.id}
+                      className={`flex cursor-pointer items-start justify-between rounded-xl border p-4 transition-all duration-200 ${
+                        selectedFace === analysis.id
+                          ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
+                          : "border-[var(--color-border)] bg-[var(--color-card)] hover:border-[var(--color-primary)]"
+                      }`}
+                    >
+                      <div className="flex flex-1 items-start gap-3">
+                        <input
+                          type="radio"
+                          name="face"
+                          value={analysis.id}
+                          checked={selectedFace === analysis.id}
+                          onChange={(e) => {
+                            setSelectedFace(e.target.value);
+                            if (validationErrors.faceAnalysisId) {
+                              setValidationErrors((prev) => {
+                                const { faceAnalysisId: _faceAnalysisId, ...rest } =
+                                  prev;
+                                return rest;
+                              });
+                            }
+                          }}
+                          className="mt-1 h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                        />
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--color-heading)]">
+                            Face analysis
+                          </p>
+                          <p className={`${subheading} text-sm`}>
+                            {getAnalysisPreview(analysis)}
+                          </p>
+                        </div>
+                      </div>
+                      <span className={`${chip} whitespace-nowrap`}>
+                        {formatAnalysisDate(analysis.createdAt)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              {validationErrors.faceAnalysisId && (
+                <p className="text-sm text-[var(--color-danger)]">
+                  {validationErrors.faceAnalysisId}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <div className={`${card} p-6 lg:p-7 space-y-6`}>
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <HeartIcon className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className={sectionTitle}>Additional information</h3>
+                <p className={`${subheading} text-sm`}>
+                  Provide optional context to refine your assessment.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-[var(--color-foreground)]">
+                  Age *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={userFormData.age}
+                  onChange={(e) => {
+                    setUserFormData((prev) => ({
+                      ...prev,
+                      age: e.target.value,
+                    }));
+                    if (validationErrors.age) {
+                      setValidationErrors((prev) => {
+                        const { age: _age, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  className={`w-full rounded-xl border px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-[var(--color-card)] border-[var(--color-border)] ${
+                    validationErrors.age ? "ring-[var(--color-danger)]" : ""
+                  }`}
+                  placeholder="Enter your age"
+                  required
+                />
+                {validationErrors.age && (
+                  <p className="mt-2 text-sm text-[var(--color-danger)]">
+                    {validationErrors.age}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-[var(--color-foreground)]">
+                  Gender *
+                </label>
+                <select
+                  value={userFormData.gender}
+                  onChange={(e) => {
+                    setUserFormData((prev) => ({
+                      ...prev,
+                      gender: e.target.value,
+                    }));
+                    if (validationErrors.gender) {
+                      setValidationErrors((prev) => {
+                        const { gender: _gender, ...rest } = prev;
+                        return rest;
+                      });
+                    }
+                  }}
+                  className={`w-full rounded-xl border px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-[var(--color-card)] border-[var(--color-border)] ${
+                    validationErrors.gender ? "ring-[var(--color-danger)]" : ""
+                  }`}
+                  required
+                >
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+                {validationErrors.gender && (
+                  <p className="mt-2 text-sm text-[var(--color-danger)]">
+                    {validationErrors.gender}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="block text-sm font-semibold text-[var(--color-foreground)]">
+                Current symptoms (optional)
+              </label>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {commonSymptoms.map((symptom) => (
+                  <label
+                    key={symptom}
+                    className="flex cursor-pointer items-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 transition-colors duration-200 hover:border-[var(--color-primary)]"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={userFormData.symptoms.includes(symptom)}
+                      onChange={(e) =>
+                        handleSymptomChange(symptom, e.target.checked)
+                      }
+                      className="h-4 w-4 rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                    />
+                    <span className="ml-3 text-sm font-medium text-[var(--color-foreground)]">
+                      {symptom}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-[var(--color-foreground)]">
+                  Medical history (optional)
+                </label>
+                <textarea
+                  value={userFormData.medicalHistory}
+                  onChange={(e) =>
+                    setUserFormData((prev) => ({
+                      ...prev,
+                      medicalHistory: e.target.value,
+                    }))
+                  }
+                  rows={4}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="Conditions, surgeries, or ongoing treatments."
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-semibold text-[var(--color-foreground)]">
+                  Current medications (optional)
+                </label>
+                <textarea
+                  value={userFormData.currentMedications}
+                  onChange={(e) =>
+                    setUserFormData((prev) => ({
+                      ...prev,
+                      currentMedications: e.target.value,
+                    }))
+                  }
+                  rows={4}
+                  className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                  placeholder="List medication names and dosages if relevant."
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              disabled={
+                isLoading ||
+                isUploadingReport ||
+                isUploadingFace ||
+                !selectedReport ||
+                !selectedFace ||
+                !userFormData.age ||
+                !userFormData.gender
+              }
+              className={primaryButton}
+              aria-label="Generate comprehensive risk assessment"
+            >
+              {isLoading || isUploadingReport || isUploadingFace ? (
+                <>
+                  <LoadingSpinner size="sm" color="white" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <ExclamationTriangleIcon className="h-5 w-5" />
+                  Generate risk assessment
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+
+        {riskAssessment && (
+          <div className={`${interactiveCard} p-6 lg:p-7`}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                  <ChartBarIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h2 className={sectionTitle}>Health risk assessment</h2>
+                  <p className={`${subheading} text-sm`}>
+                    Generated from your selected analyses and additional
+                    details.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard/history")}
+                className={secondaryButton}
+              >
+                View in history
+              </button>
+            </div>
+
+            <div className="mt-6 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-foreground)]">
+                {riskAssessment}
+              </p>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4">
+              <div className="flex items-start gap-3">
+                <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
+                <div>
+                  <p className="text-sm font-semibold text-[var(--color-heading)]">
+                    Important medical disclaimer
+                  </p>
+                  <p className={`${mutedText} mt-1 text-xs`}>
+                    This assessment is generated by AI and is for informational
+                    purposes only. It should not replace professional medical
+                    advice, diagnosis, or treatment. Always consult with a
+                    qualified healthcare provider for medical concerns.
+                  </p>
                 </div>
               </div>
             </div>
@@ -870,6 +831,7 @@ function RiskAssessmentPageContent() {
     </div>
   );
 }
+
 export default function RiskAssessmentPage() {
   return (
     <ErrorBoundary>

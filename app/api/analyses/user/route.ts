@@ -14,7 +14,11 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const type = searchParams.get("type") || undefined;
+    const typeParam = searchParams.get("type");
+    const type =
+      typeParam === "face" || typeParam === "report" || typeParam === "risk"
+        ? typeParam
+        : undefined;
 
     const analyses = await getUserAnalyses(userId, type);
 

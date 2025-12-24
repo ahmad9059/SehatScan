@@ -194,8 +194,6 @@ function ChatbotPageContent() {
     );
   }
 
-  const inputAreaClasses = "w-full min-h-12 max-h-40 resize-none bg-transparent border-b border-[var(--color-border)] px-2 py-3 text-[var(--color-foreground)] text-lg placeholder:text-[var(--color-subtle)] focus:outline-none focus:border-[var(--color-primary)] transition-colors duration-300";
-
   return (
     <div className="flex flex-col h-[calc(100vh-80px)] bg-[var(--color-bg)] relative overflow-hidden">
       {/* Centered state - before chat starts */}
@@ -210,31 +208,29 @@ function ChatbotPageContent() {
           What can I help with?
         </h1>
         {!hasStartedChat && (
-          <div className="flex items-center gap-3 w-full max-w-2xl mx-auto">
-            <div className="flex-1 relative">
-              <textarea
-                ref={inputRef}
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={handleKeyPress}
-                rows={1}
-                autoFocus
-                className={inputAreaClasses}
-                placeholder="Ask anything..."
-              />
-            </div>
+          <div className="flex items-center gap-2 w-full max-w-2xl mx-auto rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
+            <textarea
+              ref={inputRef}
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              rows={1}
+              autoFocus
+              className="flex-1 min-h-[24px] max-h-32 resize-none bg-transparent text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none text-base"
+              placeholder="Ask anything..."
+            />
             <button
               type="button"
               onClick={() => handleSendMessage()}
               disabled={!inputMessage.trim() || isLoading}
-              className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ${
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
                 inputMessage.trim()
                   ? "bg-[var(--color-foreground)] text-[var(--color-bg)]"
                   : "bg-transparent text-[var(--color-subtle)]"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
               aria-label="Send message"
             >
-              <PaperAirplaneIcon className="h-5 w-5" />
+              <PaperAirplaneIcon className="h-4 w-4" />
             </button>
           </div>
         )}
@@ -329,7 +325,7 @@ function ChatbotPageContent() {
         </div>
 
         {/* Bottom input area */}
-        <div className="bg-[var(--color-bg)] py-4 px-4">
+        <div className="bg-[var(--color-bg)] py-3 px-4">
           <div className="flex items-center gap-2 w-full max-w-2xl mx-auto rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
             <textarea
               ref={hasStartedChat ? inputRef : undefined}
@@ -355,7 +351,7 @@ function ChatbotPageContent() {
               <PaperAirplaneIcon className="h-4 w-4" />
             </button>
           </div>
-          <p className="text-center text-xs text-[var(--color-subtle)] mt-3">
+          <p className="text-center text-xs text-[var(--color-subtle)] mt-2">
             AI can make mistakes. Verify important health information with a professional.
           </p>
         </div>

@@ -15,11 +15,10 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 import {
-  card,
   chip,
   contentWidth,
+  fullWidthSection,
   heading,
-  interactiveCard,
   mutedText,
   pageContainer,
   pill,
@@ -271,14 +270,13 @@ function HistoryPageContent() {
 
   return (
     <div className={pageContainer}>
-      <div className={`${contentWidth} space-y-6`}>
-        <div className={`${card} p-6 lg:p-7`}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className={contentWidth}>
+        <section className={`${fullWidthSection} space-y-8`}>
+          <div className="flex flex-col gap-3 border-b border-[var(--color-border)] pb-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className={heading}>Analysis History</h1>
               <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                Review past analyses with the same clean cards used across the
-                dashboard.
+                Review past analyses in a single, continuous dashboard view.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -289,9 +287,7 @@ function HistoryPageContent() {
               </span>
             </div>
           </div>
-        </div>
 
-        <div className={`${card} p-4 sm:p-5`}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-2">
               {filterOptions.map((option) => (
@@ -312,110 +308,108 @@ function HistoryPageContent() {
               Showing page {currentPage} of {totalPages}
             </div>
           </div>
-        </div>
 
-        {error && (
-          <div
-            className={`${card} border border-[var(--color-danger)] bg-[var(--color-card)] p-4`}
-          >
-            <p className="text-sm text-[var(--color-danger)]">{error}</p>
-          </div>
-        )}
-
-        {loading && analyses.length === 0 ? (
-          <div className="space-y-3">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                key={index}
-                className="h-20 rounded-xl bg-[var(--color-surface)] animate-pulse"
-              />
-            ))}
-          </div>
-        ) : analyses.length === 0 ? (
-          <div className={`${card} p-6 text-center`}>
-            <DocumentTextIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
-            <h3 className="mt-3 text-lg font-semibold text-[var(--color-heading)]">
-              No analyses found
-            </h3>
-            <p className={`${subheading} mt-1 text-sm`}>
-              {filterType === "all"
-                ? "Upload a report or photo to start generating analyses."
-                : `No ${filterType} analyses yet. Try another filter or upload new content.`}
-            </p>
-            <div className="mt-4 flex justify-center gap-3">
-              <a href="/dashboard/scan-report" className={primaryButton}>
-                Upload report
-              </a>
-              <a href="/dashboard/scan-face" className={secondaryButton}>
-                Scan face
-              </a>
+          {error && (
+            <div className="border border-[var(--color-danger)] bg-[var(--color-card)]/70 px-4 py-3 rounded-xl">
+              <p className="text-sm text-[var(--color-danger)]">{error}</p>
             </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {analyses.map((analysis) => {
-              const IconComponent = getAnalysisIcon(analysis.type);
-              return (
+          )}
+
+          {loading && analyses.length === 0 ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, index) => (
                 <div
-                  key={analysis.id}
-                  className={`${interactiveCard} cursor-pointer p-5`}
-                  onClick={() => setSelectedAnalysis(analysis)}
-                >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex flex-1 items-start gap-3">
-                      <div className="h-12 w-12 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
-                        <IconComponent className="h-6 w-6" />
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-base font-semibold text-[var(--color-heading)]">
-                          {getAnalysisTypeLabel(analysis.type)}
-                        </h3>
-                        <p className={`${mutedText} mt-1 text-sm line-clamp-2`}>
-                          {getAnalysisPreview(analysis)}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--color-subtle)]">
-                          <span className={chip}>{formatDate(analysis.createdAt)}</span>
+                  key={index}
+                  className="h-20 bg-[var(--color-surface)] animate-pulse"
+                />
+              ))}
+            </div>
+          ) : analyses.length === 0 ? (
+            <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-6 py-8 text-center rounded-xl">
+              <DocumentTextIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
+              <h3 className="mt-3 text-lg font-semibold text-[var(--color-heading)]">
+                No analyses found
+              </h3>
+              <p className={`${subheading} mt-1 text-sm`}>
+                {filterType === "all"
+                  ? "Upload a report or photo to start generating analyses."
+                  : `No ${filterType} analyses yet. Try another filter or upload new content.`}
+              </p>
+              <div className="mt-4 flex justify-center gap-3">
+                <a href="/dashboard/scan-report" className={primaryButton}>
+                  Upload report
+                </a>
+                <a href="/dashboard/scan-face" className={secondaryButton}>
+                  Scan face
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {analyses.map((analysis) => {
+                const IconComponent = getAnalysisIcon(analysis.type);
+                return (
+                  <div
+                    key={analysis.id}
+                    className="cursor-pointer border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-4 transition-colors duration-200 hover:border-[var(--color-primary)] rounded-xl"
+                    onClick={() => setSelectedAnalysis(analysis)}
+                  >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-1 items-start gap-3">
+                        <div className="h-12 w-12 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
+                          <IconComponent className="h-6 w-6" />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-base font-semibold text-[var(--color-heading)]">
+                            {getAnalysisTypeLabel(analysis.type)}
+                          </h3>
+                          <p className={`${mutedText} mt-1 text-sm line-clamp-2`}>
+                            {getAnalysisPreview(analysis)}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-2 text-xs text-[var(--color-subtle)]">
+                            <span className={chip}>{formatDate(analysis.createdAt)}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="shrink-0">
-                      <span className={secondaryButton}>
-                        <EyeIcon className="h-4 w-4" />
-                        View details
-                      </span>
+                      <div className="shrink-0">
+                        <span className={secondaryButton}>
+                          <EyeIcon className="h-4 w-4" />
+                          View details
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
 
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between">
-            <div className={`${mutedText} text-sm`}>
-              {total} {total === 1 ? "analysis" : "analyses"} total
+          {totalPages > 1 && (
+            <div className="flex flex-col gap-3 border-t border-[var(--color-border)] pt-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className={`${mutedText} text-sm`}>
+                {total} {total === 1 ? "analysis" : "analyses"} total
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`${secondaryButton} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  <ChevronLeftIcon className="h-4 w-4" />
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`${secondaryButton} disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  Next
+                  <ChevronRightIcon className="h-4 w-4" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`${secondaryButton} disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                <ChevronLeftIcon className="h-4 w-4" />
-                Previous
-              </button>
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`${secondaryButton} disabled:opacity-50 disabled:cursor-not-allowed`}
-              >
-                Next
-                <ChevronRightIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </section>
 
         {selectedAnalysis && (
           <AnalysisDetailModal

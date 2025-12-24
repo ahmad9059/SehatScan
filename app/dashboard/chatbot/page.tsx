@@ -20,11 +20,10 @@ import {
   RocketLaunchIcon,
 } from "@heroicons/react/24/outline";
 import {
-  card,
   chip,
   contentWidth,
+  fullWidthSection,
   heading,
-  interactiveCard,
   mutedText,
   pageContainer,
   pill,
@@ -44,15 +43,15 @@ interface Analysis {
   id: string;
   type: string;
   createdAt: Date | string;
-  structuredData?: Record<string, unknown>;
-  visualMetrics?: Array<Record<string, unknown>>;
+  structuredData?: Record<string, unknown> | null;
+  visualMetrics?: Array<Record<string, unknown>> | null;
   riskAssessment?: string | null;
 }
 
 const assistantBubble =
-  "max-w-3xl rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-soft)]";
+  "max-w-4xl rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]/80 p-4";
 const userBubble =
-  "max-w-3xl rounded-2xl bg-[var(--color-primary)] text-[var(--color-on-primary)] p-4 shadow-[var(--shadow-soft)]";
+  "max-w-4xl rounded-xl bg-[var(--color-primary)] text-[var(--color-on-primary)] p-4";
 
 function ChatbotPageContent() {
   const { user } = useUser();
@@ -79,7 +78,7 @@ function ChatbotPageContent() {
           getUserAnalyses(user.id, "risk"),
         ]);
 
-        setUserAnalyses([...reports, ...faces, ...risks]);
+        setUserAnalyses([...reports, ...faces, ...risks] as Analysis[]);
       } catch (error) {
         console.error("Failed to load user analyses:", error);
         showErrorToast("Failed to load your health data");
@@ -115,12 +114,16 @@ How can I help you today?`,
     }
   }, [loadingAnalyses, userAnalyses.length, messages.length]);
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || isLoading) return;
+  const hasUserMessage = messages.some((m) => m.role === "user");
+  const showSuggestions = !hasUserMessage;
+
+  const handleSendMessage = async (overrideMessage?: string) => {
+    const messageToSend = (overrideMessage ?? inputMessage).trim();
+    if (!messageToSend || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputMessage.trim(),
+      content: messageToSend,
       role: "user",
       timestamp: new Date(),
     };
@@ -134,7 +137,7 @@ How can I help you today?`,
     };
 
     setMessages((prev) => [...prev, userMessage, loadingMessage]);
-    setInputMessage("");
+    setInputMessage(overrideMessage ? "" : "");
     setIsLoading(true);
 
     try {
@@ -234,219 +237,161 @@ How can I help you today?`,
   if (loadingAnalyses) {
     return (
       <div className={pageContainer}>
-        <div className={`${contentWidth} space-y-6`}>
-          <div className={`${card} p-6 flex items-center gap-3`}>
-            <LoadingSpinner size="lg" />
-            <p className={`${mutedText} text-sm`}>
-              Preparing your AI health assistant...
-            </p>
-          </div>
+        <div className={contentWidth}>
+          <section className={`${fullWidthSection} space-y-4`}>
+            <div className="flex items-center gap-3">
+              <LoadingSpinner size="lg" />
+              <p className={`${mutedText} text-sm`}>
+                Preparing your AI health assistant...
+              </p>
+            </div>
+          </section>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={pageContainer}>
-      <div className={`${contentWidth} space-y-6`}>
-        <div className={`${card} p-6 lg:p-7`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <ChatBubbleLeftRightIcon className="h-7 w-7" />
-              </div>
-              <div>
-                <h1 className={heading}>AI Health Assistant</h1>
-                <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Ask questions, explore insights, and stay aligned with the
-                  main dashboard experience.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <span className={pill}>Uses your analyses</span>
-                  <span className={pill}>Context-aware answers</span>
-                  <span className={pill}>Markdown supported</span>
+    <div className="flex flex-col h-[calc(100vh-80px)] bg-[var(--color-bg)]">
+      {/* Chat messages container with scroll */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={`flex gap-3 ${
+                message.role === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {message.role === "assistant" && (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                  <SparklesIcon className="h-5 w-5" />
+                </div>
+              )}
+
+              <div
+                className={
+                  message.role === "user" ? userBubble : assistantBubble
+                }
+              >
+                {message.isLoading ? (
+                  <div className="flex items-center gap-3">
+                    <LoadingSpinner size="sm" />
+                    <span className={mutedText}>
+                      Analyzing your health data...
+                    </span>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none text-[var(--color-foreground)] prose-p:mb-3 prose-li:mb-1 dark:prose-invert">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => (
+                          <p className="text-[var(--color-foreground)]">
+                            {children}
+                          </p>
+                        ),
+                        strong: ({ children }) => (
+                          <strong className="font-semibold text-[var(--color-heading)]">
+                            {children}
+                          </strong>
+                        ),
+                        em: ({ children }) => (
+                          <em className="italic text-[var(--color-foreground)]">
+                            {children}
+                          </em>
+                        ),
+                        code: ({ children }) => (
+                          <code className="rounded bg-[var(--color-surface)] px-2 py-1 text-[var(--color-heading)]">
+                            {children}
+                          </code>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="list-disc pl-4 text-[var(--color-foreground)]">
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="list-decimal pl-4 text-[var(--color-foreground)]">
+                            {children}
+                          </ol>
+                        ),
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+                <div className="mt-3 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
+                  <span className="h-1 w-1 rounded-full bg-current" />
+                  {formatTimestamp(message.timestamp)}
                 </div>
               </div>
+
+              {message.role === "user" && (
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-primary)] text-white">
+                  <UserIcon className="h-5 w-5" />
+                </div>
+              )}
             </div>
-            {userAnalyses.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {["report", "face", "risk"].map((type) => {
-                  const count = userAnalyses.filter(
-                    (analysis) => analysis.type === type
-                  ).length;
-                  const Icon = getAnalysisIcon(type);
-                  return (
-                    <span key={type} className={chip}>
-                      <Icon className="h-4 w-4" />
-                      {count} {type}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          ))}
+          <div ref={messagesEndRef} />
         </div>
 
-        {messages.length <= 1 && (
-          <div className={`${card} p-4 space-y-3`}>
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                {userAnalyses.length > 0 ? (
-                  <LightBulbIcon className="h-5 w-5" />
-                ) : (
-                  <RocketLaunchIcon className="h-5 w-5" />
-                )}
-              </div>
-              <p className="text-sm font-semibold text-[var(--color-heading)]">
-                {userAnalyses.length > 0
-                  ? "Suggested questions to get started"
-                  : "Try one of these questions"}
-              </p>
-            </div>
-            <div className="grid gap-2 sm:grid-cols-2">
+        {/* Suggested questions - shown inline below messages */}
+        {showSuggestions && (
+          <div className="max-w-4xl mx-auto px-4 pb-4">
+            <div className="flex flex-wrap gap-2 justify-center">
               {(userAnalyses.length > 0
-                ? suggestedQuestions.slice(0, 4)
+                ? suggestedQuestions.slice(0, 3)
                 : [
                     "What can you help me with?",
                     "How does this health assistant work?",
                     "What should I upload first?",
-                    "Tell me about health monitoring",
                   ]
               ).map((question) => (
                 <button
                   key={question}
                   type="button"
-                  onClick={() => setInputMessage(question)}
-                  className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-left text-sm font-semibold text-[var(--color-heading)] transition-colors duration-200 hover:border-[var(--color-primary)]"
+                  onClick={() => handleSendMessage(question)}
+                  className="rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-2 text-sm font-medium text-[var(--color-heading)] transition-all duration-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)]"
                 >
-                  <div className="h-2 w-2 rounded-full bg-[var(--color-primary)]" />
-                  <span>{question}</span>
+                  {question}
                 </button>
               ))}
             </div>
           </div>
         )}
+      </div>
 
-        <div className={`${interactiveCard} p-0`}>
-          <div className="flex flex-col gap-4 p-4 sm:p-6 min-h-[60vh]">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex gap-3 ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                {message.role === "assistant" && (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                    <SparklesIcon className="h-5 w-5" />
-                  </div>
-                )}
-
-                <div
-                  className={
-                    message.role === "user" ? userBubble : assistantBubble
-                  }
-                >
-                  {message.isLoading ? (
-                    <div className="flex items-center gap-3">
-                      <LoadingSpinner size="sm" />
-                      <span
-                        className={
-                          message.role === "user"
-                            ? "text-[var(--color-on-primary)]"
-                            : mutedText
-                        }
-                      >
-                        Analyzing your health data...
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="prose prose-sm max-w-none text-[var(--color-foreground)] prose-p:mb-3 prose-li:mb-1 dark:prose-invert">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        components={{
-                          p: ({ children }) => (
-                            <p className="text-[var(--color-foreground)]">
-                              {children}
-                            </p>
-                          ),
-                          strong: ({ children }) => (
-                            <strong className="font-semibold text-[var(--color-heading)]">
-                              {children}
-                            </strong>
-                          ),
-                          em: ({ children }) => (
-                            <em className="italic text-[var(--color-foreground)]">
-                              {children}
-                            </em>
-                          ),
-                          code: ({ children }) => (
-                            <code className="rounded bg-[var(--color-surface)] px-2 py-1 text-[var(--color-heading)]">
-                              {children}
-                            </code>
-                          ),
-                          ul: ({ children }) => (
-                            <ul className="list-disc pl-4 text-[var(--color-foreground)]">
-                              {children}
-                            </ul>
-                          ),
-                          ol: ({ children }) => (
-                            <ol className="list-decimal pl-4 text-[var(--color-foreground)]">
-                              {children}
-                            </ol>
-                          ),
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
-                  )}
-                  <div className="mt-3 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
-                    <span className="h-1 w-1 rounded-full bg-current" />
-                    {formatTimestamp(message.timestamp)}
-                  </div>
-                </div>
-
-                {message.role === "user" && (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--color-primary)] text-[var(--color-on-primary)]">
-                    <UserIcon className="h-5 w-5" />
-                  </div>
-                )}
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-
-          <div className="border-t border-[var(--color-border)] bg-[var(--color-card)] p-4 sm:p-5">
-            <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 sm:p-4">
-              <div className="flex items-start gap-3">
-                <textarea
-                  ref={inputRef}
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  className="min-h-[80px] flex-1 resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-                  placeholder={
-                    userAnalyses.length > 0
-                      ? "Ask about your reports, facial analyses, or risk assessments..."
-                      : "Upload a report or photo for deeper insights..."
-                  }
-                />
-                <button
-                  type="button"
-                  onClick={handleSendMessage}
-                  disabled={!inputMessage.trim() || isLoading}
-                  className={`${primaryButton} shrink-0 px-4 py-3`}
-                  aria-label="Send message"
-                >
-                  <PaperAirplaneIcon className="h-5 w-5" />
-                </button>
-              </div>
-              <div className="mt-2 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
-                <SparklesIcon className="h-4 w-4" />
-                Powered by your saved analyses for context-rich answers.
-              </div>
+      {/* Fixed input area at bottom */}
+      <div className="border-t border-[var(--color-border)] bg-[var(--color-card)]">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-end gap-3">
+            <div className="flex-1 relative">
+              <textarea
+                ref={inputRef}
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                rows={1}
+                className="w-full min-h-12 max-h-40 resize-none rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all"
+                placeholder={
+                  userAnalyses.length > 0
+                    ? "Ask about your health reports..."
+                    : "Type your message..."
+                }
+              />
             </div>
+            <button
+              type="button"
+              onClick={() => handleSendMessage()}
+              disabled={!inputMessage.trim() || isLoading}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] text-white transition-all duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              aria-label="Send message"
+            >
+              <PaperAirplaneIcon className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </div>

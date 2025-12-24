@@ -21,11 +21,10 @@ import {
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import {
-  card,
   chip,
   contentWidth,
+  fullWidthSection,
   heading,
-  interactiveCard,
   mutedText,
   pageContainer,
   pill,
@@ -199,18 +198,18 @@ function ScanReportPageContent() {
 
   return (
     <div className={pageContainer}>
-      <div className={`${contentWidth} space-y-6`}>
-        <div className={`${card} p-6 lg:p-7`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className={contentWidth}>
+        <section className={`${fullWidthSection} space-y-10`}>
+          <div className="flex flex-col gap-4 border-b border-[var(--color-border)] pb-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+              <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                 <DocumentTextIcon className="h-7 w-7" />
               </div>
               <div>
                 <h1 className={heading}>Scan Medical Report</h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Upload your lab report to extract and analyze health metrics
-                  with a clean, dashboard-aligned experience.
+                  Upload your lab report to extract and analyze health metrics in
+                  a continuous, full-width dashboard flow.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className={pill}>PDF, JPG, PNG</span>
@@ -231,189 +230,187 @@ function ScanReportPageContent() {
               </button>
             )}
           </div>
-        </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.6fr,1fr]">
-          <div className={`${interactiveCard} p-6 lg:p-7`}>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div
-                className={`relative border-2 border-dashed rounded-xl p-6 sm:p-8 text-center transition-all duration-200 ${
-                  isDragOver
-                    ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
-                    : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-primary)]"
-                }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,application/pdf"
-                  onChange={handleFileInputChange}
-                  className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                  disabled={isLoading}
-                  aria-label="Upload medical document"
-                />
+          <div className="grid gap-8 lg:grid-cols-[1.6fr,1fr]">
+            <div className="space-y-6 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-6 rounded-xl">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div
+                  className={`relative border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-all duration-200 ${
+                    isDragOver
+                      ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
+                      : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-primary)]"
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,application/pdf"
+                    onChange={handleFileInputChange}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    disabled={isLoading}
+                    aria-label="Upload medical document"
+                  />
 
-                <div className="space-y-4">
-                  <div className="flex justify-center">
-                    <div className="p-4 rounded-xl bg-[var(--color-card)] shadow-[var(--shadow-soft)]">
-                      {isLoading ? (
-                        <LoadingSpinner size="lg" />
-                      ) : (
-                        <CloudArrowUpIcon className="h-10 w-10 text-[var(--color-primary)]" />
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold text-[var(--color-heading)]">
-                      {isLoading
-                        ? "Processing document..."
-                        : "Drop your document or browse"}
-                    </h3>
-                    <p className={`${subheading} text-sm`}>
-                      High-quality uploads help us extract accurate health
-                      metrics.
-                    </p>
-                  </div>
-
-                  {file ? (
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                          {file.type.startsWith("image/") ? (
-                            <PhotoIcon className="h-5 w-5" />
-                          ) : (
-                            <DocumentTextIcon className="h-5 w-5" />
-                          )}
-                        </div>
-                        <div className="text-left">
-                          <p className="text-sm font-semibold text-[var(--color-heading)]">
-                            {file.name}
-                          </p>
-                          <p className={`${mutedText} text-xs`}>
-                            {formatFileSize(file.size)}
-                          </p>
-                        </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-center">
+                      <div className="p-4 rounded-lg bg-[var(--color-card)]">
+                        {isLoading ? (
+                          <LoadingSpinner size="lg" />
+                        ) : (
+                          <CloudArrowUpIcon className="h-10 w-10 text-[var(--color-primary)]" />
+                        )}
                       </div>
+                    </div>
 
-                      {imagePreview && (
-                        <div className="flex justify-center">
-                          <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-soft)]">
-                            <img
-                              src={imagePreview}
-                              alt="Selected preview"
-                              className="h-48 w-full object-contain"
-                            />
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-semibold text-[var(--color-heading)]">
+                        {isLoading
+                          ? "Processing document..."
+                          : "Drop your document or browse"}
+                      </h3>
+                      <p className={`${subheading} text-sm`}>
+                        High-quality uploads help us extract accurate health
+                        metrics.
+                      </p>
+                    </div>
+
+                    {file ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                            {file.type.startsWith("image/") ? (
+                              <PhotoIcon className="h-5 w-5" />
+                            ) : (
+                              <DocumentTextIcon className="h-5 w-5" />
+                            )}
+                          </div>
+                          <div className="text-left">
+                            <p className="text-sm font-semibold text-[var(--color-heading)]">
+                              {file.name}
+                            </p>
+                            <p className={`${mutedText} text-xs`}>
+                              {formatFileSize(file.size)}
+                            </p>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap justify-center gap-2">
-                      <span className={chip}>Single file at a time</span>
-                      <span className={chip}>Keep text sharp</span>
-                      <span className={chip}>No personal IDs</span>
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <span className={chip}>AI extraction</span>
-                  <span className={chip}>Auto-save to history</span>
-                  <span className={chip}>One-step workflow</span>
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className={secondaryButton}
-                    disabled={isLoading}
-                  >
-                    <PhotoIcon className="h-4 w-4" />
-                    Choose file
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!file || isLoading}
-                    className={primaryButton}
-                    aria-label="Analyze document"
-                  >
-                    {isLoading ? (
-                      <>
-                        <LoadingSpinner size="sm" color="white" />
-                        Analyzing...
-                      </>
+                        {imagePreview && (
+                          <div className="flex justify-center">
+                          <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-xl">
+                              <img
+                                src={imagePreview}
+                                alt="Selected preview"
+                                className="h-48 w-full object-contain"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     ) : (
-                      <>
-                        <ChartBarIcon className="h-4 w-4" />
-                        Analyze report
-                      </>
+                      <div className="flex flex-wrap justify-center gap-2">
+                        <span className={chip}>Single file at a time</span>
+                        <span className={chip}>Keep text sharp</span>
+                        <span className={chip}>No personal IDs</span>
+                      </div>
                     )}
-                  </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className={chip}>AI extraction</span>
+                    <span className={chip}>Auto-save to history</span>
+                    <span className={chip}>One-step workflow</span>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className={secondaryButton}
+                      disabled={isLoading}
+                    >
+                      <PhotoIcon className="h-4 w-4" />
+                      Choose file
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={!file || isLoading}
+                      className={primaryButton}
+                      aria-label="Analyze document"
+                    >
+                      {isLoading ? (
+                        <>
+                          <LoadingSpinner size="sm" color="white" />
+                          Analyzing...
+                        </>
+                      ) : (
+                        <>
+                          <ChartBarIcon className="h-4 w-4" />
+                          Analyze report
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div className="space-y-6 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-6 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                  <InformationCircleIcon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className={sectionTitle}>Upload guidance</h3>
+                  <p className={`${subheading} mt-1 text-sm`}>
+                    Follow these tips to keep the experience open and readable
+                    while getting reliable metrics.
+                  </p>
                 </div>
               </div>
-            </form>
-          </div>
 
-          <div className={`${card} p-6 lg:p-7 space-y-6`}>
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <InformationCircleIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className={sectionTitle}>Upload guidance</h3>
-                <p className={`${subheading} mt-1 text-sm`}>
-                  Follow these tips to mirror the main dashboard quality and get
-                  reliable metrics.
-                </p>
-              </div>
-            </div>
-
-            <ul className="space-y-3">
-              {uploadTips.map((tip) => (
-                <li
-                  key={tip}
-                  className="flex items-start gap-3 rounded-xl bg-[var(--color-surface)] p-3"
-                >
-                  <CheckCircleIcon className="mt-0.5 h-5 w-5 text-[var(--color-primary)]" />
-                  <p className={`${mutedText} text-sm`}>{tip}</p>
-                </li>
-              ))}
-            </ul>
-
-            <div className="border-t border-[var(--color-border)] pt-4">
-              <h4 className="text-sm font-semibold text-[var(--color-foreground)] mb-3">
-                You will receive
-              </h4>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {quickWins.map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-3"
+              <ul className="space-y-3">
+                {uploadTips.map((tip) => (
+                  <li
+                    key={tip}
+                    className="flex items-start gap-3 border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 rounded-xl"
                   >
-                    <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
-                      <ChartBarIcon className="h-5 w-5" />
-                    </div>
-                    <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      {item}
-                    </p>
-                  </div>
+                    <CheckCircleIcon className="mt-0.5 h-5 w-5 text-[var(--color-primary)]" />
+                    <p className={`${mutedText} text-sm`}>{tip}</p>
+                  </li>
                 ))}
+              </ul>
+
+              <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
+                <h4 className="text-sm font-semibold text-[var(--color-foreground)]">
+                  You will receive
+                </h4>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {quickWins.map((item) => (
+                    <div
+                      key={item}
+                    className="flex items-center gap-3 border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 rounded-xl"
+                    >
+                      <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
+                        <ChartBarIcon className="h-5 w-5" />
+                      </div>
+                      <p className="text-sm font-semibold text-[var(--color-heading)]">
+                        {item}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {result && (
-          <div className="space-y-6">
-            <div className={`${card} p-6 lg:p-7`}>
+          {result && (
+                <div className="space-y-8 border-t border-[var(--color-border)] pt-8">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                   <CheckCircleIcon className="h-6 w-6" />
                 </div>
                 <div>
@@ -424,116 +421,116 @@ function ScanReportPageContent() {
                   </p>
                 </div>
               </div>
-            </div>
 
-            <div className={`${interactiveCard} p-6 lg:p-7`}>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className={sectionTitle}>Health metrics</h3>
-                  <p className={`${subheading} text-sm`}>
-                    Structured values extracted from your report
-                  </p>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className={sectionTitle}>Health metrics</h3>
+                      <p className={`${subheading} text-sm`}>
+                        Structured values extracted from your report
+                      </p>
+                    </div>
+                    {result.structured_data?.metrics && (
+                      <span className={pill}>
+                        {result.structured_data.metrics.length} metrics
+                      </span>
+                    )}
+                  </div>
+
+                  {result.structured_data?.metrics &&
+                  result.structured_data.metrics.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {result.structured_data.metrics.map((metric, index) => (
+                        <div
+                          key={`${metric.name}-${index}`}
+                          className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl"
+                        >
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-subtle)]">
+                              #{index + 1}
+                            </span>
+                            <div className="h-8 w-8 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
+                              <ChartBarIcon className="h-4 w-4" />
+                            </div>
+                          </div>
+                          <h4 className="text-sm font-semibold text-[var(--color-heading)] mb-2">
+                            {metric.name}
+                          </h4>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-[var(--color-primary)]">
+                              {metric.value}
+                            </span>
+                            {metric.unit && (
+                              <span className={`${mutedText} text-sm`}>
+                                {metric.unit}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-6 text-center rounded-xl">
+                      <ExclamationCircleIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
+                      <h4 className="mt-3 text-base font-semibold text-[var(--color-heading)]">
+                        No health metrics found
+                      </h4>
+                      <p className={`${subheading} mt-1 text-sm`}>
+                        We could not detect structured metrics in this document.
+                        Please upload a clearer report.
+                      </p>
+                    </div>
+                  )}
                 </div>
-                {result.structured_data?.metrics && (
-                  <span className={pill}>
-                    {result.structured_data.metrics.length} metrics
-                  </span>
-                )}
-              </div>
 
-              {result.structured_data?.metrics &&
-              result.structured_data.metrics.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {result.structured_data.metrics.map((metric, index) => (
-                    <div
-                      key={`${metric.name}-${index}`}
-                      className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-soft)]"
-                    >
-                      <div className="mb-2 flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-subtle)]">
-                          #{index + 1}
-                        </span>
-                        <div className="h-8 w-8 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
-                          <ChartBarIcon className="h-4 w-4" />
+                <div className="border border-[var(--color-border)] bg-[var(--color-card)]/70 px-5 py-5 rounded-xl">
+                  <details className="group">
+                    <summary className="flex cursor-pointer list-none items-center justify-between border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-heading)] rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
+                          <DocumentTextIcon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--color-heading)]">
+                            Extracted text
+                          </p>
+                          <p className={`${subheading} text-xs`}>
+                            Full OCR output from your upload
+                          </p>
                         </div>
                       </div>
-                      <h4 className="text-sm font-semibold text-[var(--color-heading)] mb-2">
-                        {metric.name}
-                      </h4>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-[var(--color-primary)]">
-                          {metric.value}
-                        </span>
-                        {metric.unit && (
-                          <span className={`${mutedText} text-sm`}>
-                            {metric.unit}
-                          </span>
-                        )}
+                      <span className={`${mutedText} text-xs`}>Toggle view</span>
+                    </summary>
+                    <div className="mt-4 border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-lg">
+                      <div className="max-h-96 overflow-auto bg-[var(--color-surface)] px-4 py-4 rounded">
+                        <pre className="whitespace-pre-wrap text-sm text-[var(--color-foreground)]">
+                          {result.raw_text || "No text extracted"}
+                        </pre>
                       </div>
                     </div>
-                  ))}
+                  </details>
                 </div>
-              ) : (
-                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
-                  <ExclamationCircleIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
-                  <h4 className="mt-3 text-base font-semibold text-[var(--color-heading)]">
-                    No health metrics found
-                  </h4>
-                  <p className={`${subheading} mt-1 text-sm`}>
-                    We could not detect structured metrics in this document.
-                    Please upload a clearer report.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className={`${card} p-6 lg:p-7`}>
-              <details className="group">
-                <summary className="flex cursor-pointer list-none items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-[var(--color-heading)]">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
-                      <DocumentTextIcon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-[var(--color-heading)]">
-                        Extracted text
-                      </p>
-                      <p className={`${subheading} text-xs`}>
-                        Full OCR output from your upload
-                      </p>
-                    </div>
-                  </div>
-                  <span className={`${mutedText} text-xs`}>Toggle view</span>
-                </summary>
-                <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4">
-                  <div className="max-h-96 overflow-auto rounded-lg bg-[var(--color-surface)] p-4">
-                    <pre className="whitespace-pre-wrap text-sm text-[var(--color-foreground)]">
-                      {result.raw_text || "No text extracted"}
-                    </pre>
-                  </div>
-                </div>
-              </details>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div
-            className={`${card} border-[var(--color-danger)] bg-[var(--color-card)] p-6`}
-          >
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
-                <ExclamationCircleIcon className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-[var(--color-heading)]">
-                  Analysis error
-                </h3>
-                <p className={`${mutedText} mt-1 text-sm`}>{error}</p>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {error && (
+            <div className="border border-[var(--color-danger)] bg-[var(--color-card)]/70 px-5 py-4 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-[var(--color-danger)]/10 text-[var(--color-danger)]">
+                  <ExclamationCircleIcon className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--color-heading)]">
+                    Analysis error
+                  </h3>
+                  <p className={`${mutedText} mt-1 text-sm`}>{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

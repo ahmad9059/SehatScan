@@ -1,18 +1,20 @@
 export const pageContainer =
-  "min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up";
+  "min-h-screen bg-[var(--color-bg)] py-10 animate-fade-in-up";
 
-export const contentWidth = "mx-auto max-w-6xl";
+export const contentWidth = "w-full px-4 sm:px-6 lg:px-10";
 
 export const card =
   "bg-[var(--color-card)] border border-[var(--color-border)] rounded-2xl shadow-[var(--shadow-soft)]";
 
 export const interactiveCard = `${card} hover:shadow-[var(--shadow-strong)] transition-all duration-300`;
 
+export const fullWidthSection =
+  "w-full rounded-none border-b border-[var(--color-border)] bg-[var(--color-card)]/60 px-4 sm:px-6 lg:px-10 pt-0 pb-8 space-y-8";
+
 export const heading =
   "text-3xl font-bold text-[var(--color-heading)] font-poppins";
 
-export const sectionTitle =
-  "text-xl font-semibold text-[var(--color-heading)]";
+export const sectionTitle = "text-xl font-semibold text-[var(--color-heading)]";
 
 export const subheading = "text-[var(--color-subtle)]";
 
@@ -29,4 +31,3 @@ export const secondaryButton =
 
 export const chip =
   "inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-surface)] text-[var(--color-subtle)] text-xs font-semibold";
-

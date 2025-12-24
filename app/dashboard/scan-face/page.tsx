@@ -22,11 +22,10 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import {
-  card,
   chip,
   contentWidth,
+  fullWidthSection,
   heading,
-  interactiveCard,
   mutedText,
   pageContainer,
   pill,
@@ -229,18 +228,18 @@ function ScanFacePageContent() {
 
   return (
     <div className={pageContainer}>
-      <div className={`${contentWidth} space-y-6`}>
-        <div className={`${card} p-6 lg:p-7`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className={contentWidth}>
+        <section className={`${fullWidthSection} space-y-10`}>
+          <div className="flex flex-col gap-4 border-b border-[var(--color-border)] pb-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+              <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                 <FaceSmileIcon className="h-7 w-7" />
               </div>
               <div>
                 <h1 className={heading}>Facial Health Analysis</h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Upload a clear portrait to detect visual health indicators and
-                  align results with the main dashboard experience.
+                  Upload a clear portrait to detect visual health indicators in a
+                  full-width, continuous dashboard view.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className={pill}>JPG or PNG</span>
@@ -261,13 +260,11 @@ function ScanFacePageContent() {
               </button>
             )}
           </div>
-        </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.6fr,1fr]">
-          <div className={`${interactiveCard} p-6 lg:p-7`}>
+          <div className="grid gap-8 lg:grid-cols-[1.6fr,1fr]">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div
-                className={`relative border-2 border-dashed rounded-xl p-6 sm:p-8 text-center transition-all duration-200 ${
+                className={`relative border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-all duration-200 ${
                   isDragOver
                     ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
                     : "border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-primary)]"
@@ -288,7 +285,7 @@ function ScanFacePageContent() {
 
                 <div className="space-y-4">
                   <div className="flex justify-center">
-                    <div className="p-4 rounded-xl bg-[var(--color-card)] shadow-[var(--shadow-soft)]">
+                    <div className="p-4 rounded-lg bg-[var(--color-card)]">
                       {isLoading ? (
                         <LoadingSpinner size="lg" />
                       ) : (
@@ -325,7 +322,7 @@ function ScanFacePageContent() {
 
                       {imagePreview && (
                         <div className="flex justify-center">
-                          <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-soft)]">
+                          <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-xl">
                             <img
                               src={imagePreview}
                               alt="Selected preview"
@@ -382,73 +379,71 @@ function ScanFacePageContent() {
                 </div>
               </div>
             </form>
-          </div>
 
-          <div className={`${card} p-6 lg:p-7 space-y-6`}>
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                <HeartIcon className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className={sectionTitle}>Capture guidance</h3>
-                <p className={`${subheading} mt-1 text-sm`}>
-                  Quick reminders to keep the experience aligned with the main
-                  dashboard feel.
-                </p>
-              </div>
-            </div>
-
-            <ul className="space-y-3">
-              {photoTips.map((tip) => (
-                <li
-                  key={tip}
-                  className="flex items-start gap-3 rounded-xl bg-[var(--color-surface)] p-3"
-                >
-                  <CheckCircleIcon className="mt-0.5 h-5 w-5 text-[var(--color-primary)]" />
-                  <p className={`${mutedText} text-sm`}>{tip}</p>
-                </li>
-              ))}
-            </ul>
-
-            <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
-              <h4 className="text-sm font-semibold text-[var(--color-foreground)]">
-                Analysis includes
-              </h4>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-3">
-                  <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
-                    <FaceSmileIcon className="h-5 w-5" />
-                  </div>
-                  <p className="text-sm font-semibold text-[var(--color-heading)]">
-                    Detection & confidence
-                  </p>
+            <div className="space-y-5 border border-[var(--color-border)] bg-[var(--color-card)]/50 px-5 py-6 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                  <HeartIcon className="h-5 w-5" />
                 </div>
-                <div className="flex items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-3">
-                  <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
-                    <ChartBarIcon className="h-5 w-5" />
-                  </div>
-                  <p className="text-sm font-semibold text-[var(--color-heading)]">
-                    Visual health cues
+                <div>
+                  <h3 className={sectionTitle}>Capture guidance</h3>
+                  <p className={`${subheading} mt-1 text-sm`}>
+                    Quick reminders to keep the experience aligned with the open
+                    dashboard flow.
                   </p>
                 </div>
               </div>
+
+              <ul className="space-y-3">
+                {photoTips.map((tip) => (
+                  <li
+                    key={tip}
+                    className="flex items-start gap-3 border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 rounded-xl"
+                  >
+                    <CheckCircleIcon className="mt-0.5 h-5 w-5 text-[var(--color-primary)]" />
+                    <p className={`${mutedText} text-sm`}>{tip}</p>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
+                <h4 className="text-sm font-semibold text-[var(--color-foreground)]">
+                  Analysis includes
+                </h4>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="flex items-center gap-3 border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 rounded-xl">
+                    <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
+                      <FaceSmileIcon className="h-5 w-5" />
+                    </div>
+                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                      Detection & confidence
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 rounded-xl">
+                    <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
+                      <ChartBarIcon className="h-5 w-5" />
+                    </div>
+                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                      Visual health cues
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
 
-        {result && (
-          <div className="space-y-6">
-            <div className={`${card} p-6 lg:p-7`}>
+          {result && (
+            <div className="space-y-8 border-t border-[var(--color-border)] pt-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                  <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                     <CheckCircleIcon className="h-6 w-6" />
                   </div>
                   <div>
                     <h2 className={sectionTitle}>Analysis complete</h2>
                     <p className={`${subheading} mt-1 text-sm`}>
-                      Your facial analysis is ready and saved to history with
-                      the same card styling as the main dashboard.
+                      Your facial analysis is ready and saved to history within
+                      the continuous dashboard layout.
                     </p>
                   </div>
                 </div>
@@ -470,196 +465,196 @@ function ScanFacePageContent() {
                   </span>
                 </div>
               </div>
-            </div>
 
-            <div className={`${interactiveCard} p-6 lg:p-7`}>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className={sectionTitle}>Visual metrics</h3>
-                  <p className={`${subheading} text-sm`}>
-                    Key signals observed from your uploaded image
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <span className={chip}>Redness</span>
-                  <span className={chip}>Yellowness</span>
-                </div>
-              </div>
-
-              {visualMetrics ? (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {[
-                    {
-                      label: "Redness percentage",
-                      value: visualMetrics.redness_percentage,
-                      color:
-                        visualMetrics.redness_percentage > 15
-                          ? "bg-[var(--color-warning)]"
-                          : "bg-[var(--color-success)]",
-                    },
-                    {
-                      label: "Yellowness percentage",
-                      value: visualMetrics.yellowness_percentage,
-                      color:
-                        visualMetrics.yellowness_percentage > 15
-                          ? "bg-[var(--color-warning)]"
-                          : "bg-[var(--color-success)]",
-                    },
-                  ].map((metric) => (
-                    <div
-                      key={metric.label}
-                      className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 shadow-[var(--shadow-soft)]"
-                    >
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-semibold text-[var(--color-heading)]">
-                          {metric.label}
-                        </h4>
-                        <span className={pill}>{metric.value}%</span>
-                      </div>
-                      <div className="mt-3 h-2 w-full rounded-full bg-[var(--color-surface)]">
-                        <div
-                          className={`h-2 rounded-full ${metric.color}`}
-                          style={{ width: `${Math.min(metric.value, 100)}%` }}
-                        />
-                      </div>
+                <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h3 className={sectionTitle}>Visual metrics</h3>
+                      <p className={`${subheading} text-sm`}>
+                        Key signals observed from your uploaded image
+                      </p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 text-center">
-                  <ExclamationCircleIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
-                  <h4 className="mt-3 text-base font-semibold text-[var(--color-heading)]">
-                    No visual metrics found
-                  </h4>
-                  <p className={`${subheading} mt-1 text-sm`}>
-                    Try another photo with brighter lighting and clearer focus.
-                  </p>
-                </div>
-              )}
-            </div>
+                    <div className="flex gap-2">
+                      <span className={chip}>Redness</span>
+                      <span className={chip}>Yellowness</span>
+                    </div>
+                  </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className={`${card} p-6 lg:p-7 space-y-4`}>
-                <div className="flex items-center justify-between">
-                  <h3 className={sectionTitle}>Detected concerns</h3>
-                  <span className={chip}>
-                    {result.problems_detected?.length || 0} items
-                  </span>
-                </div>
-
-                {result.problems_detected &&
-                result.problems_detected.length > 0 ? (
-                  <div className="space-y-3">
-                    {result.problems_detected.map((problem, idx) => {
-                      const styles = severityStyles[problem.severity];
-                      return (
+                  {visualMetrics ? (
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {[
+                        {
+                          label: "Redness percentage",
+                          value: visualMetrics.redness_percentage,
+                          color:
+                            visualMetrics.redness_percentage > 15
+                              ? "bg-[var(--color-warning)]"
+                              : "bg-[var(--color-success)]",
+                        },
+                        {
+                          label: "Yellowness percentage",
+                          value: visualMetrics.yellowness_percentage,
+                          color:
+                            visualMetrics.yellowness_percentage > 15
+                              ? "bg-[var(--color-warning)]"
+                              : "bg-[var(--color-success)]",
+                        },
+                      ].map((metric) => (
                         <div
-                          key={`${problem.type}-${idx}`}
-                          className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
+                          key={metric.label}
+                          className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl"
                         >
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
-                              <p className="text-sm font-semibold text-[var(--color-heading)]">
-                                {problem.type}
+                            <h4 className="text-sm font-semibold text-[var(--color-heading)]">
+                              {metric.label}
+                            </h4>
+                            <span className={pill}>{metric.value}%</span>
+                          </div>
+                          <div className="mt-3 h-2 w-full rounded-full bg-[var(--color-surface)]">
+                            <div
+                              className={`h-2 rounded-full ${metric.color}`}
+                              style={{ width: `${Math.min(metric.value, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-6 text-center rounded-xl">
+                      <ExclamationCircleIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
+                      <h4 className="mt-3 text-base font-semibold text-[var(--color-heading)]">
+                        No visual metrics found
+                      </h4>
+                      <p className={`${subheading} mt-1 text-sm`}>
+                        Try another photo with brighter lighting and clearer focus.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-5 rounded-xl">
+                    <div className="flex items-center justify-between">
+                      <h3 className={sectionTitle}>Detected concerns</h3>
+                      <span className={chip}>
+                        {result.problems_detected?.length || 0} items
+                      </span>
+                    </div>
+
+                    {result.problems_detected &&
+                    result.problems_detected.length > 0 ? (
+                      <div className="space-y-3">
+                        {result.problems_detected.map((problem, idx) => {
+                          const styles = severityStyles[problem.severity];
+                          return (
+                            <div
+                              key={`${problem.type}-${idx}`}
+                              className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 rounded-xl"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
+                                  <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                    {problem.type}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${styles.text} ${styles.border} border`}
+                                >
+                                  {styles.label}
+                                </span>
+                              </div>
+                              <p className={`${mutedText} mt-2 text-sm`}>
+                                {problem.description}
                               </p>
                             </div>
-                            <span
-                              className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${styles.text} ${styles.border} border`}
-                            >
-                              {styles.label}
-                            </span>
-                          </div>
-                          <p className={`${mutedText} mt-2 text-sm`}>
-                            {problem.description}
-                          </p>
-                        </div>
-                      );
-                    })}
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className={`${mutedText} text-sm`}>
+                        No specific concerns detected for this photo.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p className={`${mutedText} text-sm`}>
-                    No specific concerns detected for this photo.
-                  </p>
-                )}
-              </div>
 
-              <div className={`${card} p-6 lg:p-7 space-y-4`}>
-                <div className="flex items-center justify-between">
-                  <h3 className={sectionTitle}>Recommended actions</h3>
-                  <span className={chip}>
-                    {result.treatments?.length || 0} suggestions
-                  </span>
-                </div>
+                  <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-5 rounded-xl">
+                    <div className="flex items-center justify-between">
+                      <h3 className={sectionTitle}>Recommended actions</h3>
+                      <span className={chip}>
+                        {result.treatments?.length || 0} suggestions
+                      </span>
+                    </div>
 
-                {result.treatments && result.treatments.length > 0 ? (
-                  <div className="space-y-3">
-                    {result.treatments.map((treatment, idx) => (
-                      <div
-                        key={`${treatment.category}-${idx}`}
-                        className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
-                            <p className="text-sm font-semibold text-[var(--color-heading)]">
-                              {treatment.category}
+                    {result.treatments && result.treatments.length > 0 ? (
+                      <div className="space-y-3">
+                        {result.treatments.map((treatment, idx) => (
+                          <div
+                            key={`${treatment.category}-${idx}`}
+                            className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 rounded-xl"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                                <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                  {treatment.category}
+                                </p>
+                              </div>
+                              <span className={pill}>{treatment.priority}</span>
+                            </div>
+                            <p className={`${mutedText} mt-2 text-sm`}>
+                              {treatment.recommendation}
+                            </p>
+                            <p className={`${subheading} mt-2 text-xs`}>
+                              Timeline: {treatment.timeframe}
                             </p>
                           </div>
-                          <span className={pill}>{treatment.priority}</span>
-                        </div>
-                        <p className={`${mutedText} mt-2 text-sm`}>
-                          {treatment.recommendation}
-                        </p>
-                        <p className={`${subheading} mt-2 text-xs`}>
-                          Timeline: {treatment.timeframe}
-                        </p>
+                        ))}
                       </div>
-                    ))}
+                    ) : (
+                      <p className={`${mutedText} text-sm`}>
+                        Recommendations will appear here after analysis.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p className={`${mutedText} text-sm`}>
-                    Recommendations will appear here after analysis.
-                  </p>
+                </div>
+
+                {result.annotated_image && (
+                  <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-5 rounded-xl">
+                    <div className="flex items-center justify-between">
+                      <h3 className={sectionTitle}>Annotated image</h3>
+                      <span className={chip}>AI overlay</span>
+                    </div>
+                    <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-lg">
+                      <img
+                        src={`data:image/png;base64,${result.annotated_image}`}
+                        alt="Annotated analysis"
+                        className="w-full object-contain"
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
+          )}
 
-            {result.annotated_image && (
-              <div className={`${interactiveCard} p-6 lg:p-7`}>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className={sectionTitle}>Annotated image</h3>
-                  <span className={chip}>AI overlay</span>
+          {error && (
+            <div className="border border-[var(--color-danger)] bg-[var(--color-card)]/70 px-5 py-4 rounded-xl">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-[var(--color-surface)] text-[var(--color-danger)]">
+                  <ExclamationCircleIcon className="h-6 w-6" />
                 </div>
-                <div className="overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-soft)]">
-                  <img
-                    src={`data:image/png;base64,${result.annotated_image}`}
-                    alt="Annotated analysis"
-                    className="w-full object-contain"
-                  />
+                <div>
+                  <h3 className="text-lg font-semibold text-[var(--color-heading)]">
+                    Analysis error
+                  </h3>
+                  <p className={`${mutedText} mt-1 text-sm`}>{error}</p>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {error && (
-          <div
-            className={`${card} border-[var(--color-danger)] bg-[var(--color-card)] p-6`}
-          >
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-[var(--color-surface)] text-[var(--color-danger)]">
-                <ExclamationCircleIcon className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-[var(--color-heading)]">
-                  Analysis error
-                </h3>
-                <p className={`${mutedText} mt-1 text-sm`}>{error}</p>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </section>
       </div>
     </div>
   );

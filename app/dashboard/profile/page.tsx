@@ -17,11 +17,10 @@ import {
   DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import {
-  card,
   chip,
   contentWidth,
+  fullWidthSection,
   heading,
-  interactiveCard,
   mutedText,
   pageContainer,
   pill,
@@ -82,8 +81,12 @@ function ProfilePageContent() {
   if (!isLoaded) {
     return (
       <div className={pageContainer}>
-        <div className={`${contentWidth} flex justify-center`}>
-          <LoadingSpinner size="lg" />
+        <div className={contentWidth}>
+          <section
+            className={`${fullWidthSection} flex items-center justify-center`}
+          >
+            <LoadingSpinner size="lg" />
+          </section>
         </div>
       </div>
     );
@@ -92,16 +95,16 @@ function ProfilePageContent() {
   if (!user) {
     return (
       <div className={pageContainer}>
-        <div className={`${contentWidth} max-w-xl`}>
-          <div className={`${card} p-6 text-center`}>
+        <div className={contentWidth}>
+          <section className={`${fullWidthSection} space-y-4 text-center`}>
             <UserIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
-            <h1 className="mt-4 text-2xl font-bold text-[var(--color-heading)]">
+            <h1 className="text-2xl font-bold text-[var(--color-heading)]">
               Authentication required
             </h1>
-            <p className={`${subheading} mt-2`}>
+            <p className={subheading}>
               Please log in to view your profile and settings.
             </p>
-          </div>
+          </section>
         </div>
       </div>
     );
@@ -117,21 +120,21 @@ function ProfilePageContent() {
 
   return (
     <div className={pageContainer}>
-      <div className={`${contentWidth} space-y-6`}>
-        <div className={`${card} p-6 lg:p-7`}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className={contentWidth}>
+        <section className={`${fullWidthSection} space-y-8`}>
+          <div className="flex flex-col gap-3 border-b border-[var(--color-border)] pb-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
-              <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+              <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                 <UserIcon className="h-7 w-7" />
               </div>
               <div>
                 <h1 className={heading}>Profile & Settings</h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Keep your account aligned with the dashboard look and feel.
+                  Keep your account aligned with the continuous dashboard flow.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className={pill}>Clerk secured</span>
-                  <span className={pill}>Single dashboard style</span>
+                  <span className={pill}>Full-width layout</span>
                 </div>
               </div>
             </div>
@@ -142,131 +145,131 @@ function ProfilePageContent() {
                 : "Verification pending"}
             </span>
           </div>
-        </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className={`${interactiveCard} lg:col-span-2 p-6 lg:p-7`}>
-            <div className="flex items-start gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-primary)] text-[var(--color-on-primary)] text-2xl font-bold shadow-[var(--shadow-soft)]">
-                {userInitial}
-              </div>
-              <div className="flex-1">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 className={sectionTitle}>{userName}</h2>
-                    <div className="mt-1 flex items-center gap-2">
-                      <EnvelopeIcon className="h-4 w-4 text-[var(--color-subtle)]" />
-                      <p className={`${mutedText} text-sm`}>{userEmail}</p>
-                    </div>
-                    <div className="mt-1 flex items-center gap-2">
-                      <CalendarIcon className="h-4 w-4 text-[var(--color-subtle)]" />
-                      <p className={`${mutedText} text-sm`}>
-                        Member since{" "}
-                        {user.createdAt
-                          ? formatJoinDate(user.createdAt)
-                          : "Unknown"}
-                      </p>
-                    </div>
-                  </div>
-                  <span className={chip}>User ID: {user.id}</span>
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2 space-y-5 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-6 rounded-xl">
+              <div className="flex items-start gap-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--color-primary)] text-[var(--color-on-primary)] text-2xl font-bold">
+                  {userInitial}
                 </div>
+                <div className="flex-1">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h2 className={sectionTitle}>{userName}</h2>
+                      <div className="mt-1 flex items-center gap-2">
+                        <EnvelopeIcon className="h-4 w-4 text-[var(--color-subtle)]" />
+                        <p className={`${mutedText} text-sm`}>{userEmail}</p>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-[var(--color-subtle)]" />
+                        <p className={`${mutedText} text-sm`}>
+                          Member since{" "}
+                          {user.createdAt
+                            ? formatJoinDate(user.createdAt)
+                            : "Unknown"}
+                        </p>
+                      </div>
+                    </div>
+                    <span className={chip}>User ID: {user.id}</span>
+                  </div>
 
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                    <p className={`${mutedText} text-xs`}>Total analyses</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <ChartBarIcon className="h-5 w-5 text-[var(--color-primary)]" />
-                      <span className="text-xl font-bold text-[var(--color-heading)]">
-                        {isLoadingStats ? "..." : userStats.totalAnalyses}
-                      </span>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+                      <p className={`${mutedText} text-xs`}>Total analyses</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <ChartBarIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                        <span className="text-xl font-bold text-[var(--color-heading)]">
+                          {isLoadingStats ? "..." : userStats.totalAnalyses}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                    <p className={`${mutedText} text-xs`}>Email status</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <ShieldCheckIcon className="h-5 w-5 text-[var(--color-primary)]" />
-                      <span className="text-sm font-semibold text-[var(--color-heading)]">
-                        {user.emailAddresses[0]?.verification?.status ===
-                        "verified"
-                          ? "Verified"
-                          : "Pending"}
-                      </span>
+                    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+                      <p className={`${mutedText} text-xs`}>Email status</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <ShieldCheckIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                        <span className="text-sm font-semibold text-[var(--color-heading)]">
+                          {user.emailAddresses[0]?.verification?.status ===
+                          "verified"
+                            ? "Verified"
+                            : "Pending"}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                    <p className={`${mutedText} text-xs`}>Account type</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <SparklesIcon className="h-5 w-5 text-[var(--color-primary)]" />
-                      <span className="text-sm font-semibold text-[var(--color-heading)]">
-                        Standard
-                      </span>
+                    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+                      <p className={`${mutedText} text-xs`}>Account type</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <SparklesIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                        <span className="text-sm font-semibold text-[var(--color-heading)]">
+                          Standard
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <div className="space-y-4 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-6 rounded-xl">
+              <h3 className={sectionTitle}>Account actions</h3>
+              <p className={`${subheading} text-sm`}>
+                Manage your profile, view saved analyses, or sign out securely.
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() =>
+                    window.open("https://accounts.clerk.dev/user", "_blank")
+                  }
+                  className={secondaryButton}
+                >
+                  <UserIcon className="h-4 w-4" />
+                  Manage profile
+                </button>
+                <a href="/dashboard/history" className={secondaryButton}>
+                  <DocumentTextIcon className="h-4 w-4" />
+                  View history
+                </a>
+                <button onClick={handleLogout} className={primaryButton}>
+                  <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                  Log out
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className={`${card} p-6 lg:p-7 space-y-4`}>
-            <h3 className={sectionTitle}>Account actions</h3>
-            <p className={`${subheading} text-sm`}>
-              Manage your profile, view saved analyses, or sign out securely.
-            </p>
-            <div className="space-y-3">
-              <button
-                onClick={() =>
-                  window.open("https://accounts.clerk.dev/user", "_blank")
-                }
-                className={secondaryButton}
-              >
-                <UserIcon className="h-4 w-4" />
-                Manage profile
-              </button>
-              <a href="/dashboard/history" className={secondaryButton}>
-                <DocumentTextIcon className="h-4 w-4" />
-                View history
-              </a>
-              <button onClick={handleLogout} className={primaryButton}>
-                <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                Log out
-              </button>
+          <div className="space-y-4 border-t border-[var(--color-border)] pt-6">
+            <div className="flex items-start gap-3">
+              <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                <ShieldCheckIcon className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className={sectionTitle}>Data protection</h3>
+                <p className={`${subheading} mt-1 text-sm`}>
+                  Your profile and analyses are secured. Reach out if you want to
+                  export or delete your data.
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 rounded-xl">
+                <p className="text-sm font-semibold text-[var(--color-heading)]">
+                  Export data
+                </p>
+                <p className={`${mutedText} mt-1 text-sm`}>
+                  Contact support to export your analyses in a structured format.
+                </p>
+              </div>
+              <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 rounded-xl">
+                <p className="text-sm font-semibold text-[var(--color-heading)]">
+                  Delete account
+                </p>
+                <p className={`${mutedText} mt-1 text-sm`}>
+                  We will guide you through secure removal of your profile and
+                  data.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className={`${interactiveCard} p-6 lg:p-7`}>
-          <div className="flex items-start gap-3">
-            <div className="p-3 rounded-xl bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-              <ShieldCheckIcon className="h-6 w-6" />
-            </div>
-            <div>
-              <h3 className={sectionTitle}>Data protection</h3>
-              <p className={`${subheading} mt-1 text-sm`}>
-                Your profile and analyses are secured. Reach out if you want to
-                export or delete your data.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-              <p className="text-sm font-semibold text-[var(--color-heading)]">
-                Export data
-              </p>
-              <p className={`${mutedText} mt-1 text-sm`}>
-                Contact support to export your analyses in a structured format.
-              </p>
-            </div>
-            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-              <p className="text-sm font-semibold text-[var(--color-heading)]">
-                Delete account
-              </p>
-              <p className={`${mutedText} mt-1 text-sm`}>
-                We will guide you through secure removal of your profile and
-                data.
-              </p>
-            </div>
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   );

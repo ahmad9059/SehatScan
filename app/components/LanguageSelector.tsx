@@ -53,24 +53,24 @@ export function LanguageSelector() {
       {/* Language Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+        className="group relative p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-150 hover:-translate-y-[1px]"
         title={`Current language: ${selectedLanguage.name}`}
       >
         <div className="flex items-center gap-2">
           <span className="text-lg">{selectedLanguage.flag}</span>
-          <LanguageIcon className="h-4 w-4 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300" />
+          <LanguageIcon className="h-4 w-4 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-150" />
         </div>
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-xl z-50 animate-fade-in max-h-80 overflow-y-auto">
+        <div className="absolute right-0 mt-2 w-64 bg-[var(--color-card)] rounded-xl shadow-[var(--shadow-soft)] border border-[var(--color-border)] z-50 animate-fade-in max-h-80 overflow-y-auto">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-200/50 dark:border-gray-700/50">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+          <div className="px-4 py-3 border-b border-[var(--color-border)]">
+            <h3 className="text-sm font-semibold text-[var(--color-heading)]">
               {t("language.select")}
             </h3>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[var(--color-subtle)] mt-1">
               {t("language.choose")}
             </p>
           </div>
@@ -81,29 +81,29 @@ export function LanguageSelector() {
               <button
                 key={language.code}
                 onClick={() => handleLanguageSelect(language)}
-                className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center justify-between"
+                className="w-full px-4 py-3 text-left hover:bg-[var(--color-surface)] transition-colors flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{language.flag}</span>
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-[var(--color-foreground)]">
                       {language.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-[var(--color-subtle)]">
                       {language.nativeName}
                     </p>
                   </div>
                 </div>
                 {selectedLanguage.code === language.code && (
-                  <CheckIcon className="h-4 w-4 text-[#037BFC]" />
+                  <CheckIcon className="h-4 w-4 text-[var(--color-primary)]" />
                 )}
               </button>
             ))}
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50">
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="px-4 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+            <p className="text-xs text-[var(--color-subtle)]">
               {t("language.saved")}
             </p>
           </div>

@@ -68,7 +68,7 @@ function ProfilePageContent() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -76,7 +76,7 @@ function ProfilePageContent() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 flex items-center justify-center animate-fade-in-up">
+      <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 flex items-center justify-center animate-fade-in-up">
         <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-12 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 border border-gray-100 dark:border-gray-700/50 overflow-hidden max-w-md w-full">
           <div className="relative z-10 text-center">
             <div className="p-4 bg-gradient-to-br from-red-500/10 to-rose-500/10 rounded-2xl mx-auto w-fit mb-6">
@@ -103,7 +103,7 @@ function ProfilePageContent() {
   const userInitial = userName.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
+    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 mb-8 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden">

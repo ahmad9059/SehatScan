@@ -116,14 +116,14 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-start justify-center p-4 text-center sm:p-0">
         <div
-          className="fixed inset-0 bg-gray-500/75 dark:bg-gray-900/75 transition-opacity"
+          className="fixed inset-0 bg-black/30 transition-opacity"
           onClick={onClose}
         />
 
-        <div className="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50">
+        <div className="relative transform overflow-hidden rounded-xl bg-[var(--color-card)] text-left shadow-[var(--shadow-strong)] transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-[var(--color-border)]">
           {/* Search Input */}
-          <div className="flex items-center px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 mr-3" />
+          <div className="flex items-center px-6 py-4 border-b border-[var(--color-border)]">
+            <MagnifyingGlassIcon className="h-5 w-5 text-[var(--color-muted)] mr-3" />
             <input
               ref={inputRef}
               type="text"
@@ -131,13 +131,13 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent border-none outline-none text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-lg"
+              className="flex-1 bg-transparent border-none outline-none text-[var(--color-foreground)] placeholder-[var(--color-subtle)] text-lg"
             />
             <button
               onClick={onClose}
-              className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-1 rounded-lg hover:bg-[var(--color-surface)] transition-colors"
             >
-              <XMarkIcon className="h-5 w-5 text-gray-400" />
+              <XMarkIcon className="h-5 w-5 text-[var(--color-muted)]" />
             </button>
           </div>
 
@@ -149,56 +149,56 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   <button
                     key={result.id}
                     onClick={() => handleSelect(result)}
-                    className={`w-full px-6 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                      index === selectedIndex
-                        ? "bg-gray-50 dark:bg-gray-700/50"
-                        : ""
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {result.title}
-                        </h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {result.description}
-                        </p>
-                      </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 capitalize">
-                        {result.type}
-                      </span>
+                  className={`w-full px-6 py-3 text-left hover:bg-[var(--color-surface)] transition-colors ${
+                    index === selectedIndex
+                      ? "bg-[var(--color-primary-soft)]"
+                      : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-semibold text-[var(--color-heading)]">
+                        {result.title}
+                      </h3>
+                      <p className="text-xs text-[var(--color-subtle)] mt-1">
+                        {result.description}
+                      </p>
                     </div>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="px-6 py-8 text-center">
-                <p className="text-gray-500 dark:text-gray-400">
-                  No results found for "{query}"
-                </p>
-              </div>
-            )}
-          </div>
+                    <span className="text-xs px-2 py-1 rounded-full bg-[var(--color-surface)] text-[var(--color-muted)] capitalize">
+                      {result.type}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="px-6 py-8 text-center">
+              <p className="text-[var(--color-subtle)]">
+                No results found for "{query}"
+              </p>
+            </div>
+          )}
+        </div>
 
           {/* Footer */}
-          <div className="px-6 py-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50">
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="px-6 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+            <div className="flex items-center justify-between text-xs text-[var(--color-subtle)]">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs">
+                  <kbd className="px-1.5 py-0.5 bg-[var(--color-card)] border border-[var(--color-border)] rounded text-xs">
                     ↑↓
                   </kbd>
                   Navigate
                 </span>
                 <span className="flex items-center gap-1">
-                  <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs">
+                  <kbd className="px-1.5 py-0.5 bg-[var(--color-card)] border border-[var(--color-border)] rounded text-xs">
                     ↵
                   </kbd>
                   Select
                 </span>
               </div>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs">
+                <kbd className="px-1.5 py-0.5 bg-[var(--color-card)] border border-[var(--color-border)] rounded text-xs">
                   Esc
                 </kbd>
                 Close

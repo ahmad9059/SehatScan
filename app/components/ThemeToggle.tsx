@@ -1,59 +1,66 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string;
+  elevated?: boolean;
+}
+
+export function ThemeToggle({ className, elevated = true }: ThemeToggleProps) {
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return (
-      <button className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-        <div className="h-5 w-5" />
-      </button>
-    );
-  }
+  const isDark = mounted && resolvedTheme === "dark";
+  const nextTheme = isDark ? "light" : "dark";
 
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+      type="button"
       aria-label="Toggle theme"
+      aria-pressed={isDark}
+      onClick={() => setTheme(nextTheme)}
+      className={`inline-flex items-center gap-3 rounded-full border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-[13px] font-semibold text-[var(--color-foreground)] transition-all duration-200 hover:-translate-y-[1px] hover:border-[var(--color-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${className ?? ""}`}
+      style={elevated ? { boxShadow: "var(--shadow-soft)" } : undefined}
     >
-      {theme === "dark" ? (
-        <svg
-          className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-          />
-        </svg>
-      ) : (
-        <svg
-          className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-          />
-        </svg>
-      )}
+      <span className="relative flex h-6 w-11 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] transition-colors">
+        <span
+          className={`absolute left-1 top-1 h-4 w-4 rounded-full bg-[var(--color-primary)] transition-transform duration-200 ${
+            isDark ? "translate-x-5" : ""
+          }`}
+        />
+      </span>
+      <span className="flex items-center gap-1 text-[var(--color-muted)]">
+        {isDark ? (
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M20.354 15.354A9 9 0 018.646 3.646 9 9 0 1012 21a8.96 8.96 0 008.354-5.646z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : (
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364l-1.414-1.414M7.05 7.05L5.636 5.636m12.728 0L16.95 7.05M7.05 16.95 5.636 18.364M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+        <span className="text-[var(--color-foreground)]">
+          {mounted ? (isDark ? "Dark" : "Light") : "Theme"}
+        </span>
+      </span>
     </button>
   );
 }

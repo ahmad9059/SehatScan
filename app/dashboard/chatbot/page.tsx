@@ -223,7 +223,7 @@ How can I help you today?`,
 
   if (loadingAnalyses) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 flex flex-col animate-fade-in-up">
+      <div className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in-up">
         {/* Header */}
         <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-100 dark:border-gray-700/50 overflow-hidden">
           {/* Animated Background Elements */}
@@ -272,7 +272,7 @@ How can I help you today?`,
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 flex flex-col animate-fade-in-up">
+    <div className="min-h-screen bg-[var(--color-bg)] flex flex-col animate-fade-in-up">
       {/* Header Section */}
       <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-100 dark:border-gray-700/50 overflow-hidden">
         {/* Animated Background Elements */}

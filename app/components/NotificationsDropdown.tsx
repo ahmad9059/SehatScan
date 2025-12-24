@@ -130,11 +130,11 @@ export function NotificationsDropdown() {
       {/* Notifications Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+        className="group relative p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-150 hover:-translate-y-[1px]"
       >
-        <BellIcon className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300" />
+        <BellIcon className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-150" />
         {unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center">
+          <div className="absolute -top-1 -right-1 h-5 w-5 bg-[var(--color-danger)] rounded-full flex items-center justify-center">
             <span className="text-xs text-white font-semibold">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
@@ -144,24 +144,24 @@ export function NotificationsDropdown() {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-xl z-50 animate-fade-in">
+        <div className="absolute right-0 mt-2 w-96 bg-[var(--color-card)] rounded-xl shadow-[var(--shadow-soft)] border border-[var(--color-border)] z-50 animate-fade-in">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="px-6 py-4 border-b border-[var(--color-border)]">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg font-semibold text-[var(--color-heading)]">
                 Notifications
               </h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-[#037BFC] hover:text-[#0260c9] font-medium"
+                  className="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-medium"
                 >
                   Mark all read
                 </button>
               )}
             </div>
             {unreadCount > 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-sm text-[var(--color-subtle)] mt-1">
                 You have {unreadCount} unread notification
                 {unreadCount !== 1 ? "s" : ""}
               </p>
@@ -175,10 +175,10 @@ export function NotificationsDropdown() {
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-l-4 ${
+                    className={`px-6 py-4 hover:bg-[var(--color-surface)] transition-colors border-l-4 ${
                       notification.read
                         ? "border-transparent"
-                        : "border-[#037BFC] bg-blue-50/50 dark:bg-blue-900/10"
+                        : "border-[var(--color-primary)] bg-[color-mix(in srgb, var(--color-primary) 10%, transparent)]"
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -188,13 +188,13 @@ export function NotificationsDropdown() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            <p className="text-sm font-semibold text-[var(--color-heading)]">
                               {notification.title}
                             </p>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                            <p className="text-sm text-[var(--color-foreground)] mt-1">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                            <p className="text-xs text-[var(--color-subtle)] mt-2">
                               {formatTimestamp(notification.timestamp)}
                             </p>
                           </div>
@@ -202,20 +202,20 @@ export function NotificationsDropdown() {
                             {!notification.read && (
                               <button
                                 onClick={() => markAsRead(notification.id)}
-                                className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                className="p-1 rounded-lg hover:bg-[var(--color-surface)] transition-colors"
                                 title="Mark as read"
                               >
-                                <CheckIcon className="h-4 w-4 text-gray-500" />
+                                <CheckIcon className="h-4 w-4 text-[var(--color-muted)]" />
                               </button>
                             )}
                             <button
                               onClick={() =>
                                 deleteNotification(notification.id)
                               }
-                              className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                              className="p-1 rounded-lg hover:bg-[var(--color-surface)] transition-colors"
                               title="Delete notification"
                             >
-                              <XMarkIcon className="h-4 w-4 text-gray-500" />
+                              <XMarkIcon className="h-4 w-4 text-[var(--color-muted)]" />
                             </button>
                           </div>
                         </div>
@@ -226,8 +226,8 @@ export function NotificationsDropdown() {
               </div>
             ) : (
               <div className="px-6 py-8 text-center">
-                <BellIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">
+                <BellIcon className="h-12 w-12 text-[var(--color-muted)] mx-auto mb-4" />
+                <p className="text-[var(--color-subtle)]">
                   No notifications yet
                 </p>
               </div>
@@ -236,8 +236,8 @@ export function NotificationsDropdown() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-6 py-3 border-t border-gray-200/50 dark:border-gray-700/50 bg-gray-50/50 dark:bg-gray-800/50">
-              <button className="w-full text-center text-sm text-[#037BFC] hover:text-[#0260c9] font-medium">
+            <div className="px-6 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+              <button className="w-full text-center text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-medium">
                 View all notifications
               </button>
             </div>

@@ -91,14 +91,14 @@ export default function DashboardCharts({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-gray-900 dark:text-white">
+        <div className="bg-[var(--color-card)] p-3 border border-[var(--color-border)] rounded-lg shadow-lg">
+          <p className="text-sm font-medium text-[var(--color-heading)]">
             {label}
           </p>
           {payload.map((entry: any, index: number) => (
             <p
               key={index}
-              className="text-sm text-gray-600 dark:text-gray-400"
+              className="text-sm text-[var(--color-subtle)]"
               style={{ color: entry.color }}
             >
               {entry.name}: {entry.value}
@@ -112,13 +112,9 @@ export default function DashboardCharts({
 
   if (stats.total === 0) {
     return (
-      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700/50 overflow-hidden text-center">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-500/5 via-transparent to-slate-500/5"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gray-400/20 to-slate-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-
+      <div className="group relative bg-[var(--color-card)] rounded-xl p-8 shadow-[var(--shadow-soft)] border border-[var(--color-border)] overflow-hidden text-center">
         <div className="relative z-10">
-          <div className="text-gray-500 dark:text-gray-400">
+          <div className="text-[var(--color-subtle)]">
             <svg
               className="mx-auto h-12 w-12 mb-4"
               fill="none"
@@ -132,10 +128,12 @@ export default function DashboardCharts({
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            <h3 className="text-lg font-medium mb-2">
+            <h3 className="text-lg font-medium mb-2 text-[var(--color-heading)]">
               {t("common.noDataAvailable")}
             </h3>
-            <p className="text-sm">{t("common.startAnalyzing")}</p>
+            <p className="text-sm text-[var(--color-subtle)]">
+              {t("common.startAnalyzing")}
+            </p>
           </div>
         </div>
       </div>
@@ -145,14 +143,9 @@ export default function DashboardCharts({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Pie Chart - Analysis Distribution */}
-      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-purple-500/5"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-indigo-400/20 to-purple-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-indigo-300/10 to-indigo-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
+      <div className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] border border-[var(--color-border)] overflow-hidden">
         <div className="relative z-10">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
+          <h3 className="text-lg font-semibold text-[var(--color-heading)] mb-4">
             {t("charts.analysisDistribution")}
           </h3>
           <div className="h-64">
@@ -191,14 +184,9 @@ export default function DashboardCharts({
       </div>
 
       {/* Bar Chart - Analysis Types */}
-      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-teal-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-300/10 to-emerald-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
+      <div className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] border border-[var(--color-border)] overflow-hidden">
         <div className="relative z-10">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
+          <h3 className="text-lg font-semibold text-[var(--color-heading)] mb-4">
             {t("charts.analysisTypes")}
           </h3>
           <div className="h-64">
@@ -226,14 +214,9 @@ export default function DashboardCharts({
       </div>
 
       {/* Line Chart - Activity Over Time */}
-      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-cyan-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-300/10 to-blue-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
+      <div className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] border border-[var(--color-border)] overflow-hidden">
         <div className="relative z-10">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+          <h3 className="text-lg font-semibold text-[var(--color-heading)] mb-4">
             {t("charts.activityLast7Days")}
           </h3>
           <div className="h-64">

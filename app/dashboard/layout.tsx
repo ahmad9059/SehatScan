@@ -12,7 +12,6 @@ import { SearchModal } from "../components/SearchModal";
 import { ProfileDropdown } from "../components/ProfileDropdown";
 import { LanguageSelector } from "../components/LanguageSelector";
 import { NotificationsDropdown } from "../components/NotificationsDropdown";
-import { useTheme } from "next-themes";
 import { useSimpleLanguage } from "../components/SimpleLanguageContext";
 import {
   HomeIcon,
@@ -93,7 +92,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, user }: SidebarProps) {
             onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 left-0 z-50 w-72 bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50 transform transition-transform animate-slide-in-left shadow-2xl">
+          <div className="fixed inset-y-0 left-0 z-50 w-72 bg-[var(--color-card)] border-r border-[var(--color-border)] transform transition-transform animate-slide-in-left shadow-xl">
             <SidebarContent
               pathname={pathname}
               user={user}
@@ -107,7 +106,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen, user }: SidebarProps) {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-700/50 px-6 pb-4 shadow-xl">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-[var(--color-card)] border-r border-[var(--color-border)] px-6 pb-4 shadow-[var(--shadow-soft)]">
           <SidebarContent
             pathname={pathname}
             user={user}
@@ -149,42 +148,19 @@ function SidebarContent({
               className="h-8 w-8 rounded-lg"
             />
           </div>
-          <span className="font-poppins font-bold text-xl text-gray-900 dark:text-white">
+          <span className="font-poppins font-bold text-xl text-[var(--color-heading)]">
             SehatScan
           </span>
         </Link>
         {isMobile && (
           <button
             type="button"
-            className="lg:hidden p-2 text-gray-700 dark:text-gray-300"
+            className="lg:hidden p-2 text-[var(--color-muted)]"
             onClick={onClose}
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
         )}
-      </div>
-
-      {/* User info */}
-      <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#037BFC]/5 via-transparent to-indigo-500/5"></div>
-        <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-[#037BFC]/20 to-indigo-500/20 rounded-full blur-xl -translate-y-8 translate-x-8 group-hover:scale-125 transition-transform duration-500"></div>
-
-        <div className="relative z-10 flex items-center gap-x-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold shadow-lg group-hover:scale-110 transition-transform duration-300">
-            {user?.name
-              ? user.name.charAt(0).toUpperCase()
-              : user?.email?.charAt(0).toUpperCase() || "U"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
-              {user?.name || "User"}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 truncate group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors duration-300">
-              {user?.email}
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Navigation */}
@@ -205,26 +181,19 @@ function SidebarContent({
                       onClick={isMobile ? onClose : undefined}
                       className={classNames(
                         isActive
-                          ? "bg-gradient-to-r from-[#037BFC]/10 to-indigo-500/10 text-[#037BFC] dark:text-blue-400 border-r-2 border-[#037BFC]"
-                          : "text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-gray-100/50 hover:to-slate-100/50 dark:hover:from-gray-700/50 dark:hover:to-gray-600/50 hover:text-[#037BFC] dark:hover:text-blue-400",
-                        "group flex gap-x-3 rounded-2xl p-3 text-sm font-semibold leading-6 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 hover:shadow-md hover:scale-105 backdrop-blur-sm border border-transparent hover:border-gray-200/50 dark:hover:border-gray-600/50"
+                          ? "text-[var(--color-primary)]"
+                          : "text-[var(--color-muted)] hover:text-[var(--color-primary)]",
+                        "group relative flex gap-x-3 rounded-lg p-3 text-sm font-semibold leading-6 transition-colors duration-150 focus:outline-none"
                       )}
                       aria-current={isActive ? "page" : undefined}
                     >
-                      <div
-                        className={classNames(
-                          isActive
-                            ? "bg-[#037BFC]/10 text-[#037BFC] dark:text-blue-400"
-                            : "bg-gray-100/50 dark:bg-gray-700/50 text-gray-400 group-hover:bg-[#037BFC]/10 group-hover:text-[#037BFC] dark:group-hover:text-blue-400",
-                          "p-2 rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
-                        )}
-                      >
-                        <item.icon
-                          className="h-5 w-5 shrink-0 transition-colors duration-300"
-                          aria-hidden="true"
-                        />
+                      {isActive && (
+                        <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-full bg-[var(--color-primary)]" aria-hidden="true" />
+                      )}
+                      <div className="p-2 rounded-lg text-inherit">
+                        <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                       </div>
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                      <span className="group-hover:translate-x-1 transition-transform duration-150">
                         {t(item.nameKey)}
                       </span>
                     </Link>
@@ -238,16 +207,16 @@ function SidebarContent({
           <li className="mt-auto">
             <button
               onClick={onLogout}
-              className="group flex w-full gap-x-3 rounded-2xl p-3 text-sm font-semibold leading-6 text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-red-50/50 hover:to-pink-50/50 dark:hover:from-red-900/20 dark:hover:to-pink-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 hover:shadow-md hover:scale-105 backdrop-blur-sm border border-transparent hover:border-red-200/50 dark:hover:border-red-600/50"
+              className="group flex w-full gap-x-3 rounded-xl p-3 text-sm font-semibold leading-6 text-[var(--color-muted)] hover:bg-[color-mix(in srgb, var(--color-danger) 8%, transparent)] hover:text-[var(--color-danger)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-danger)] focus:ring-offset-2 border border-transparent hover:border-[var(--color-danger)]/30"
               aria-label="Sign out of your account"
             >
-              <div className="p-2 rounded-xl bg-gray-100/50 dark:bg-gray-700/50 group-hover:bg-red-100/50 dark:group-hover:bg-red-900/30 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+              <div className="p-2 rounded-lg bg-[var(--color-surface)] group-hover:bg-[color-mix(in srgb, var(--color-danger) 12%, transparent)] transition-all duration-200">
                 <ArrowRightOnRectangleIcon
-                  className="h-5 w-5 shrink-0 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-300"
+                  className="h-5 w-5 shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-danger)] transition-colors duration-200"
                   aria-hidden="true"
                 />
               </div>
-              <span className="group-hover:translate-x-1 transition-transform duration-300">
+              <span className="group-hover:translate-x-1 transition-transform duration-200">
                 Logout
               </span>
             </button>
@@ -267,7 +236,6 @@ export default function DashboardLayout({
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const { theme } = useTheme();
   const { t } = useSimpleLanguage();
 
   useEffect(() => {
@@ -297,7 +265,7 @@ export default function DashboardLayout({
   // Show loading state while checking authentication
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#037BFC]"></div>
       </div>
     );
@@ -319,7 +287,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-foreground)]">
       <Sidebar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
@@ -327,22 +295,22 @@ export default function DashboardLayout({
       />
 
       {/* Mobile menu button */}
-      <div className="sticky top-0 z-40 flex items-center gap-x-6 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 px-4 py-4 shadow-sm sm:px-6 lg:hidden border-b border-gray-200/50 dark:border-gray-700/50">
+      <div className="sticky top-0 z-40 flex items-center gap-x-6 backdrop-blur-md bg-[var(--color-card)]/90 px-4 py-4 shadow-sm sm:px-6 lg:hidden border-b border-[var(--color-border)]">
         <button
           type="button"
-          className="p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg text-gray-700 dark:text-gray-300 lg:hidden focus:outline-none focus:ring-2 focus:ring-[#037BFC] focus:ring-offset-2"
+          className="p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-200 hover:-translate-y-[1px] text-[var(--color-foreground)] lg:hidden focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
           onClick={() => setSidebarOpen(true)}
           aria-label="Open navigation menu"
         >
           <span className="sr-only">Open sidebar</span>
           <Bars3Icon className="h-5 w-5" aria-hidden="true" />
         </button>
-        <div className="flex-1 text-lg font-semibold leading-6 text-gray-900 dark:text-white font-poppins">
+        <div className="flex-1 text-lg font-semibold leading-6 text-[var(--color-heading)] font-poppins">
           {t("dashboard.title")}
         </div>
 
         {/* Mobile user avatar */}
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold text-sm shadow-lg">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary)] text-white font-semibold text-sm shadow-sm">
           {userForComponents?.name
             ? userForComponents.name.charAt(0).toUpperCase()
             : userForComponents?.email?.charAt(0).toUpperCase() || "U"}
@@ -352,16 +320,16 @@ export default function DashboardLayout({
       {/* Main content */}
       <main className="lg:pl-72">
         {/* Top Navbar */}
-        <div className="sticky top-0 z-30 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="sticky top-0 z-30 backdrop-blur-md bg-[var(--color-card)]/95 border-b border-[var(--color-border)]">
           <div className="px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               {/* Left side - Page title and breadcrumb */}
               <div className="flex items-center gap-4">
                 <div className="hidden lg:block">
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-poppins">
+                  <h1 className="text-2xl font-bold text-[var(--color-heading)] font-poppins">
                     {t("dashboard.title")}
                   </h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-[var(--color-subtle)] mt-1">
                     {t("dashboard.subtitle")}
                   </p>
                 </div>
@@ -375,10 +343,10 @@ export default function DashboardLayout({
                 {/* Search */}
                 <button
                   onClick={() => setSearchOpen(true)}
-                  className="group relative p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                  className="group relative p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-200 hover:-translate-y-[1px]"
                 >
                   <svg
-                    className="h-5 w-5 text-gray-600 dark:text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300"
+                    className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-200"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

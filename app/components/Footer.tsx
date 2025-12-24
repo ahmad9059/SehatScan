@@ -34,7 +34,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-gray-900 text-white pt-20 pb-10">
+    <footer className="bg-[var(--color-surface)] text-[var(--color-foreground)] pt-20 pb-10 border-t border-[var(--color-border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid md:grid-cols-5 gap-12 mb-16">
@@ -47,10 +47,10 @@ export default function Footer() {
                 className="h-12 w-auto transition-transform group-hover:scale-110"
               />
               <span className="text-2xl font-bold">
-                Sehat<span className="text-[#037BFC]">Scan</span>
+                Sehat<span className="text-[var(--color-primary)]">Scan</span>
               </span>
             </Link>
-            <p className="text-gray-400 mb-8 max-w-sm leading-relaxed">
+            <p className="text-[var(--color-subtle)] mb-8 max-w-sm leading-relaxed">
               AI-powered health risk assessment platform combining advanced
               image processing and machine learning to transform healthcare data
               into actionable insights.
@@ -58,7 +58,7 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="w-11 h-11 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-[#037BFC] transition-all hover:scale-110"
+                className="w-11 h-11 bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl flex items-center justify-center hover:bg-[var(--color-primary)] hover:text-white transition-all hover:scale-110"
               >
                 <svg
                   className="w-5 h-5"
@@ -70,7 +70,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="w-11 h-11 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-[#037BFC] transition-all hover:scale-110"
+                className="w-11 h-11 bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl flex items-center justify-center hover:bg-[var(--color-primary)] hover:text-white transition-all hover:scale-110"
               >
                 <svg
                   className="w-5 h-5"
@@ -82,7 +82,7 @@ export default function Footer() {
               </a>
               <a
                 href="#"
-                className="w-11 h-11 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-[#037BFC] transition-all hover:scale-110"
+                className="w-11 h-11 bg-[var(--color-card)] border border-[var(--color-border)] rounded-xl flex items-center justify-center hover:bg-[var(--color-primary)] hover:text-white transition-all hover:scale-110"
               >
                 <svg
                   className="w-5 h-5"
@@ -98,7 +98,7 @@ export default function Footer() {
           {/* Links Columns */}
           {footerSections.map((section, index) => (
             <div key={index}>
-              <h4 className="font-bold text-white mb-5 text-lg">
+              <h4 className="font-bold text-[var(--color-heading)] mb-5 text-lg">
                 {section.title}
               </h4>
               <ul className="space-y-3">
@@ -106,7 +106,7 @@ export default function Footer() {
                   <li key={linkIndex}>
                     <a
                       href={link.href}
-                      className="text-gray-400 hover:text-[#037BFC] transition-colors text-[15px]"
+                      className="text-[var(--color-subtle)] hover:text-[var(--color-primary)] transition-colors text-[15px]"
                     >
                       {link.name}
                     </a>
@@ -118,26 +118,26 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-          <p className="text-gray-400 text-sm">
+        <div className="border-t border-[var(--color-border)] pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <p className="text-[var(--color-subtle)] text-sm">
             © 2024 SehatScan. All rights reserved.
           </p>
           <div className="flex items-center space-x-6">
             <a
               href="#"
-              className="text-gray-400 hover:text-white text-sm transition-colors"
+              className="text-[var(--color-subtle)] hover:text-[var(--color-primary)] text-sm transition-colors"
             >
               Privacy Policy
             </a>
             <a
               href="#"
-              className="text-gray-400 hover:text-white text-sm transition-colors"
+              className="text-[var(--color-subtle)] hover:text-[var(--color-primary)] text-sm transition-colors"
             >
               Terms of Service
             </a>
             <a
               href="#"
-              className="text-gray-400 hover:text-white text-sm transition-colors"
+              className="text-[var(--color-subtle)] hover:text-[var(--color-primary)] text-sm transition-colors"
             >
               Cookie Policy
             </a>

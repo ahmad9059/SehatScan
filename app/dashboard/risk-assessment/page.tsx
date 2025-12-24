@@ -338,7 +338,7 @@ function RiskAssessmentPageContent() {
 
   if (loadingAnalyses) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
+      <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
         <div className="mx-auto max-w-4xl">
           {/* Header */}
           <div className="mb-8 animate-fade-in">
@@ -372,7 +372,7 @@ function RiskAssessmentPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
+    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8 animate-fade-in">
@@ -432,7 +432,7 @@ function RiskAssessmentPageContent() {
                       </div>
                     ) : reportAnalyses.length === 0 ? (
                       <div className="text-center py-8">
-                        <div className="p-4 bg-gradient-to-br from-gray-500/10 to-slate-500/10 rounded-2xl mx-auto w-fit mb-4">
+                        <div className="p-4 bg-[var(--color-surface)] rounded-2xl mx-auto w-fit mb-4">
                           <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto" />
                         </div>
                         <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -445,7 +445,7 @@ function RiskAssessmentPageContent() {
                         <button
                           onClick={() => handleFileSelect("report")}
                           disabled={isUploadingReport || isUploadingFace}
-                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-2xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                           Upload Report
@@ -496,7 +496,7 @@ function RiskAssessmentPageContent() {
                         <button
                           onClick={() => handleFileSelect("report")}
                           disabled={isUploadingReport || isUploadingFace}
-                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed mt-3"
                         >
                           <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                           Upload New Report
@@ -515,17 +515,13 @@ function RiskAssessmentPageContent() {
                 </div>
 
                 {/* Face Selection */}
-                <div className="group/face relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-                  {/* Animated Background Elements */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5"></div>
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-purple-400/15 to-pink-500/15 rounded-full blur-xl -translate-y-10 translate-x-10 group-hover/face:scale-125 transition-transform duration-500"></div>
-
+                <div className="group/face relative bg-[var(--color-card)] rounded-2xl p-6 hover:shadow-[var(--shadow-strong)] transition-all duration-300 transform hover:-translate-y-1 border border-[var(--color-border)] overflow-hidden">
                   <div className="relative z-10">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl group-hover/face:scale-110 transition-transform duration-300 group-hover/face:rotate-3">
-                        <PhotoIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                      <div className="p-3 bg-[var(--color-primary-soft)] rounded-2xl group-hover/face:scale-105 transition-transform duration-300">
+                        <PhotoIcon className="h-6 w-6 text-[var(--color-primary)]" />
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover/face:text-purple-600 dark:group-hover/face:text-purple-400 transition-colors duration-300">
+                      <h3 className="text-lg font-bold text-[var(--color-heading)] group-hover/face:text-[var(--color-primary)] transition-colors duration-300">
                         Select Face Analysis
                       </h3>
                     </div>
@@ -533,8 +529,8 @@ function RiskAssessmentPageContent() {
                     {isUploadingFace ? (
                       <div className="space-y-4">
                         <div className="flex items-center justify-center py-8">
-                          <div className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl">
-                            <PhotoIcon className="h-12 w-12 text-purple-600 dark:text-purple-400" />
+                          <div className="p-4 bg-[var(--color-surface)] rounded-2xl">
+                            <PhotoIcon className="h-12 w-12 text-[var(--color-primary)]" />
                           </div>
                         </div>
                         <div className="space-y-2">
@@ -550,7 +546,7 @@ function RiskAssessmentPageContent() {
                       </div>
                     ) : faceAnalyses.length === 0 ? (
                       <div className="text-center py-8">
-                        <div className="p-4 bg-gradient-to-br from-gray-500/10 to-slate-500/10 rounded-2xl mx-auto w-fit mb-4">
+                        <div className="p-4 bg-[var(--color-surface)] rounded-2xl mx-auto w-fit mb-4">
                           <PhotoIcon className="h-12 w-12 text-gray-400 mx-auto" />
                         </div>
                         <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -562,7 +558,7 @@ function RiskAssessmentPageContent() {
                         <button
                           onClick={() => handleFileSelect("face")}
                           disabled={isUploadingReport || isUploadingFace}
-                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-2xl overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-2xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                           Upload Photo
@@ -613,7 +609,7 @@ function RiskAssessmentPageContent() {
                         <button
                           onClick={() => handleFileSelect("face")}
                           disabled={isUploadingReport || isUploadingFace}
-                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 rounded-xl overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed mt-3"
+                          className="w-full group relative inline-flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed mt-3"
                         >
                           <CloudArrowUpIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                           Upload New Photo
@@ -778,22 +774,9 @@ function RiskAssessmentPageContent() {
                     !userFormData.age ||
                     !userFormData.gender
                   }
-                  className="group relative inline-flex items-center gap-3 px-8 py-4 text-base font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-2xl overflow-hidden bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  className="group relative inline-flex items-center gap-3 px-8 py-4 text-base font-semibold text-white transition-all duration-300 transform focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2 rounded-2xl overflow-hidden bg-[var(--color-primary)] hover:bg-[var(--color-primary-strong)] hover:scale-105 hover:shadow-[var(--shadow-soft)] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   aria-label="Generate comprehensive risk assessment"
                 >
-                  {/* Button Background Animation */}
-                  {!(
-                    isLoading ||
-                    isUploadingReport ||
-                    isUploadingFace ||
-                    !selectedReport ||
-                    !selectedFace ||
-                    !userFormData.age ||
-                    !userFormData.gender
-                  ) && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-400/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  )}
-
                   <div className="relative z-10 flex items-center gap-3">
                     {isLoading ? (
                       <>

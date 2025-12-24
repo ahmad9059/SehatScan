@@ -53,16 +53,16 @@ export default function IntegrationsSection() {
   return (
     <section
       id="integrations"
-      className="py-24 text-white relative overflow-hidden"
+      className="py-24 text-[var(--color-foreground)] relative overflow-hidden bg-[var(--color-bg)]"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16 md:mb-20">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 px-4 text-[var(--color-heading)]">
             Don&apos;t Replace.{" "}
-            <span className="text-[#037BFC]">Integrate.</span>
+            <span className="text-[var(--color-primary)]">Integrate.</span>
           </h2>
-          <p className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto px-4">
+          <p className="text-base sm:text-lg text-[var(--color-subtle)] max-w-2xl mx-auto px-4">
             Built with industry-leading technologies for reliability and
             performance.
           </p>
@@ -76,10 +76,10 @@ export default function IntegrationsSection() {
               className="flex flex-col items-center justify-center space-y-3 group relative"
             >
               {/* Tooltip */}
-              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+              <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-[var(--color-foreground)] text-[var(--color-bg)] text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
                 {integration.name}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                  <div className="border-4 border-transparent border-t-gray-800"></div>
+                  <div className="border-4 border-transparent border-t-[var(--color-foreground)]"></div>
                 </div>
               </div>
 
@@ -90,7 +90,7 @@ export default function IntegrationsSection() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-xs font-medium text-gray-500 group-hover:text-gray-400 transition-colors text-center hidden sm:block">
+              <span className="text-xs font-medium text-[var(--color-subtle)] group-hover:text-[var(--color-foreground)] transition-colors text-center hidden sm:block">
                 {integration.name}
               </span>
             </div>

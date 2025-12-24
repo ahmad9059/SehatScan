@@ -123,39 +123,33 @@ export default function AnalysisDetailModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-6xl max-h-[92vh] transform overflow-hidden rounded-3xl bg-white dark:bg-gray-800/50 backdrop-blur-sm shadow-2xl transition-all overflow-y-auto border border-gray-100 dark:border-gray-700/50">
-                {/* Header with gradient background */}
-                <div className="relative bg-gradient-to-r from-slate-700 via-slate-600 to-slate-500 rounded-t-3xl p-4 text-white sticky top-0 z-10 overflow-hidden">
-                  {/* Animated Background Elements */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-600/20 via-transparent to-slate-500/20"></div>
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-slate-500/30 to-slate-400/30 rounded-full blur-xl -translate-y-12 translate-x-12"></div>
-                  <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-slate-400/20 to-slate-500/20 rounded-full blur-lg translate-y-10 -translate-x-10"></div>
-
+              <Dialog.Panel className="analysis-modal w-full max-w-6xl max-h-[92vh] transform overflow-hidden rounded-3xl bg-[var(--color-card)] shadow-2xl transition-all overflow-y-auto border border-[var(--color-border)]">
+                <div className="relative rounded-t-3xl p-4 text-[var(--color-heading)] sticky top-0 z-10 overflow-hidden bg-[var(--color-surface)] border-b border-[var(--color-border)]">
                   <div className="relative z-10 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white/20 backdrop-blur-sm rounded-xl hover:scale-110 transition-transform duration-300 hover:rotate-3">
+                      <div className="p-2 bg-[var(--color-primary-soft)] rounded-xl hover:scale-110 transition-transform duration-300">
                         {analysis.type === "face" && (
-                          <EyeIcon className="h-6 w-6" />
+                          <EyeIcon className="h-6 w-6 text-[var(--color-primary)]" />
                         )}
                         {analysis.type === "report" && (
-                          <HeartIcon className="h-6 w-6" />
+                          <HeartIcon className="h-6 w-6 text-[var(--color-primary)]" />
                         )}
                         {analysis.type === "risk" && (
-                          <ChartBarIcon className="h-6 w-6" />
+                          <ChartBarIcon className="h-6 w-6 text-[var(--color-primary)]" />
                         )}
                       </div>
                       <div>
                         <Dialog.Title as="h3" className="text-xl font-bold">
                           {getAnalysisTypeLabel(analysis.type)} Dashboard
                         </Dialog.Title>
-                        <p className="text-white/80 text-xs mt-1">
+                        <p className="text-[var(--color-subtle)] text-xs mt-1">
                           {formatDate(analysis.createdAt)}
                         </p>
                       </div>
                     </div>
                     <button
                       type="button"
-                      className="rounded-xl bg-white/20 backdrop-blur-sm hover:bg-white/30 p-2 text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50 hover:scale-110 hover:rotate-3"
+                      className="rounded-xl bg-[var(--color-primary-soft)] p-2 text-[var(--color-heading)] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] hover:scale-110"
                       onClick={onClose}
                     >
                       <span className="sr-only">Close</span>

@@ -169,7 +169,7 @@ export default function DashboardClient({
   const recentAnalysesLimited = recentAnalyses.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50 dark:from-gray-900 dark:via-slate-900 dark:to-gray-800 px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
+    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
       <div className="mx-auto max-w-7xl">
         {/* Welcome Section with Logo */}
         <div className="mb-8 flex items-center gap-4">
@@ -213,39 +213,34 @@ export default function DashboardClient({
         {/* Stats Cards - Ultra Modern Design */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           {/* Total Analyses Card */}
-          <div className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer">
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-300/10 to-blue-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
+          <div className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 border border-[var(--color-border)] overflow-hidden cursor-pointer">
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-6">
-                <div className="p-4 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-2xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
-                  <ChartBarIcon className="h-7 w-7 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-300" />
+                <div className="p-4 rounded-xl bg-[var(--color-primary-soft)] group-hover:scale-105 transition-transform duration-300">
+                  <ChartBarIcon className="h-7 w-7 text-[var(--color-primary)]" />
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                  <div className="text-3xl font-bold text-[var(--color-heading)] mb-1">
                     {stats.total}
                   </div>
-                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                  <div className="text-xs text-[var(--color-primary)] font-medium">
                     +12% this month
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
+                <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
                   {t("analytics.totalAnalyses")}
                 </h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between text-xs text-[var(--color-subtle)]">
                     <span>Progress</span>
                     <span>{progressData.totalProgress}%</span>
                   </div>
-                  <div className="w-full bg-gray-200/60 dark:bg-gray-700/60 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-1000 group-hover:from-blue-600 group-hover:to-indigo-600"
+                      className="bg-[var(--color-primary)] h-2 rounded-full transition-all duration-700"
                       style={{ width: `${progressData.totalProgress}%` }}
                     ></div>
                   </div>
@@ -256,41 +251,36 @@ export default function DashboardClient({
 
           {/* Reports Scanned Card */}
           <div
-            className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+            className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
             style={{ animationDelay: "0.1s" }}
           >
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-teal-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-emerald-300/10 to-emerald-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-6">
-                <div className="p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-2xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
-                  <DocumentTextIcon className="h-7 w-7 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300" />
+                <div className="p-4 rounded-xl bg-[var(--color-primary-soft)] group-hover:scale-105 transition-transform duration-300">
+                  <DocumentTextIcon className="h-7 w-7 text-[var(--color-primary)]" />
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
+                  <div className="text-3xl font-bold text-[var(--color-heading)] mb-1">
                     {stats.reports}
                   </div>
-                  <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                  <div className="text-xs text-[var(--color-primary)] font-medium">
                     +8% this week
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
+                <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
                   {t("analytics.reportsScanned")}
                 </h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between text-xs text-[var(--color-subtle)]">
                     <span>Accuracy</span>
                     <span>{progressData.reportsAccuracy}%</span>
                   </div>
-                  <div className="w-full bg-gray-200/60 dark:bg-gray-700/60 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-1000 group-hover:from-emerald-600 group-hover:to-teal-600"
+                      className="bg-[var(--color-primary)] h-2 rounded-full transition-all duration-700"
                       style={{ width: `${progressData.reportsAccuracy}%` }}
                     ></div>
                   </div>
@@ -301,41 +291,36 @@ export default function DashboardClient({
 
           {/* Faces Analyzed Card */}
           <div
-            className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+            className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
             style={{ animationDelay: "0.2s" }}
           >
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-purple-300/10 to-purple-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-6">
-                <div className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
-                  <FaceSmileIcon className="h-7 w-7 text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors duration-300" />
+                <div className="p-4 rounded-xl bg-[var(--color-primary-soft)] group-hover:scale-105 transition-transform duration-300">
+                  <FaceSmileIcon className="h-7 w-7 text-[var(--color-primary)]" />
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300">
+                  <div className="text-3xl font-bold text-[var(--color-heading)] mb-1">
                     {stats.faces}
                   </div>
-                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">
+                  <div className="text-xs text-[var(--color-primary)] font-medium">
                     +15% today
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
+                <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
                   {t("analytics.facesAnalyzed")}
                 </h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between text-xs text-[var(--color-subtle)]">
                     <span>Detection Rate</span>
                     <span>{progressData.faceDetectionRate}%</span>
                   </div>
-                  <div className="w-full bg-gray-200/60 dark:bg-gray-700/60 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-1000 group-hover:from-purple-600 group-hover:to-pink-600"
+                      className="bg-[var(--color-primary)] h-2 rounded-full transition-all duration-700"
                       style={{ width: `${progressData.faceDetectionRate}%` }}
                     ></div>
                   </div>
@@ -346,41 +331,36 @@ export default function DashboardClient({
 
           {/* Risk Assessments Card */}
           <div
-            className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+            className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
             style={{ animationDelay: "0.3s" }}
           >
-            {/* Animated Background Elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5"></div>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-300/10 to-amber-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-6">
-                <div className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-2xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
-                  <ExclamationTriangleIcon className="h-7 w-7 text-amber-600 dark:text-amber-400 group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors duration-300" />
+                <div className="p-4 rounded-xl bg-[var(--color-primary-soft)] group-hover:scale-105 transition-transform duration-300">
+                  <ExclamationTriangleIcon className="h-7 w-7 text-[var(--color-primary)]" />
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
+                  <div className="text-3xl font-bold text-[var(--color-heading)] mb-1">
                     {stats.risks}
                   </div>
-                  <div className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+                  <div className="text-xs text-[var(--color-primary)] font-medium">
                     {stats.risks > 0 ? "+5% this week" : "Start assessing"}
                   </div>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors duration-300">
+                <h3 className="text-sm font-semibold text-[var(--color-foreground)]">
                   {t("analytics.riskAssessments")}
                 </h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between text-xs text-[var(--color-subtle)]">
                     <span>Completion</span>
                     <span>{progressData.riskCompletion}%</span>
                   </div>
-                  <div className="w-full bg-gray-200/60 dark:bg-gray-700/60 rounded-full h-2 overflow-hidden">
+                  <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all duration-1000 group-hover:from-amber-600 group-hover:to-orange-600"
+                      className="bg-[var(--color-primary)] h-2 rounded-full transition-all duration-700"
                       style={{ width: `${progressData.riskCompletion}%` }}
                     ></div>
                   </div>
@@ -407,7 +387,7 @@ export default function DashboardClient({
             {recentAnalyses.length > 0 && (
               <Link
                 href="/dashboard/history"
-                className="text-[#037BFC] hover:text-[#0260c9] font-medium text-sm transition-colors"
+                className="text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-medium text-sm transition-colors"
               >
                 {t("recent.viewAll")} →
               </Link>
@@ -419,37 +399,32 @@ export default function DashboardClient({
               {recentAnalysesLimited.map((analysis, index) => (
                 <div
                   key={analysis.id}
-                  className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-3xl p-6 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in-up border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+                  className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in-up border border-[var(--color-border)] overflow-hidden cursor-pointer"
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => setSelectedAnalysis(analysis)}
                 >
-                  {/* Animated Background Elements */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-500/5 via-transparent to-gray-500/5"></div>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-slate-400/20 to-gray-500/20 rounded-full blur-2xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-slate-300/10 to-slate-500/10 rounded-full blur-xl translate-y-12 -translate-x-12 group-hover:scale-125 transition-transform duration-700"></div>
-
                   <div className="relative z-10">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div className="flex items-center space-x-4 min-w-0 flex-1">
                         <div className="shrink-0">
-                          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#037BFC]/10 to-indigo-500/10 group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--color-primary-soft)] group-hover:scale-105 transition-transform duration-300">
                             {getAnalysisIcon(analysis.type)}
                           </div>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
+                          <h3 className="text-lg font-semibold text-[var(--color-heading)] truncate group-hover:text-[var(--color-primary)] transition-colors duration-300">
                             {getAnalysisTypeLabel(analysis.type)}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                          <p className="text-sm text-[var(--color-subtle)] mt-1 line-clamp-2 group-hover:text-[var(--color-foreground)] transition-colors duration-300">
                             {getAnalysisPreview(analysis)}
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-2 group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors duration-300">
+                          <p className="text-xs text-[var(--color-muted)] mt-2">
                             {formatDate(new Date(analysis.createdAt))}
                           </p>
                         </div>
                       </div>
                       <div className="shrink-0">
-                        <div className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-[#037BFC]/10 to-indigo-500/10 px-4 py-2 text-sm font-semibold text-[#037BFC] dark:text-blue-400 group-hover:from-[#037BFC]/20 group-hover:to-indigo-500/20 transition-all duration-300">
+                        <div className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-primary-soft)] px-4 py-2 text-sm font-semibold text-[var(--color-primary)]">
                           <EyeIcon className="h-4 w-4 group-hover:scale-110 transition-transform duration-300" />
                           {t("common.viewDetails")}
                         </div>
@@ -490,22 +465,17 @@ export default function DashboardClient({
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <Link
               href="/dashboard/scan-report"
-              className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+              className="group relative bg-[var(--color-card)] rounded-xl p-4 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
               aria-label="Upload medical report for analysis"
             >
-              {/* Animated Background Elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5"></div>
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400/20 to-indigo-500/20 rounded-full blur-2xl -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-blue-300/10 to-blue-500/10 rounded-full blur-xl translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-700"></div>
-
               <div className="relative z-10 text-center">
-                <div className="p-3 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3 mx-auto w-fit mb-3">
-                  <DocumentTextIcon className="h-6 w-6 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-300" />
+                <div className="p-3 bg-[var(--color-primary-soft)] rounded-xl group-hover:scale-105 transition-transform duration-300 mx-auto w-fit mb-3">
+                  <DocumentTextIcon className="h-6 w-6 text-[var(--color-primary)]" />
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300 mb-1">
+                <h3 className="text-base font-semibold text-[var(--color-heading)] group-hover:text-[var(--color-primary)] transition-colors duration-300 mb-1">
                   {t("actions.uploadReport")}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                <p className="text-xs text-[var(--color-subtle)] group-hover:text-[var(--color-foreground)] transition-colors duration-300">
                   {t("actions.uploadReportDesc")}
                 </p>
               </div>
@@ -513,23 +483,18 @@ export default function DashboardClient({
 
             <Link
               href="/dashboard/scan-face"
-              className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+              className="group relative bg-[var(--color-card)] rounded-xl p-4 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
               style={{ animationDelay: "0.1s" }}
               aria-label="Upload photo for facial analysis"
             >
-              {/* Animated Background Elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5"></div>
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-full blur-2xl -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-purple-300/10 to-purple-500/10 rounded-full blur-xl translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-700"></div>
-
               <div className="relative z-10 text-center">
-                <div className="p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3 mx-auto w-fit mb-3">
-                  <PhotoIcon className="h-6 w-6 text-purple-600 dark:text-purple-400 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors duration-300" />
+                <div className="p-3 bg-[var(--color-primary-soft)] rounded-xl group-hover:scale-105 transition-transform duration-300 mx-auto w-fit mb-3">
+                  <PhotoIcon className="h-6 w-6 text-[var(--color-primary)]" />
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 mb-1">
+                <h3 className="text-base font-semibold text-[var(--color-heading)] group-hover:text-[var(--color-primary)] transition-colors duration-300 mb-1">
                   {t("actions.scanFace")}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                <p className="text-xs text-[var(--color-subtle)] group-hover:text-[var(--color-foreground)] transition-colors duration-300">
                   {t("actions.scanFaceDesc")}
                 </p>
               </div>
@@ -537,23 +502,18 @@ export default function DashboardClient({
 
             <Link
               href="/dashboard/risk-assessment"
-              className="group relative bg-white dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-2 animate-fade-in border border-gray-100 dark:border-gray-700/50 overflow-hidden cursor-pointer"
+              className="group relative bg-[var(--color-card)] rounded-xl p-4 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
               style={{ animationDelay: "0.2s" }}
               aria-label="Generate comprehensive risk assessment"
             >
-              {/* Animated Background Elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5"></div>
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-emerald-400/20 to-teal-500/20 rounded-full blur-2xl -translate-y-12 translate-x-12 group-hover:scale-150 transition-transform duration-700"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-emerald-300/10 to-emerald-500/10 rounded-full blur-xl translate-y-8 -translate-x-8 group-hover:scale-125 transition-transform duration-700"></div>
-
               <div className="relative z-10 text-center">
-                <div className="p-3 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-xl group-hover:scale-110 transition-transform duration-300 group-hover:rotate-3 mx-auto w-fit mb-3">
-                  <ChartBarIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors duration-300" />
+                <div className="p-3 bg-[var(--color-primary-soft)] rounded-xl group-hover:scale-105 transition-transform duration-300 mx-auto w-fit mb-3">
+                  <ChartBarIcon className="h-6 w-6 text-[var(--color-primary)]" />
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300 mb-1">
+                <h3 className="text-base font-semibold text-[var(--color-heading)] group-hover:text-[var(--color-primary)] transition-colors duration-300 mb-1">
                   {t("actions.riskAssessment")}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
+                <p className="text-xs text-[var(--color-subtle)] group-hover:text-[var(--color-foreground)] transition-colors duration-300">
                   {t("actions.riskAssessmentDesc")}
                 </p>
               </div>

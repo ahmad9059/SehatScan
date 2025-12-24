@@ -66,13 +66,13 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section id="how-it-works" className="py-20 relative overflow-hidden">
+    <section id="how-it-works" className="py-20 relative overflow-hidden bg-[var(--color-bg)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 px-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[var(--color-heading)] mb-4 px-4">
             How It Works
           </h2>
-          <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto px-4">
+          <p className="text-base sm:text-lg md:text-xl text-[var(--color-subtle)] max-w-3xl mx-auto px-4">
             Get started in three simple steps and receive your health insights
             within minutes
           </p>
@@ -80,27 +80,27 @@ export default function HowItWorksSection() {
 
         <div className="grid sm:grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 relative">
           {/* Connection Line */}
-          <div className="hidden md:block absolute top-24 left-0 right-0 h-0.5 bg-linear-to-r from-transparent via-[#037BFC] to-transparent"></div>
+          <div className="hidden md:block absolute top-24 left-0 right-0 h-0.5 bg-[var(--color-border)]"></div>
 
           {steps.map((step, index) => (
             <div key={index} className="relative">
               {/* Step Card */}
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 group relative z-10 border border-gray-700/50">
+              <div className="bg-[var(--color-card)] rounded-2xl p-6 sm:p-8 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 group relative z-10 border border-[var(--color-border)]">
                 {/* Number Badge */}
-                <div className="absolute -top-4 sm:-top-6 left-6 sm:left-8 w-12 h-12 sm:w-16 sm:h-16 bg-[#037BFC] rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg group-hover:scale-110 transition-transform">
+                <div className="absolute -top-4 sm:-top-6 left-6 sm:left-8 w-12 h-12 sm:w-16 sm:h-16 bg-[var(--color-primary)] rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-[var(--shadow-soft)] group-hover:scale-110 transition-transform">
                   {step.number}
                 </div>
 
                 {/* Icon */}
-                <div className="mt-6 sm:mt-8 mb-4 sm:mb-6 w-12 h-12 sm:w-16 sm:h-16 bg-gray-800 rounded-xl flex items-center justify-center text-[#037BFC] shadow-md group-hover:scale-110 transition-transform border border-gray-700">
+                <div className="mt-6 sm:mt-8 mb-4 sm:mb-6 w-12 h-12 sm:w-16 sm:h-16 bg-[var(--color-surface)] rounded-xl flex items-center justify-center text-[var(--color-primary)] shadow-md group-hover:scale-110 transition-transform border border-[var(--color-border)]">
                   {step.icon}
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">
+                <h3 className="text-xl sm:text-2xl font-bold text-[var(--color-heading)] mb-3 sm:mb-4">
                   {step.title}
                 </h3>
-                <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
+                <p className="text-sm sm:text-base text-[var(--color-subtle)] leading-relaxed">
                   {step.description}
                 </p>
               </div>
@@ -109,7 +109,7 @@ export default function HowItWorksSection() {
               {index < steps.length - 1 && (
                 <div className="hidden md:block absolute top-24 -right-6 z-20">
                   <svg
-                    className="w-12 h-12 text-[#037BFC]"
+                    className="w-12 h-12 text-[var(--color-primary)]"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

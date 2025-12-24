@@ -88,21 +88,21 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
       {/* Profile Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 p-2 rounded-xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 hover:bg-white/80 dark:hover:bg-gray-800/80 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+        className="flex items-center gap-3 p-2 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] transition-all duration-300 hover:scale-105 hover:shadow-[var(--shadow-soft)]"
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary)] text-white font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300">
           {user?.name
             ? user.name.charAt(0).toUpperCase()
             : user?.email?.charAt(0).toUpperCase() || "U"}
         </div>
         <div className="hidden sm:block text-left">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-colors duration-300">
+          <p className="text-sm font-semibold text-[var(--color-foreground)] group-hover:text-[var(--color-primary)] transition-colors duration-300">
             {user?.name || "User"}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
+          <p className="text-xs text-[var(--color-subtle)]">Online</p>
         </div>
         <svg
-          className={`h-4 w-4 text-gray-400 group-hover:text-[#037BFC] dark:group-hover:text-blue-400 transition-all duration-300 ${
+          className={`h-4 w-4 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-all duration-300 ${
             isOpen ? "rotate-180" : ""
           }`}
           fill="none"
@@ -120,20 +120,20 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 backdrop-blur-xl z-50 animate-fade-in">
+        <div className="absolute right-0 mt-2 w-80 bg-[var(--color-card)] rounded-2xl shadow-xl border border-[var(--color-border)] z-50 animate-fade-in">
           {/* User Info Header */}
-          <div className="px-6 py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="px-6 py-4 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#037BFC] to-indigo-500 text-white font-semibold text-lg shadow-lg">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary)] text-white font-semibold text-lg shadow-lg">
                 {user?.name
                   ? user.name.charAt(0).toUpperCase()
                   : user?.email?.charAt(0).toUpperCase() || "U"}
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                <p className="text-sm font-semibold text-[var(--color-foreground)]">
                   {user?.name || "User"}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-[var(--color-subtle)]">
                   {user?.email}
                 </p>
               </div>
@@ -149,16 +149,16 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
                   router.push(item.href);
                   setIsOpen(false);
                 }}
-                className="w-full px-6 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors flex items-center gap-3"
+                className="w-full px-6 py-3 text-left hover:bg-[var(--color-surface)] transition-colors flex items-center gap-3"
               >
-                <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
-                  <item.icon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                <div className="p-2 rounded-lg bg-[var(--color-surface)]">
+                  <item.icon className="h-4 w-4 text-[var(--color-muted)]" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  <p className="text-sm font-medium text-[var(--color-foreground)]">
                     {item.label}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-[var(--color-subtle)]">
                     {item.description}
                   </p>
                 </div>
@@ -167,12 +167,12 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
           </div>
 
           {/* Logout */}
-          <div className="border-t border-gray-200/50 dark:border-gray-700/50 py-2">
+          <div className="border-t border-[var(--color-border)] py-2">
             <button
               onClick={handleLogout}
-              className="w-full px-6 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-3 text-red-600 dark:text-red-400"
+              className="w-full px-6 py-3 text-left hover:bg-[color-mix(in srgb, var(--color-danger) 10%, transparent)] transition-colors flex items-center gap-3 text-[var(--color-danger)]"
             >
-              <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
+              <div className="p-2 rounded-lg bg-[color-mix(in srgb, var(--color-danger) 12%, transparent)]">
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
               </div>
               <div>

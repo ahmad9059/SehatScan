@@ -99,7 +99,7 @@ function ChatbotPageContent() {
     };
 
     setMessages((prev) => [...prev, userMessage, loadingMessage]);
-    setInputMessage(overrideMessage ? "" : "");
+    setInputMessage("");
     setIsLoading(true);
 
     try {
@@ -109,7 +109,7 @@ function ChatbotPageContent() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: inputMessage.trim(),
+          message: messageToSend,
           userAnalyses,
           conversationHistory: messages.slice(-10),
         }),
@@ -197,7 +197,8 @@ function ChatbotPageContent() {
                 What can I help with?
               </h2>
               <p className="text-[var(--color-subtle)] max-w-md">
-                Ask me anything about your health data, reports, or general health questions.
+                Ask me anything about your health data, reports, or general
+                health questions.
               </p>
             </div>
           )}
@@ -280,6 +281,24 @@ function ChatbotPageContent() {
 
       {/* Bottom input area - always at bottom */}
       <div className="shrink-0 bg-[var(--color-bg)] py-2 px-4">
+        {/* Suggested questions - only show when no messages */}
+        {messages.length === 0 && (
+          <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto mb-3">
+            {[
+              "Explain my latest health report",
+              "What trends do you see in my data?",
+            ].map((question) => (
+              <button
+                key={question}
+                type="button"
+                onClick={() => handleSendMessage(question)}
+                className="px-4 py-2 text-sm rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] transition-all duration-200"
+              >
+                {question}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="flex items-center gap-2 w-full max-w-2xl mx-auto rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
           <textarea
             ref={inputRef}
@@ -302,11 +321,12 @@ function ChatbotPageContent() {
             } disabled:opacity-50 disabled:cursor-not-allowed`}
             aria-label="Send message"
           >
-            <PaperAirplaneIcon className="h-4 w-4" />
+            <PaperAirplaneIcon className="h-6 w-6" />
           </button>
         </div>
         <p className="text-center text-[10px] text-[var(--color-subtle)] py-1">
-          AI can make mistakes. Verify important health information with a professional.
+          AI can make mistakes. Verify important health information with a
+          professional.
         </p>
       </div>
     </div>

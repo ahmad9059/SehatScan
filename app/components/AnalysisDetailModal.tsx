@@ -94,12 +94,14 @@ export default function AnalysisDetailModal({
   const healthMetrics = useMemo(() => {
     if (analysis?.type !== "report" || !analysis?.structuredData?.metrics)
       return [];
-    return analysis.structuredData.metrics.map((metric: any, index: number) => ({
-      name: metric.name,
-      value: parseFloat(metric.value) || 0,
-      unit: metric.unit || "",
-      color: metricColors[index % metricColors.length],
-    }));
+    return analysis.structuredData.metrics.map(
+      (metric: any, index: number) => ({
+        name: metric.name,
+        value: parseFloat(metric.value) || 0,
+        unit: metric.unit || "",
+        color: metricColors[index % metricColors.length],
+      })
+    );
   }, [analysis]);
 
   const hasProblems =
@@ -200,8 +202,10 @@ export default function AnalysisDetailModal({
                         </div>
                         <div className="h-2 w-full rounded-full bg-[var(--color-border)]/60">
                           <div
-                            className="h-2 rounded-full bg-[var(--color-primary)]"
-                            style={{ width: `${Math.min(100, faceMetrics.redness)}%` }}
+                            className="h-2 rounded-full bg-[var(--color-danger)]"
+                            style={{
+                              width: `${Math.min(100, faceMetrics.redness)}%`,
+                            }}
                           />
                         </div>
                       </div>
@@ -218,7 +222,10 @@ export default function AnalysisDetailModal({
                           <div
                             className="h-2 rounded-full bg-[#f59e0b]"
                             style={{
-                              width: `${Math.min(100, faceMetrics.yellowness)}%`,
+                              width: `${Math.min(
+                                100,
+                                faceMetrics.yellowness
+                              )}%`,
                             }}
                           />
                         </div>
@@ -346,11 +353,19 @@ export default function AnalysisDetailModal({
                             <BarChart data={healthMetrics}>
                               <XAxis
                                 dataKey="name"
-                                tick={{ fontSize: 12, fill: "var(--color-subtle)" }}
+                                tick={{
+                                  fontSize: 12,
+                                  fill: "var(--color-subtle)",
+                                }}
                                 interval={0}
                                 height={50}
                               />
-                              <YAxis tick={{ fontSize: 12, fill: "var(--color-subtle)" }} />
+                              <YAxis
+                                tick={{
+                                  fontSize: 12,
+                                  fill: "var(--color-subtle)",
+                                }}
+                              />
                               <Tooltip
                                 formatter={(value: number, _name, props: any) =>
                                   `${value} ${props.payload.unit || ""}`
@@ -382,50 +397,59 @@ export default function AnalysisDetailModal({
                           </p>
                         </div>
                         <div className="space-y-3">
-                          {analysis.problemsDetected.map((problem: any, idx: number) => (
-                            <div
-                              key={`${problem.type}-${idx}`}
-                              className={`rounded-lg border px-3 py-3 ${
-                                problem.severity === "severe"
-                                  ? "border-[var(--color-danger)]/60 bg-[var(--color-danger)]/10"
-                                  : problem.severity === "moderate"
-                                  ? "border-[var(--color-warning)]/60 bg-[var(--color-warning)]/10"
-                                  : "border-[var(--color-success)]/60 bg-[var(--color-success)]/10"
-                              }`}
+                          {analysis.problemsDetected.map(
+                            (problem: any, idx: number) => (
+                              <div
+                                key={`${problem.type}-${idx}`}
+                                className={`rounded-lg border px-3 py-3 ${
+                                  problem.severity === "severe"
+                                    ? "border-[var(--color-danger)]/60 bg-[var(--color-danger)]/10"
+                                    : problem.severity === "moderate"
+                                    ? "border-[var(--color-warning)]/60 bg-[var(--color-warning)]/10"
+                                    : "border-[var(--color-success)]/60 bg-[var(--color-success)]/10"
+                                }`}
                               >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-heading)]" />
-                                  <p className="text-sm font-semibold text-[var(--color-heading)]">
-                                    {problem.type}
-                                  </p>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-heading)]" />
+                                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                      {problem.type}
+                                    </p>
+                                  </div>
+                                  <span className={chipStyles}>
+                                    {problem.severity}
+                                  </span>
                                 </div>
-                                <span className={chipStyles}>{problem.severity}</span>
-                              </div>
-                              <p className="mt-2 text-sm text-[var(--color-foreground)]">
-                                {problem.description}
-                              </p>
-                              <div className="mt-3 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
-                                <span className="font-semibold text-[var(--color-heading)]">
-                                  Confidence
-                                </span>
-                                <div className="h-2 w-28 rounded-full bg-[var(--color-card)] border border-[var(--color-border)]">
-                                  <div
-                                    className="h-full rounded-full bg-[var(--color-primary)]"
-                                    style={{
-                                      width: `${Math.min(
-                                        100,
-                                        Math.round((problem.confidence || 0) * 100)
-                                      )}%`,
-                                    }}
-                                  />
+                                <p className="mt-2 text-sm text-[var(--color-foreground)]">
+                                  {problem.description}
+                                </p>
+                                <div className="mt-3 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
+                                  <span className="font-semibold text-[var(--color-heading)]">
+                                    Confidence
+                                  </span>
+                                  <div className="h-2 w-28 rounded-full bg-[var(--color-card)] border border-[var(--color-border)]">
+                                    <div
+                                      className="h-full rounded-full bg-[var(--color-primary)]"
+                                      style={{
+                                        width: `${Math.min(
+                                          100,
+                                          Math.round(
+                                            (problem.confidence || 0) * 100
+                                          )
+                                        )}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-[var(--color-heading)] font-semibold">
+                                    {Math.round(
+                                      (problem.confidence || 0) * 100
+                                    )}
+                                    %
+                                  </span>
                                 </div>
-                                <span className="text-[var(--color-heading)] font-semibold">
-                                  {Math.round((problem.confidence || 0) * 100)}%
-                                </span>
                               </div>
-                            </div>
-                          ))}
+                            )
+                          )}
                         </div>
                       </div>
                     )}
@@ -441,8 +465,15 @@ export default function AnalysisDetailModal({
                         <div className="space-y-3">
                           {analysis.treatments
                             .sort((a: any, b: any) => {
-                              const order: Record<string, number> = { high: 3, medium: 2, low: 1 };
-                              return (order[b.priority] || 0) - (order[a.priority] || 0);
+                              const order: Record<string, number> = {
+                                high: 3,
+                                medium: 2,
+                                low: 1,
+                              };
+                              return (
+                                (order[b.priority] || 0) -
+                                (order[a.priority] || 0)
+                              );
                             })
                             .map((treatment: any, idx: number) => (
                               <div
@@ -475,10 +506,12 @@ export default function AnalysisDetailModal({
                                 Important Medical Disclaimer
                               </p>
                               <p className="text-xs text-[var(--color-foreground)] mt-1 leading-relaxed">
-                                These recommendations are for informational purposes only and should
-                                not replace professional medical advice. Always consult with a
-                                qualified healthcare provider or dermatologist for proper diagnosis
-                                and treatment, especially for severe or persistent symptoms.
+                                These recommendations are for informational
+                                purposes only and should not replace
+                                professional medical advice. Always consult with
+                                a qualified healthcare provider or dermatologist
+                                for proper diagnosis and treatment, especially
+                                for severe or persistent symptoms.
                               </p>
                             </div>
                           </div>

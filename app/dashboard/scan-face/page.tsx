@@ -498,10 +498,7 @@ function ScanFacePageContent() {
                         {
                           label: "Redness percentage",
                           value: visualMetrics.redness_percentage,
-                          color:
-                            visualMetrics.redness_percentage > 15
-                              ? "bg-[var(--color-warning)]"
-                              : "bg-[var(--color-success)]",
+                          color: "bg-[var(--color-danger)]",
                         },
                         {
                           label: "Yellowness percentage",

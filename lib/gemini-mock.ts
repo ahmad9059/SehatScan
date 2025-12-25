@@ -236,34 +236,62 @@ Ready to start your health journey? Upload your first report or photo!`;
       userQuestion.includes("blood test")
     ) {
       if (hasReportData) {
-        // Extract metrics from context
-        const metricsSection = prompt.match(
-          /Metrics Found[\s\S]*?(?=\n\n|\n📸|\n⚠️|$)/i
-        );
-        const summaryMatch = prompt.match(/Summary:\s*([^\n]+)/i);
-        const concernsMatch = prompt.match(/⚠️ Concerns:\s*([^\n]+)/i);
-
         response = `${greeting}Based on your uploaded health reports, here's what I found:\n\n`;
 
-        if (metricsSection) {
-          response += `**📊 Your Health Metrics:**\n${metricsSection[0]}\n\n`;
+        // Extract individual metrics with better formatting
+        const metricsMatches = prompt.matchAll(
+          /([✓⚠️⬇️])\s*([^:]+):\s*([^\[]+)\[([^\]]+)\]/g
+        );
+        const metrics = [...metricsMatches];
+
+        if (metrics.length > 0) {
+          response += `**📊 Your Health Metrics:**\n\n`;
+          response += `| Metric | Value | Status |\n`;
+          response += `|--------|-------|--------|\n`;
+
+          for (const match of metrics) {
+            const icon =
+              match[1] === "✓" ? "✅" : match[1] === "⬇️" ? "🔽" : "⚠️";
+            const name = match[2].trim();
+            const value = match[3].trim();
+            const status = match[4].trim();
+            response += `| ${name} | ${value} | ${icon} ${status} |\n`;
+          }
+          response += `\n`;
         }
 
-        if (summaryMatch) {
-          response += `**📋 Summary:** ${summaryMatch[1]}\n\n`;
+        // Extract problems detected
+        const problemsMatch = prompt.match(
+          /Problems Detected:[\s\S]*?(?=💊|Recommended|$)/i
+        );
+        if (problemsMatch) {
+          const problems = problemsMatch[0]
+            .replace(/Problems Detected:\s*-?\s*/i, "")
+            .trim();
+          if (problems && problems.length > 0) {
+            response += `**🔍 Issues Found:**\n- ${problems}\n\n`;
+          }
         }
 
-        if (concernsMatch) {
-          response += `**⚠️ Areas to Watch:** ${concernsMatch[1]}\n\n`;
+        // Extract treatments
+        const treatmentsMatch = prompt.match(
+          /Recommended Treatments:[\s\S]*?(?=\n\n|\n📸|\n⚠️|Summary|$)/i
+        );
+        if (treatmentsMatch) {
+          const treatments = treatmentsMatch[0]
+            .replace(/Recommended Treatments:\s*-?\s*/i, "")
+            .trim();
+          if (treatments && treatments.length > 0) {
+            response += `**💊 Recommended Actions:**\n- ${treatments}\n\n`;
+          }
         }
 
-        response += `**💡 Recommendations:**
-- Continue monitoring your health regularly
-- Discuss any abnormal values with your healthcare provider
-- Consider follow-up tests for any concerning metrics
-- Maintain a healthy lifestyle with balanced nutrition and exercise
-
-Would you like me to explain any specific metric in more detail?`;
+        response += `**💡 General Recommendations:**\n`;
+        response += `- Continue monitoring your health regularly\n`;
+        response += `- Discuss any abnormal values with your healthcare provider\n`;
+        response += `- Consider follow-up tests for any concerning metrics\n`;
+        response += `- Maintain a healthy lifestyle with balanced nutrition and exercise\n\n`;
+        response += `Would you like me to explain any specific metric in more detail?`;
       } else {
         response = `${greeting}I don't see any health reports in your account yet.
 

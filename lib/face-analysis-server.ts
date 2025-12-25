@@ -26,6 +26,8 @@ export interface FaceDetectionResult {
     width: number;
     height: number;
   }>;
+  image_width?: number;
+  image_height?: number;
   visual_metrics: Array<{
     face_index: number;
     redness_percentage: number;
@@ -48,6 +50,12 @@ export async function analyzeFaceImageServer(
     // Convert file to buffer for server-side processing
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    const dataUrl = `data:${file.type || "image/jpeg"};base64,${buffer.toString(
+      "base64"
+    )}`;
+
+    // Best-effort image dimensions to scale overlay on the client
+    const { width: imgWidth, height: imgHeight } = getImageDimensions(buffer);
 
     // For now, we'll create a mock analysis since we don't have access to
     // image processing libraries like Sharp or Canvas in this environment
@@ -75,17 +83,24 @@ export async function analyzeFaceImageServer(
     const treatments = generateTreatmentRecommendations(problemsDetected);
 
     // Create mock face detection result
+    const boxWidth = Math.max(180, Math.round(imgWidth * 0.45));
+    const boxHeight = Math.max(180, Math.round(imgHeight * 0.5));
+    const boxX = Math.max(0, Math.round((imgWidth - boxWidth) / 2));
+    const boxY = Math.max(0, Math.round((imgHeight - boxHeight) / 2.5));
+
     const result: FaceDetectionResult = {
       face_detected: true,
       faces_count: 1,
       faces: [
         {
-          x: 100,
-          y: 80,
-          width: 200,
-          height: 250,
+          x: boxX,
+          y: boxY,
+          width: boxWidth,
+          height: boxHeight,
         },
       ],
+      image_width: imgWidth,
+      image_height: imgHeight,
       visual_metrics: [
         {
           face_index: 0,
@@ -99,8 +114,10 @@ export async function analyzeFaceImageServer(
       ],
       problems_detected: problemsDetected,
       treatments: treatments,
-      // Note: In production, you'd generate an actual annotated image
-      annotated_image: generateMockAnnotatedImage(),
+      // Send back the original image as a data URL so the UI can render it
+      // instead of a blank placeholder. In production, replace with a real
+      // annotated overlay image.
+      annotated_image: dataUrl,
     };
 
     return result;
@@ -111,6 +128,41 @@ export async function analyzeFaceImageServer(
       }`
     );
   }
+}
+
+function getImageDimensions(buffer: Buffer): { width: number; height: number } {
+  // PNG: width/height stored at bytes 16-23 (big-endian)
+  if (
+    buffer
+      .slice(0, 8)
+      .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+  ) {
+    return {
+      width: buffer.readUInt32BE(16),
+      height: buffer.readUInt32BE(20),
+    };
+  }
+
+  // JPEG: scan for SOF0/2 marker to read dimensions
+  if (buffer[0] === 0xff && buffer[1] === 0xd8) {
+    let offset = 2;
+    while (offset < buffer.length) {
+      const marker = buffer[offset];
+      const markerNext = buffer[offset + 1];
+      if (marker !== 0xff) break;
+      // SOF0 (0xC0) or SOF2 (0xC2)
+      if (markerNext === 0xc0 || markerNext === 0xc2) {
+        const height = buffer.readUInt16BE(offset + 5);
+        const width = buffer.readUInt16BE(offset + 7);
+        return { width, height };
+      }
+      const blockLength = buffer.readUInt16BE(offset + 2);
+      offset += 2 + blockLength;
+    }
+  }
+
+  // Fallback dimensions if parsing fails
+  return { width: 800, height: 600 };
 }
 
 /**

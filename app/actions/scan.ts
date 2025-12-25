@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { requireAuth } from "@/lib/clerk-session";
 import { saveAnalysis } from "@/lib/analysis";
 
@@ -43,6 +44,23 @@ function validateUploadFile(formData: FormData): {
   }
 
   return { isValid: true, file };
+}
+
+async function resolveBaseUrl() {
+  const headerStore = await headers();
+  const host =
+    headerStore.get("x-forwarded-host") ?? headerStore.get("host") ?? "";
+  const proto = headerStore.get("x-forwarded-proto") ?? "https";
+
+  if (host) {
+    return `${proto}://${host}`;
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 }
 
 export async function analyzeFace(formData: FormData) {
@@ -91,9 +109,7 @@ export async function analyzeFace(formData: FormData) {
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       // Get the base URL for server-side requests
-      const baseUrl = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000";
+      const baseUrl = await resolveBaseUrl();
 
       response = await fetch(`${baseUrl}/api/analyze/face`, {
         method: "POST",
@@ -292,9 +308,7 @@ export async function analyzeReport(formData: FormData) {
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for OCR
 
       // Get the base URL for server-side requests
-      const baseUrl = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000";
+      const baseUrl = await resolveBaseUrl();
 
       response = await fetch(`${baseUrl}/api/analyze/report`, {
         method: "POST",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { analyzeFace } from "../../actions/scan";
 import { validateFile } from "@/lib/validation";
 import {
@@ -41,9 +42,13 @@ interface FaceAnalysisResult {
   faces: Array<{
     x: number;
     y: number;
-    w: number;
-    h: number;
+    width?: number;
+    height?: number;
+    w?: number;
+    h?: number;
   }>;
+  image_width?: number;
+  image_height?: number;
   visual_metrics: Array<{
     redness_percentage: number;
     yellowness_percentage: number;
@@ -94,6 +99,12 @@ function ScanFacePageContent() {
   const [result, setResult] = useState<FaceAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [annotatedDims, setAnnotatedDims] = useState({
+    renderW: 0,
+    renderH: 0,
+    naturalW: 0,
+    naturalH: 0,
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (selectedFile: File) => {
@@ -238,8 +249,8 @@ function ScanFacePageContent() {
               <div>
                 <h1 className={heading}>Facial Health Analysis</h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Upload a clear portrait to detect visual health indicators in a
-                  full-width, continuous dashboard view.
+                  Upload a clear portrait to detect visual health indicators in
+                  a full-width, continuous dashboard view.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className={pill}>JPG or PNG</span>
@@ -466,7 +477,7 @@ function ScanFacePageContent() {
                 </div>
               </div>
 
-                <div className="space-y-6">
+              <div className="space-y-6">
                 <div className="space-y-3">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -514,7 +525,9 @@ function ScanFacePageContent() {
                           <div className="mt-3 h-2 w-full rounded-full bg-[var(--color-surface)]">
                             <div
                               className={`h-2 rounded-full ${metric.color}`}
-                              style={{ width: `${Math.min(metric.value, 100)}%` }}
+                              style={{
+                                width: `${Math.min(metric.value, 100)}%`,
+                              }}
                             />
                           </div>
                         </div>
@@ -527,7 +540,8 @@ function ScanFacePageContent() {
                         No visual metrics found
                       </h4>
                       <p className={`${subheading} mt-1 text-sm`}>
-                        Try another photo with brighter lighting and clearer focus.
+                        Try another photo with brighter lighting and clearer
+                        focus.
                       </p>
                     </div>
                   )}
@@ -626,12 +640,84 @@ function ScanFacePageContent() {
                       <h3 className={sectionTitle}>Annotated image</h3>
                       <span className={chip}>AI overlay</span>
                     </div>
-                    <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-lg">
+                    <div className="relative overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-lg">
                       <img
-                        src={`data:image/png;base64,${result.annotated_image}`}
+                        src={
+                          result.annotated_image.startsWith("data:")
+                            ? result.annotated_image
+                            : `data:image/png;base64,${result.annotated_image}`
+                        }
                         alt="Annotated analysis"
-                        className="w-full object-contain"
+                        className="w-full max-h-[70vh] object-contain bg-[var(--color-surface)]"
+                        onLoad={(e) => {
+                          const img = e.currentTarget;
+                          setAnnotatedDims({
+                            renderW: img.clientWidth,
+                            renderH: img.clientHeight,
+                            naturalW: img.naturalWidth,
+                            naturalH: img.naturalHeight,
+                          });
+                        }}
                       />
+
+                      {result.faces && result.faces.length > 0 && (
+                        <div className="pointer-events-none absolute inset-0">
+                          {result.faces.map((face, idx) => {
+                            const imgW =
+                              result.image_width ||
+                              annotatedDims.naturalW ||
+                              annotatedDims.renderW ||
+                              1;
+                            const imgH =
+                              result.image_height ||
+                              annotatedDims.naturalH ||
+                              annotatedDims.renderH ||
+                              1;
+                            const scaleX = annotatedDims.renderW
+                              ? annotatedDims.renderW / imgW
+                              : 1;
+                            const scaleY = annotatedDims.renderH
+                              ? annotatedDims.renderH / imgH
+                              : 1;
+
+                            const rawWidth =
+                              face.width ?? face.w ?? Math.round(imgW * 0.45);
+                            const rawHeight =
+                              face.height ?? face.h ?? Math.round(imgH * 0.5);
+                            const rawX =
+                              face.x ??
+                              Math.max(0, Math.round((imgW - rawWidth) / 2));
+                            const rawY =
+                              face.y ??
+                              Math.max(0, Math.round((imgH - rawHeight) / 2.5));
+
+                            const boxStyle: CSSProperties = {
+                              left: rawX * scaleX,
+                              top: rawY * scaleY,
+                              width: rawWidth * scaleX,
+                              height: rawHeight * scaleY,
+                              border: "2px solid var(--color-primary)",
+                              boxShadow: "0 0 0 1px rgba(0,0,0,0.1)",
+                              borderRadius: "12px",
+                              position: "absolute",
+                              background:
+                                "linear-gradient(135deg, rgba(76,110,245,0.08), rgba(76,110,245,0.02))",
+                            };
+
+                            return (
+                              <div
+                                key={`${face.x}-${face.y}-${idx}`}
+                                style={boxStyle}
+                                className="flex items-start"
+                              >
+                                <span className="m-2 rounded-md bg-[var(--color-card)] px-2 py-1 text-[10px] font-semibold text-[var(--color-primary)] shadow-sm">
+                                  Face {idx + 1}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

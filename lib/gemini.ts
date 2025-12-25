@@ -42,9 +42,9 @@ export class GeminiAnalyzer {
     }
 
     this.genai = new GoogleGenerativeAI(key);
-    // Try different model names that might be available
+    // Use gemini-2.0-flash which is the current recommended model
     this.model = this.genai.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash",
     });
   }
 

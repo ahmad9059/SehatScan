@@ -36,12 +36,12 @@ interface NavigationItem {
 
 const navigationItems: NavigationItem[] = [
   { nameKey: "nav.dashboard", href: "/dashboard", icon: HomeIcon },
+  { nameKey: "nav.scanFace", href: "/dashboard/scan-face", icon: CameraIcon },
   {
     nameKey: "nav.scanReport",
     href: "/dashboard/scan-report",
     icon: DocumentTextIcon,
   },
-  { nameKey: "nav.scanFace", href: "/dashboard/scan-face", icon: CameraIcon },
   {
     nameKey: "nav.riskAssessment",
     href: "/dashboard/risk-assessment",

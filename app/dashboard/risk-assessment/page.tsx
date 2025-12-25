@@ -395,110 +395,7 @@ function RiskAssessmentPageContent() {
 
           <form onSubmit={handleSubmit} className="space-y-10">
             <div className="grid gap-8 lg:grid-cols-2">
-              {/* Report selection */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
-                      <DocumentTextIcon className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className={sectionTitle}>Select report analysis</h3>
-                      <p className={`${subheading} text-sm`}>
-                        Choose an existing report or upload a new one.
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleFileSelect("report")}
-                    disabled={isUploadingReport || isUploadingFace || isLoading}
-                    className={secondaryButton}
-                  >
-                    <CloudArrowUpIcon className="h-4 w-4" />
-                    Upload report
-                  </button>
-                </div>
-
-                {isUploadingReport ? (
-                  <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/70 px-4 py-4 rounded-xl">
-                    <div className="flex items-center gap-2">
-                      <LoadingSpinner size="sm" />
-                      <p className="text-sm font-semibold text-[var(--color-heading)]">
-                        Uploading {reportFile?.name}
-                      </p>
-                    </div>
-                    <ProgressBar
-                      progress={reportUploadProgress}
-                      label="Analyzing report"
-                      size="sm"
-                    />
-                  </div>
-                ) : reportAnalyses.length === 0 ? (
-                  <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 text-center rounded-xl">
-                    <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      No report analyses yet
-                    </p>
-                    <p className={`${subheading} mt-1 text-sm`}>
-                      Upload a medical report to begin a risk assessment.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {reportAnalyses.map((analysis) => (
-                      <label
-                        key={analysis.id}
-                        className={`flex cursor-pointer items-start justify-between border p-4 rounded-xl transition-all duration-200 ${
-                          selectedReport === analysis.id
-                            ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
-                            : "border-[var(--color-border)] bg-[var(--color-card)]/60 hover:border-[var(--color-primary)]"
-                        }`}
-                      >
-                        <div className="flex flex-1 items-start gap-3">
-                          <input
-                            type="radio"
-                            name="report"
-                            value={analysis.id}
-                            checked={selectedReport === analysis.id}
-                            onChange={(e) => {
-                              setSelectedReport(e.target.value);
-                              if (validationErrors.reportAnalysisId) {
-                                setValidationErrors((prev) => {
-                                  const {
-                                    reportAnalysisId: _reportAnalysisId,
-                                    ...rest
-                                  } = prev;
-                                  return rest;
-                                });
-                              }
-                            }}
-                            className="mt-1 h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                          />
-                          <div>
-                            <p className="text-sm font-semibold text-[var(--color-heading)]">
-                              Report analysis
-                            </p>
-                            <p className={`${subheading} text-sm`}>
-                              {getAnalysisPreview(analysis)}
-                            </p>
-                          </div>
-                        </div>
-                        <span className={`${chip} whitespace-nowrap`}>
-                          {formatAnalysisDate(analysis.createdAt)}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-
-                {validationErrors.reportAnalysisId && (
-                  <p className="text-sm text-[var(--color-danger)]">
-                    {validationErrors.reportAnalysisId}
-                  </p>
-                )}
-              </div>
-
-              {/* Face selection */}
+              {/* Face selection (left) */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -597,6 +494,109 @@ function RiskAssessmentPageContent() {
                 {validationErrors.faceAnalysisId && (
                   <p className="text-sm text-[var(--color-danger)]">
                     {validationErrors.faceAnalysisId}
+                  </p>
+                )}
+              </div>
+
+              {/* Report selection (right) */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                      <DocumentTextIcon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h3 className={sectionTitle}>Select report analysis</h3>
+                      <p className={`${subheading} text-sm`}>
+                        Choose an existing report or upload a new one.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleFileSelect("report")}
+                    disabled={isUploadingReport || isUploadingFace || isLoading}
+                    className={secondaryButton}
+                  >
+                    <CloudArrowUpIcon className="h-4 w-4" />
+                    Upload report
+                  </button>
+                </div>
+
+                {isUploadingReport ? (
+                  <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/70 px-4 py-4 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <LoadingSpinner size="sm" />
+                      <p className="text-sm font-semibold text-[var(--color-heading)]">
+                        Uploading {reportFile?.name}
+                      </p>
+                    </div>
+                    <ProgressBar
+                      progress={reportUploadProgress}
+                      label="Analyzing report"
+                      size="sm"
+                    />
+                  </div>
+                ) : reportAnalyses.length === 0 ? (
+                  <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 text-center rounded-xl">
+                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                      No report analyses yet
+                    </p>
+                    <p className={`${subheading} mt-1 text-sm`}>
+                      Upload a medical report to begin a risk assessment.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {reportAnalyses.map((analysis) => (
+                      <label
+                        key={analysis.id}
+                        className={`flex cursor-pointer items-start justify-between border p-4 rounded-xl transition-all duration-200 ${
+                          selectedReport === analysis.id
+                            ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
+                            : "border-[var(--color-border)] bg-[var(--color-card)]/60 hover:border-[var(--color-primary)]"
+                        }`}
+                      >
+                        <div className="flex flex-1 items-start gap-3">
+                          <input
+                            type="radio"
+                            name="report"
+                            value={analysis.id}
+                            checked={selectedReport === analysis.id}
+                            onChange={(e) => {
+                              setSelectedReport(e.target.value);
+                              if (validationErrors.reportAnalysisId) {
+                                setValidationErrors((prev) => {
+                                  const {
+                                    reportAnalysisId: _reportAnalysisId,
+                                    ...rest
+                                  } = prev;
+                                  return rest;
+                                });
+                              }
+                            }}
+                            className="mt-1 h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                          />
+                          <div>
+                            <p className="text-sm font-semibold text-[var(--color-heading)]">
+                              Report analysis
+                            </p>
+                            <p className={`${subheading} text-sm`}>
+                              {getAnalysisPreview(analysis)}
+                            </p>
+                          </div>
+                        </div>
+                        <span className={`${chip} whitespace-nowrap`}>
+                          {formatAnalysisDate(analysis.createdAt)}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
+                {validationErrors.reportAnalysisId && (
+                  <p className="text-sm text-[var(--color-danger)]">
+                    {validationErrors.reportAnalysisId}
                   </p>
                 )}
               </div>

@@ -10,7 +10,7 @@ export default function HeroSection() {
           backgroundColor: "var(--color-bg)",
           backgroundImage:
             "radial-gradient(circle at 1px 1px, var(--hero-grid-dot) 1.2px, transparent 0)",
-          backgroundSize: "28px 28px",
+          backgroundSize: "16px 16px",
         }}
       >
         <div className="absolute left-1/2 top-1/3 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--hero-grid-accent),transparent_60%)] blur-3xl opacity-60" />

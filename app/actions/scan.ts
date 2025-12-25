@@ -602,9 +602,7 @@ export async function generateRiskAssessment(
       const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for AI processing
 
       // Get the base URL for server-side requests
-      const baseUrl = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000";
+      const baseUrl = await resolveBaseUrl();
 
       response = await fetch(`${baseUrl}/api/analyze/risk`, {
         method: "POST",

@@ -53,6 +53,7 @@ export class GeminiAnalyzer {
 
   constructor(apiKey?: string) {
     const key = apiKey || process.env.GEMINI_API_KEY;
+    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
     if (!key) {
       throw new Error(
@@ -61,9 +62,9 @@ export class GeminiAnalyzer {
     }
 
     this.genai = new GoogleGenerativeAI(key);
-    // Use gemini-2.0-flash which is the current recommended model
+    // Default to gemini-2.5-flash; allow override via GEMINI_MODEL for quota flexibility
     this.model = this.genai.getGenerativeModel({
-      model: "gemini-2.0-flash",
+      model: modelName,
     });
   }
 

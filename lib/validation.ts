@@ -316,27 +316,43 @@ export function validateLoginForm(data: {
 
 // Risk assessment form validation
 export function validateRiskAssessmentForm(data: {
-  reportAnalysisId: string;
-  faceAnalysisId: string;
+  reportAnalysisId?: string;
+  faceAnalysisId?: string;
   age?: string;
   gender?: string;
   symptoms?: string;
+  includeReport?: boolean;
+  includeFace?: boolean;
 }): ValidationResult {
   const errors: Record<string, string> = {};
 
-  if (!data.reportAnalysisId) {
+  const includeReport = data.includeReport ?? true;
+  const includeFace = data.includeFace ?? true;
+
+  if (!includeReport && !includeFace) {
+    errors.reportAnalysisId = "Select at least one analysis source";
+    errors.faceAnalysisId = "Select at least one analysis source";
+  }
+
+  if (includeReport && !data.reportAnalysisId) {
     errors.reportAnalysisId = "Please select a report analysis";
   }
 
-  if (!data.faceAnalysisId) {
+  if (includeFace && !data.faceAnalysisId) {
     errors.faceAnalysisId = "Please select a face analysis";
   }
 
-  if (data.age) {
+  if (!data.age || !data.age.trim()) {
+    errors.age = "Please provide your age";
+  } else {
     const ageResult = validateAge(data.age);
     if (!ageResult.isValid) {
       Object.assign(errors, ageResult.errors);
     }
+  }
+
+  if (!data.gender || !data.gender.trim()) {
+    errors.gender = "Please select your gender";
   }
 
   return {

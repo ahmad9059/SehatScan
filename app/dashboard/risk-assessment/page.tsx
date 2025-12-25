@@ -6,7 +6,6 @@ import {
   analyzeReport,
   analyzeFace,
 } from "@/app/actions/scan";
-import { getUserAnalyses } from "@/lib/analysis";
 import { useUser } from "@clerk/nextjs";
 import { validateRiskAssessmentForm } from "@/lib/validation";
 import {
@@ -18,6 +17,7 @@ import ErrorBoundary from "@/app/components/ErrorBoundary";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
 import ProgressBar from "@/app/components/ProgressBar";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from "react-markdown";
 import {
   DocumentTextIcon,
   PhotoIcon,
@@ -106,6 +106,9 @@ function RiskAssessmentPageContent() {
   const [faceUploadProgress, setFaceUploadProgress] = useState(0);
   const [isUploadingReport, setIsUploadingReport] = useState(false);
   const [isUploadingFace, setIsUploadingFace] = useState(false);
+  const [includeReport, setIncludeReport] = useState(true);
+  const [includeFace, setIncludeFace] = useState(true);
+  const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
 
   useEffect(() => {
     const loadAnalyses = async () => {
@@ -114,15 +117,29 @@ function RiskAssessmentPageContent() {
         return;
       }
 
+      const fetchAnalyses = async (type: "report" | "face") => {
+        const res = await fetch(`/api/analyses/user?type=${type}`, {
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          throw new Error(`Failed to fetch ${type} analyses`);
+        }
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(data.error || `Failed to fetch ${type} analyses`);
+        }
+        return (data.analyses || []) as Analysis[];
+      };
+
       try {
         setLoadingAnalyses(true);
         const [reports, faces] = await Promise.all([
-          getUserAnalyses(user.id, "report"),
-          getUserAnalyses(user.id, "face"),
+          fetchAnalyses("report"),
+          fetchAnalyses("face"),
         ]);
 
-        setReportAnalyses(reports as Analysis[]);
-        setFaceAnalyses(faces as Analysis[]);
+        setReportAnalyses(reports);
+        setFaceAnalyses(faces);
       } catch (error) {
         console.error("Failed to load analyses:", error);
         showErrorToast(
@@ -135,6 +152,24 @@ function RiskAssessmentPageContent() {
 
     loadAnalyses();
   }, [user]);
+
+  useEffect(() => {
+    if (!selectedFace && faceAnalyses.length > 0) {
+      const firstWithId = faceAnalyses.find((a) => a?.id);
+      if (firstWithId?.id) {
+        setSelectedFace(String(firstWithId.id));
+      }
+    }
+  }, [faceAnalyses, selectedFace]);
+
+  useEffect(() => {
+    if (!selectedReport && reportAnalyses.length > 0) {
+      const firstWithId = reportAnalyses.find((a) => a?.id);
+      if (firstWithId?.id) {
+        setSelectedReport(String(firstWithId.id));
+      }
+    }
+  }, [reportAnalyses, selectedReport]);
 
   const handleSymptomChange = (symptom: string, checked: boolean) => {
     setUserFormData((prev) => ({
@@ -301,11 +336,13 @@ function RiskAssessmentPageContent() {
     setValidationErrors({});
 
     const formValidation = validateRiskAssessmentForm({
-      reportAnalysisId: selectedReport,
-      faceAnalysisId: selectedFace,
+      reportAnalysisId: includeReport ? selectedReport : "",
+      faceAnalysisId: includeFace ? selectedFace : "",
       age: userFormData.age,
       gender: userFormData.gender,
       symptoms: userFormData.symptoms.join(", "),
+      includeReport,
+      includeFace,
     });
 
     if (!formValidation.isValid) {
@@ -350,6 +387,17 @@ function RiskAssessmentPageContent() {
     }
   };
 
+  const hasAnySource = includeReport || includeFace;
+  const canSubmit =
+    !isLoading &&
+    !isUploadingReport &&
+    !isUploadingFace &&
+    hasAnySource &&
+    (!includeReport || !!selectedReport) &&
+    (!includeFace || !!selectedFace) &&
+    !!userFormData.age.trim() &&
+    !!userFormData.gender.trim();
+
   if (loadingAnalyses) {
     return (
       <div className={pageContainer}>
@@ -384,13 +432,72 @@ function RiskAssessmentPageContent() {
                   layout.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className={pill}>Report + Face required</span>
+                  <span className={pill}>Pick face and/or report</span>
                   <span className={pill}>Save to history</span>
                   <span className={pill}>Adaptive recommendations</span>
                 </div>
               </div>
             </div>
-            {analysisId && <span className={chip}>Saved ID: {analysisId}</span>}
+            <div className="flex flex-col gap-3 sm:items-end">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setSourceMenuOpen((prev) => !prev)}
+                  className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm font-semibold text-[var(--color-heading)] hover:border-[var(--color-primary)]"
+                >
+                  Sources
+                  <span
+                    className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                      includeFace && includeReport
+                        ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                        : "bg-[var(--color-surface)] text-[var(--color-foreground)]"
+                    }`}
+                  >
+                    {includeFace && includeReport
+                      ? "Face + Report"
+                      : includeFace
+                        ? "Face only"
+                        : includeReport
+                          ? "Report only"
+                          : "None selected"}
+                  </span>
+                </button>
+                {sourceMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-soft)] z-20">
+                    <div className="p-3 space-y-2 text-sm">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                          checked={includeFace}
+                          onChange={(e) => setIncludeFace(e.target.checked)}
+                        />
+                        <span className="text-[var(--color-foreground)]">
+                          Use face analysis
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                          checked={includeReport}
+                          onChange={(e) => setIncludeReport(e.target.checked)}
+                        />
+                        <span className="text-[var(--color-foreground)]">
+                          Use report analysis
+                        </span>
+                      </label>
+                      {!hasAnySource && (
+                        <p className="text-xs text-[var(--color-danger)]">
+                          Select at least one source
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {analysisId && <span className={chip}>Saved ID: {analysisId}</span>}
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-10">
@@ -445,11 +552,11 @@ function RiskAssessmentPageContent() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {faceAnalyses.map((analysis) => (
+                    {faceAnalyses.map((analysis, index) => (
                       <label
-                        key={analysis.id}
+                        key={analysis.id || `face-${index}`}
                         className={`flex cursor-pointer items-start justify-between border p-4 rounded-xl transition-all duration-200 ${
-                          selectedFace === analysis.id
+                          selectedFace === analysis.id && includeFace
                             ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
                             : "border-[var(--color-border)] bg-[var(--color-card)]/60 hover:border-[var(--color-primary)]"
                         }`}
@@ -548,11 +655,11 @@ function RiskAssessmentPageContent() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {reportAnalyses.map((analysis) => (
+                    {reportAnalyses.map((analysis, index) => (
                       <label
-                        key={analysis.id}
+                        key={analysis.id || `report-${index}`}
                         className={`flex cursor-pointer items-start justify-between border p-4 rounded-xl transition-all duration-200 ${
-                          selectedReport === analysis.id
+                          selectedReport === analysis.id && includeReport
                             ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
                             : "border-[var(--color-border)] bg-[var(--color-card)]/60 hover:border-[var(--color-primary)]"
                         }`}
@@ -755,15 +862,7 @@ function RiskAssessmentPageContent() {
             <div className="flex justify-center border-t border-[var(--color-border)] pt-6">
               <button
                 type="submit"
-                disabled={
-                  isLoading ||
-                  isUploadingReport ||
-                  isUploadingFace ||
-                  !selectedReport ||
-                  !selectedFace ||
-                  !userFormData.age ||
-                  !userFormData.gender
-                }
+                disabled={!canSubmit}
                 className={primaryButton}
                 aria-label="Generate comprehensive risk assessment"
               >
@@ -806,10 +905,8 @@ function RiskAssessmentPageContent() {
                 </button>
               </div>
 
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--color-foreground)]">
-                  {riskAssessment}
-                </p>
+              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 prose prose-sm max-w-none text-[var(--color-foreground)] dark:prose-invert">
+                <ReactMarkdown>{riskAssessment}</ReactMarkdown>
               </div>
 
               <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] p-4">

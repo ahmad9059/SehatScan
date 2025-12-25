@@ -17,6 +17,7 @@ interface ProfileDropdownProps {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    avatar?: string | null;
   };
 }
 
@@ -49,6 +50,11 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
       console.error("Logout error:", error);
     }
   };
+
+  const avatarUrl = user?.avatar || user?.image || null;
+  const fallbackInitial = user?.name
+    ? user.name.charAt(0).toUpperCase()
+    : user?.email?.charAt(0).toUpperCase() || "U";
 
   const menuItems = [
     {
@@ -90,10 +96,17 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 p-2 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] transition-all duration-300 hover:scale-105 hover:shadow-[var(--shadow-soft)]"
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-primary)] text-white font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300">
-          {user?.name
-            ? user.name.charAt(0).toUpperCase()
-            : user?.email?.charAt(0).toUpperCase() || "U"}
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+          {avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarUrl}
+              alt={user?.name || "User avatar"}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            fallbackInitial
+          )}
         </div>
         <div className="hidden sm:block text-left">
           <p className="text-sm font-semibold text-[var(--color-foreground)] group-hover:text-[var(--color-primary)] transition-colors duration-300">
@@ -124,10 +137,17 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
           {/* User Info Header */}
           <div className="px-6 py-4 border-b border-[var(--color-border)]">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--color-primary)] text-white font-semibold text-lg shadow-lg">
-                {user?.name
-                  ? user.name.charAt(0).toUpperCase()
-                  : user?.email?.charAt(0).toUpperCase() || "U"}
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] font-semibold text-lg shadow-lg overflow-hidden">
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl}
+                    alt={user?.name || "User avatar"}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  fallbackInitial
+                )}
               </div>
               <div>
                 <p className="text-sm font-semibold text-[var(--color-foreground)]">

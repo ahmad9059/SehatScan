@@ -44,6 +44,13 @@ function ChatbotPageContent() {
   const [loadingAnalyses, setLoadingAnalyses] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const avatarUrl =
+    ((user?.unsafeMetadata as Record<string, unknown> | undefined) ||
+      (user?.publicMetadata as Record<string, unknown> | undefined))
+      ?.avatarUrl as string | undefined || user?.imageUrl || null;
+  const userInitial = user?.firstName
+    ? user.firstName.charAt(0).toUpperCase()
+    : user?.emailAddresses?.[0]?.emailAddress?.charAt(0).toUpperCase() || "U";
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -269,8 +276,17 @@ function ChatbotPageContent() {
               </div>
 
               {message.role === "user" && (
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-surface)] text-[var(--color-foreground)]">
-                  <UserIcon className="h-4 w-4" />
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] overflow-hidden">
+                  {avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={avatarUrl}
+                      alt="User avatar"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-xs font-semibold">{userInitial}</span>
+                  )}
                 </div>
               )}
             </div>

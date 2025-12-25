@@ -73,6 +73,11 @@ export async function getUserAnalyses(
   userId: string,
   type?: "face" | "report" | "risk"
 ) {
+  if (!userId) return [];
+  // Ensure this runs server-side only
+  if (typeof window !== "undefined") {
+    throw new Error("getUserAnalyses should not be called on the client");
+  }
   try {
     const analyses = await prisma.analysis.findMany({
       where: {

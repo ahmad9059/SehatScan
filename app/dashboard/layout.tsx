@@ -65,6 +65,8 @@ interface SidebarProps {
   setSidebarOpen: (open: boolean) => void;
   compact: boolean;
   onToggleCompact: () => void;
+  avatar?: string | null;
+  userInitial?: string;
 }
 
 function Sidebar({
@@ -72,6 +74,8 @@ function Sidebar({
   setSidebarOpen,
   compact,
   onToggleCompact,
+  avatar,
+  userInitial,
 }: SidebarProps) {
   const pathname = usePathname();
   const { t } = useSimpleLanguage();
@@ -107,6 +111,8 @@ function Sidebar({
               onClose={() => setSidebarOpen(false)}
               isMobile={true}
               compact={false}
+              avatar={avatar}
+              userInitial={userInitial}
             />
           </div>
         </div>
@@ -131,6 +137,8 @@ function Sidebar({
             isMobile={false}
             compact={compact}
             onToggleCompact={onToggleCompact}
+            avatar={avatar}
+            userInitial={userInitial}
           />
         </div>
       </div>
@@ -145,6 +153,8 @@ interface SidebarContentProps {
   isMobile?: boolean;
   compact?: boolean;
   onToggleCompact?: () => void;
+  avatar?: string | null;
+  userInitial?: string;
 }
 
 function SidebarContent({
@@ -154,6 +164,8 @@ function SidebarContent({
   isMobile = false,
   compact = false,
   onToggleCompact,
+  avatar,
+  userInitial,
 }: SidebarContentProps) {
   const { t } = useSimpleLanguage();
 
@@ -243,6 +255,7 @@ function SidebarContent({
             <ul role="list" className="space-y-2 w-full">
               {navigationItems.map((item, index) => {
                 const isActive = pathname === item.href;
+                const isProfile = item.href === "/dashboard/profile";
                 return (
                   <li
                     key={item.nameKey}
@@ -261,15 +274,27 @@ function SidebarContent({
                       )}
                       aria-current={isActive ? "page" : undefined}
                     >
-                      <item.icon
-                        className={classNames(
-                          "h-5 w-5 shrink-0 transition-colors duration-200",
-                          isActive
-                            ? "text-white"
-                            : "text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
-                        )}
-                        aria-hidden="true"
-                      />
+                      {isProfile && avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={avatar}
+                          alt="Profile avatar"
+                          className={classNames(
+                            "h-6 w-6 shrink-0 rounded-full object-cover transition-transform duration-200",
+                            isActive ? "ring-2 ring-white/70" : ""
+                          )}
+                        />
+                      ) : (
+                        <item.icon
+                          className={classNames(
+                            "h-5 w-5 shrink-0 transition-colors duration-200",
+                            isActive
+                              ? "text-white"
+                              : "text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
+                          )}
+                          aria-hidden="true"
+                        />
+                      )}
                       {!compact && (
                         <span className="group-hover:translate-x-1 transition-transform duration-150">
                           {t(item.nameKey)}
@@ -367,7 +392,16 @@ export default function DashboardLayout({
         ? `${user.firstName} ${user.lastName}`
         : user.firstName || user.username || "User",
     email: user.emailAddresses[0]?.emailAddress || "",
-    image: user.imageUrl || null,
+  avatar:
+    (
+      (user.unsafeMetadata as Record<string, unknown> | undefined) ||
+      (user.publicMetadata as Record<string, unknown> | undefined)
+    )?.avatarUrl?.toString() || null,
+  image: user.imageUrl || null,
+    initial:
+      user.firstName?.charAt(0).toUpperCase() ||
+      user.emailAddresses[0]?.emailAddress?.charAt(0).toUpperCase() ||
+      "U",
   };
 
   return (
@@ -377,6 +411,8 @@ export default function DashboardLayout({
         setSidebarOpen={setSidebarOpen}
         compact={compactSidebar}
         onToggleCompact={() => setCompactSidebar((prev) => !prev)}
+        avatar={userForComponents.avatar || userForComponents.image || null}
+        userInitial={userForComponents.initial}
       />
 
       {/* Mobile menu button */}

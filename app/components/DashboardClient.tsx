@@ -436,10 +436,10 @@ export default function DashboardClient({
             </div>
           ) : (
             // Empty State
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 animate-fade-in">
+            <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] shadow-[var(--shadow-soft)] animate-fade-in">
               <EmptyState
                 icon={
-                  <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400" />
+                  <ClipboardDocumentListIcon className="h-12 w-12 text-[var(--color-muted)]" />
                 }
                 title="No analyses yet"
                 description="Get started by uploading a medical report or taking a photo for analysis. Our AI will help you understand your health data better."

@@ -47,7 +47,8 @@ async function analyzeReportWithGeminiVision(file: File): Promise<{
   }
 
   const genai = new GoogleGenerativeAI(apiKey);
-  const model = genai.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const model = genai.getGenerativeModel({ model: modelName });
 
   // Convert file to base64
   const arrayBuffer = await file.arrayBuffer();

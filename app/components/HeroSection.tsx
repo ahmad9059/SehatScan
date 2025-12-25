@@ -3,6 +3,19 @@ import Link from "next/link";
 export default function HeroSection() {
   return (
     <section className="relative isolate px-6 pt-14 lg:px-8 min-h-screen flex items-center overflow-hidden bg-[var(--color-bg)] text-[var(--color-foreground)]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          backgroundColor: "var(--color-bg)",
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, var(--hero-grid-dot) 1px, transparent 0)",
+          backgroundSize: "32px 32px",
+        }}
+      >
+        <div className="absolute left-1/2 top-1/3 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--hero-grid-accent),transparent_60%)] blur-3xl opacity-60" />
+      </div>
+
       {/* Main Content */}
       <div className="mx-auto max-w-3xl py-32 sm:py-48 lg:py-56">
         {/* Announcement Badge */}

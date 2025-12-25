@@ -7,10 +7,29 @@ interface HealthMetric {
   name: string;
   value: string;
   unit?: string;
+  status?: "normal" | "low" | "high" | "critical";
+  reference_range?: string;
+}
+
+interface DetectedProblem {
+  type: string;
+  severity: "mild" | "moderate" | "severe";
+  description: string;
+  confidence: number;
+}
+
+interface Treatment {
+  category: string;
+  recommendation: string;
+  priority: "low" | "medium" | "high";
+  timeframe: string;
 }
 
 interface StructuredData {
   metrics: HealthMetric[];
+  problems_detected?: DetectedProblem[];
+  treatments?: Treatment[];
+  summary?: string;
 }
 
 interface VisualMetrics {
@@ -140,7 +159,75 @@ export class MockGeminiAnalyzer {
       });
     }
 
-    return { metrics };
+    // Generate problems and treatments based on detected metrics
+    const problems_detected: DetectedProblem[] = [];
+    const treatments: Treatment[] = [];
+
+    // Check for abnormal values and generate problems/treatments
+    metrics.forEach((metric) => {
+      const value = parseFloat(metric.value.replace(/[^0-9.]/g, ""));
+
+      if (metric.name === "Hemoglobin" && value < 12) {
+        problems_detected.push({
+          type: "Low Hemoglobin",
+          severity: value < 10 ? "severe" : "moderate",
+          description: `Hemoglobin level of ${metric.value} is below normal range. This may indicate anemia or blood loss.`,
+          confidence: 0.85,
+        });
+        treatments.push({
+          category: "Medical Consultation",
+          recommendation:
+            "Consult with a healthcare provider for further evaluation and possible iron supplementation.",
+          priority: "high",
+          timeframe: "Within 1 week",
+        });
+      }
+
+      if (metric.name === "Total Cholesterol" && value > 200) {
+        problems_detected.push({
+          type: "Elevated Cholesterol",
+          severity: value > 240 ? "severe" : "moderate",
+          description: `Total cholesterol of ${metric.value} is above recommended levels, increasing cardiovascular risk.`,
+          confidence: 0.8,
+        });
+        treatments.push({
+          category: "Lifestyle Changes",
+          recommendation:
+            "Adopt a heart-healthy diet low in saturated fats, increase physical activity, and consider medication if levels remain high.",
+          priority: "medium",
+          timeframe: "Ongoing",
+        });
+      }
+
+      if (metric.name === "Glucose" || metric.name === "Blood Sugar") {
+        if (value > 126) {
+          problems_detected.push({
+            type: "Elevated Blood Sugar",
+            severity: value > 200 ? "severe" : "moderate",
+            description: `Fasting glucose of ${metric.value} may indicate diabetes or prediabetes.`,
+            confidence: 0.85,
+          });
+          treatments.push({
+            category: "Medical Follow-up",
+            recommendation:
+              "Schedule an HbA1c test and consult with an endocrinologist for diabetes management.",
+            priority: "high",
+            timeframe: "Within 1-2 weeks",
+          });
+        }
+      }
+    });
+
+    // Generate summary
+    let summary = "Report analysis completed. ";
+    if (problems_detected.length === 0) {
+      summary +=
+        "All detected values appear within normal ranges. Continue regular health monitoring.";
+    } else {
+      summary += `${problems_detected.length} potential health concern(s) identified. Please review recommendations and consult healthcare provider.`;
+    }
+
+    return { metrics, problems_detected, treatments, summary };
   }
 
   /**

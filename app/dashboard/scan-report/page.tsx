@@ -19,6 +19,8 @@ import {
   XMarkIcon,
   PhotoIcon,
   InformationCircleIcon,
+  ExclamationTriangleIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 import {
   chip,
@@ -41,7 +43,22 @@ interface AnalysisResult {
       name: string;
       value: string;
       unit?: string;
+      status?: "normal" | "low" | "high" | "critical";
+      reference_range?: string;
     }>;
+    problems_detected?: Array<{
+      type: string;
+      severity: "mild" | "moderate" | "severe";
+      description: string;
+      confidence: number;
+    }>;
+    treatments?: Array<{
+      category: string;
+      recommendation: string;
+      priority: "low" | "medium" | "high";
+      timeframe: string;
+    }>;
+    summary?: string;
   };
 }
 
@@ -208,8 +225,8 @@ function ScanReportPageContent() {
               <div>
                 <h1 className={heading}>Scan Medical Report</h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Upload your lab report to extract and analyze health metrics in
-                  a continuous, full-width dashboard flow.
+                  Upload your lab report to extract and analyze health metrics
+                  in a continuous, full-width dashboard flow.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className={pill}>PDF, JPG, PNG</span>
@@ -299,7 +316,7 @@ function ScanReportPageContent() {
 
                         {imagePreview && (
                           <div className="flex justify-center">
-                          <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-xl">
+                            <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-xl">
                               <img
                                 src={imagePreview}
                                 alt="Selected preview"
@@ -392,7 +409,7 @@ function ScanReportPageContent() {
                   {quickWins.map((item) => (
                     <div
                       key={item}
-                    className="flex items-center gap-3 border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 rounded-xl"
+                      className="flex items-center gap-3 border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 rounded-xl"
                     >
                       <div className="h-9 w-9 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
                         <ChartBarIcon className="h-5 w-5" />
@@ -408,7 +425,7 @@ function ScanReportPageContent() {
           </div>
 
           {result && (
-                <div className="space-y-8 border-t border-[var(--color-border)] pt-8">
+            <div className="space-y-8 border-t border-[var(--color-border)] pt-8">
               <div className="flex items-start gap-4">
                 <div className="p-3 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
                   <CheckCircleIcon className="h-6 w-6" />
@@ -441,34 +458,70 @@ function ScanReportPageContent() {
                   {result.structured_data?.metrics &&
                   result.structured_data.metrics.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                      {result.structured_data.metrics.map((metric, index) => (
-                        <div
-                          key={`${metric.name}-${index}`}
-                          className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl"
-                        >
-                          <div className="mb-2 flex items-center justify-between">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-subtle)]">
-                              #{index + 1}
-                            </span>
-                            <div className="h-8 w-8 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
-                              <ChartBarIcon className="h-4 w-4" />
+                      {result.structured_data.metrics.map((metric, index) => {
+                        const statusColors = {
+                          normal: "text-[var(--color-success)]",
+                          low: "text-[var(--color-warning)]",
+                          high: "text-[var(--color-warning)]",
+                          critical: "text-[var(--color-danger)]",
+                        };
+                        const statusBg = {
+                          normal: "bg-[var(--color-success)]/10",
+                          low: "bg-[var(--color-warning)]/10",
+                          high: "bg-[var(--color-warning)]/10",
+                          critical: "bg-[var(--color-danger)]/10",
+                        };
+                        return (
+                          <div
+                            key={`${metric.name}-${index}`}
+                            className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl"
+                          >
+                            <div className="mb-2 flex items-center justify-between">
+                              {metric.status && (
+                                <span
+                                  className={`text-xs font-semibold uppercase tracking-wide px-2 py-0.5 rounded ${
+                                    statusColors[metric.status]
+                                  } ${statusBg[metric.status]}`}
+                                >
+                                  {metric.status}
+                                </span>
+                              )}
+                              {!metric.status && (
+                                <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-subtle)]">
+                                  #{index + 1}
+                                </span>
+                              )}
+                              <div className="h-8 w-8 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)] flex items-center justify-center">
+                                <ChartBarIcon className="h-4 w-4" />
+                              </div>
                             </div>
-                          </div>
-                          <h4 className="text-sm font-semibold text-[var(--color-heading)] mb-2">
-                            {metric.name}
-                          </h4>
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-[var(--color-primary)]">
-                              {metric.value}
-                            </span>
-                            {metric.unit && (
-                              <span className={`${mutedText} text-sm`}>
-                                {metric.unit}
+                            <h4 className="text-sm font-semibold text-[var(--color-heading)] mb-2">
+                              {metric.name}
+                            </h4>
+                            <div className="flex items-baseline gap-2">
+                              <span
+                                className={`text-2xl font-bold ${
+                                  metric.status && metric.status !== "normal"
+                                    ? statusColors[metric.status]
+                                    : "text-[var(--color-primary)]"
+                                }`}
+                              >
+                                {metric.value}
                               </span>
+                              {metric.unit && (
+                                <span className={`${mutedText} text-sm`}>
+                                  {metric.unit}
+                                </span>
+                              )}
+                            </div>
+                            {metric.reference_range && (
+                              <p className={`${mutedText} text-xs mt-1`}>
+                                Reference: {metric.reference_range}
+                              </p>
                             )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-6 text-center rounded-xl">
@@ -483,6 +536,199 @@ function ScanReportPageContent() {
                     </div>
                   )}
                 </div>
+
+                {/* Summary section */}
+                {result.structured_data?.summary && (
+                  <div className="border border-[var(--color-border)] bg-[var(--color-primary-soft)] px-5 py-4 rounded-xl">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-[var(--color-primary)]/20 text-[var(--color-primary)]">
+                        <InformationCircleIcon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-[var(--color-heading)]">
+                          Summary
+                        </h3>
+                        <p className={`${mutedText} mt-1 text-sm`}>
+                          {result.structured_data.summary}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Problems detected section */}
+                {result.structured_data?.problems_detected &&
+                  result.structured_data.problems_detected.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-[var(--color-warning)]/10 text-[var(--color-warning)]">
+                            <ExclamationTriangleIcon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <h3 className={sectionTitle}>Detected concerns</h3>
+                            <p className={`${subheading} text-sm`}>
+                              Health issues identified in your report
+                            </p>
+                          </div>
+                        </div>
+                        <span className={pill}>
+                          {result.structured_data.problems_detected.length}{" "}
+                          issues
+                        </span>
+                      </div>
+
+                      <div className="space-y-3">
+                        {result.structured_data.problems_detected.map(
+                          (problem, idx) => {
+                            const severityStyles = {
+                              mild: {
+                                border: "border-[var(--color-success)]/60",
+                                bg: "bg-[var(--color-success)]/10",
+                                text: "text-[var(--color-success)]",
+                              },
+                              moderate: {
+                                border: "border-[var(--color-warning)]/60",
+                                bg: "bg-[var(--color-warning)]/10",
+                                text: "text-[var(--color-warning)]",
+                              },
+                              severe: {
+                                border: "border-[var(--color-danger)]/60",
+                                bg: "bg-[var(--color-danger)]/10",
+                                text: "text-[var(--color-danger)]",
+                              },
+                            };
+                            const style =
+                              severityStyles[problem.severity] ||
+                              severityStyles.mild;
+                            return (
+                              <div
+                                key={`${problem.type}-${idx}`}
+                                className={`border ${style.border} ${style.bg} px-4 py-4 rounded-xl`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <ExclamationTriangleIcon
+                                      className={`h-5 w-5 ${style.text}`}
+                                    />
+                                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                      {problem.type}
+                                    </p>
+                                  </div>
+                                  <span
+                                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${style.text} ${style.border} border`}
+                                  >
+                                    {problem.severity}
+                                  </span>
+                                </div>
+                                <p className={`${mutedText} mt-2 text-sm`}>
+                                  {problem.description}
+                                </p>
+                                <div className="mt-3 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
+                                  <span className="font-semibold text-[var(--color-heading)]">
+                                    Confidence
+                                  </span>
+                                  <div className="h-2 w-28 rounded-full bg-[var(--color-card)] border border-[var(--color-border)]">
+                                    <div
+                                      className="h-full rounded-full bg-[var(--color-primary)]"
+                                      style={{
+                                        width: `${Math.min(
+                                          100,
+                                          Math.round(problem.confidence * 100)
+                                        )}%`,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-[var(--color-heading)] font-semibold">
+                                    {Math.round(problem.confidence * 100)}%
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Treatments section */}
+                {result.structured_data?.treatments &&
+                  result.structured_data.treatments.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-lg bg-[var(--color-primary-soft)] text-[var(--color-primary)]">
+                            <HeartIcon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <h3 className={sectionTitle}>
+                              Recommended actions
+                            </h3>
+                            <p className={`${subheading} text-sm`}>
+                              Suggested treatments and next steps
+                            </p>
+                          </div>
+                        </div>
+                        <span className={pill}>
+                          {result.structured_data.treatments.length} suggestions
+                        </span>
+                      </div>
+
+                      <div className="space-y-3">
+                        {result.structured_data.treatments
+                          .sort((a, b) => {
+                            const order: Record<string, number> = {
+                              high: 3,
+                              medium: 2,
+                              low: 1,
+                            };
+                            return (
+                              (order[b.priority] || 0) -
+                              (order[a.priority] || 0)
+                            );
+                          })
+                          .map((treatment, idx) => (
+                            <div
+                              key={`${treatment.category}-${idx}`}
+                              className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 rounded-xl"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                                  <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                    {treatment.category}
+                                  </p>
+                                </div>
+                                <span className={chip}>
+                                  {treatment.priority} · {treatment.timeframe}
+                                </span>
+                              </div>
+                              <p className={`${mutedText} mt-2 text-sm`}>
+                                {treatment.recommendation}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+
+                      <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
+                        <div className="flex items-start gap-2">
+                          <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)] mt-0.5" />
+                          <div>
+                            <p className="text-sm font-semibold text-[var(--color-heading)]">
+                              Important Medical Disclaimer
+                            </p>
+                            <p className="text-xs text-[var(--color-foreground)] mt-1 leading-relaxed">
+                              These recommendations are for informational
+                              purposes only and should not replace professional
+                              medical advice. Always consult with a qualified
+                              healthcare provider for proper diagnosis and
+                              treatment.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                 <div className="border border-[var(--color-border)] bg-[var(--color-card)]/70 px-5 py-5 rounded-xl">
                   <details className="group">
@@ -500,7 +746,9 @@ function ScanReportPageContent() {
                           </p>
                         </div>
                       </div>
-                      <span className={`${mutedText} text-xs`}>Toggle view</span>
+                      <span className={`${mutedText} text-xs`}>
+                        Toggle view
+                      </span>
                     </summary>
                     <div className="mt-4 border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-lg">
                       <div className="max-h-96 overflow-auto bg-[var(--color-surface)] px-4 py-4 rounded">

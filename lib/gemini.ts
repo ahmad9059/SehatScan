@@ -9,10 +9,29 @@ interface HealthMetric {
   name: string;
   value: string;
   unit?: string;
+  status?: "normal" | "low" | "high" | "critical";
+  reference_range?: string;
+}
+
+interface DetectedProblem {
+  type: string;
+  severity: "mild" | "moderate" | "severe";
+  description: string;
+  confidence: number;
+}
+
+interface Treatment {
+  category: string;
+  recommendation: string;
+  priority: "low" | "medium" | "high";
+  timeframe: string;
 }
 
 interface StructuredData {
   metrics: HealthMetric[];
+  problems_detected?: DetectedProblem[];
+  treatments?: Treatment[];
+  summary?: string;
 }
 
 interface VisualMetrics {
@@ -56,19 +75,39 @@ export class GeminiAnalyzer {
       throw new Error("Raw text cannot be empty");
     }
 
-    const prompt = `Extract key health metrics from this medical report OCR text and return as valid JSON.
-Include metric names, values, and units where available.
+    const prompt = `You are a medical report analyzer. Analyze this medical report text and provide a comprehensive health analysis.
 
-OCR Text:
+Medical Report Text:
 ${rawText}
 
-Return format: {"metrics": [{"name": "...", "value": "...", "unit": "..."}]}
+Provide a complete analysis with:
+1. All health metrics found (with status: normal/low/high/critical if determinable)
+2. Any health problems or concerns detected
+3. Recommended treatments or actions
+4. Brief summary of overall health status
 
-Important:
-- Return ONLY valid JSON, no additional text
-- If a metric has no unit, you can omit the "unit" field or set it to null
-- Extract all numerical health metrics you can identify
-- Use standard medical terminology for metric names`;
+Return as valid JSON in this exact format:
+{
+  "metrics": [
+    {"name": "Metric Name", "value": "123", "unit": "mg/dL", "status": "normal", "reference_range": "70-100"}
+  ],
+  "problems_detected": [
+    {"type": "Problem Name", "severity": "mild|moderate|severe", "description": "Detailed description of the issue", "confidence": 0.85}
+  ],
+  "treatments": [
+    {"category": "Category", "recommendation": "Specific recommendation", "priority": "low|medium|high", "timeframe": "When to act"}
+  ],
+  "summary": "Brief overall health summary based on the report"
+}
+
+IMPORTANT:
+- Return ONLY valid JSON, no additional text or markdown
+- Analyze ALL types of medical reports (blood tests, imaging, checkups, prescriptions, etc.)
+- If values are outside normal ranges, mark status accordingly and add to problems_detected
+- Provide actionable treatments for any detected problems
+- Be thorough but concise in descriptions
+- If no problems found, return empty problems_detected array and note "healthy" in summary
+- Confidence should be between 0 and 1`;
 
     try {
       const result = await this.model.generateContent(prompt, {

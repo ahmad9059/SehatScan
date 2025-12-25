@@ -1,69 +1,140 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createGeminiAnalyzer } from "@/lib/gemini";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createMockGeminiAnalyzer } from "@/lib/gemini-mock";
 
-// Server-side OCR processing using base64 conversion
-async function extractTextFromImageServer(
-  file: File
-): Promise<{ text: string; confidence: number }> {
-  try {
-    // Convert file to base64 for processing
-    const arrayBuffer = await file.arrayBuffer();
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
+/**
+ * Generate mock analysis when Gemini API is unavailable
+ */
+async function generateMockReportAnalysis(file: File): Promise<{
+  raw_text: string;
+  structured_data: any;
+}> {
+  const mockAnalyzer = createMockGeminiAnalyzer();
 
-    // For now, we'll use a mock OCR since Tesseract.js requires browser APIs
-    // In production, you'd use a server-side OCR service like:
-    // - Google Cloud Vision API
-    // - AWS Textract
-    // - Azure Computer Vision
-    // - Or a self-hosted Tesseract server
+  // Generate a mock raw text based on file info
+  const mockRawText = `Medical Report Analysis
+File: ${file.name}
+Date: ${new Date().toLocaleDateString()}
 
-    // Mock OCR result based on file characteristics
-    const mockText = generateMockOCRText(file.name, file.size);
+Note: This is a simulated analysis. The AI service is temporarily unavailable.
+Please try again later for actual report analysis.`;
 
-    return {
-      text: mockText,
-      confidence: 85, // Mock confidence
-    };
-  } catch (error) {
-    throw new Error(
-      `Server OCR processing failed: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+  // Use the mock analyzer to generate structured data
+  const structuredData = await mockAnalyzer.structureOcrData(mockRawText);
+
+  // Add a note about the mock analysis
+  structuredData.summary =
+    "⚠️ AI service temporarily unavailable. This is a demo analysis. Please try again later for actual medical report analysis.";
+
+  return {
+    raw_text: mockRawText,
+    structured_data: structuredData,
+  };
+}
+
+/**
+ * Analyze medical report image directly using Gemini Vision API
+ * This provides accurate OCR and analysis in one step
+ */
+async function analyzeReportWithGeminiVision(file: File): Promise<{
+  raw_text: string;
+  structured_data: any;
+}> {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY not configured");
+  }
+
+  const genai = new GoogleGenerativeAI(apiKey);
+  const model = genai.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+  // Convert file to base64
+  const arrayBuffer = await file.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString("base64");
+
+  const mimeType = file.type || "image/jpeg";
+
+  const prompt = `You are analyzing a medical report image. First extract ALL text from the image, then analyze it.
+
+TASK 1 - TEXT EXTRACTION:
+Extract every piece of text visible in the image exactly as written.
+
+TASK 2 - HEALTH ANALYSIS:
+Analyze the extracted text and provide:
+1. All health metrics found with their status (normal/low/high/critical)
+2. Any health problems or concerns detected  
+3. Recommended treatments or actions
+4. Brief summary of findings
+
+Return as valid JSON in this exact format:
+{
+  "raw_text": "Full extracted text from the image...",
+  "structured_data": {
+    "metrics": [
+      {"name": "Metric Name", "value": "123", "unit": "mg/dL", "status": "normal", "reference_range": "70-100"}
+    ],
+    "problems_detected": [
+      {"type": "Problem Name", "severity": "mild|moderate|severe", "description": "Detailed description", "confidence": 0.85}
+    ],
+    "treatments": [
+      {"category": "Category", "recommendation": "Specific recommendation", "priority": "low|medium|high", "timeframe": "When to act"}
+    ],
+    "summary": "Brief overall health summary"
   }
 }
 
-// Generate mock OCR text for demonstration
-function generateMockOCRText(fileName: string, fileSize: number): string {
-  // This is a mock implementation - replace with actual OCR service
-  return `MEDICAL REPORT
+IMPORTANT RULES:
+- Return ONLY valid JSON, no markdown or extra text
+- Extract ALL text from the image for raw_text field
+- Analyze ANY type of medical document (lab tests, prescriptions, imaging reports, checkups, etc.)
+- If values are outside normal ranges, add them to problems_detected
+- Provide actionable treatments for detected problems
+- If no problems found, return empty problems_detected array
+- Confidence should be between 0 and 1
+- Be thorough and accurate`;
 
-Patient Name: John Doe
-Date: ${new Date().toLocaleDateString()}
-Doctor: Dr. Smith
+  try {
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          mimeType,
+          data: base64,
+        },
+      },
+      { text: prompt },
+    ]);
 
-LABORATORY RESULTS:
-- Hemoglobin: 14.2 g/dL (Normal: 12.0-16.0)
-- White Blood Cell Count: 7,500/μL (Normal: 4,000-11,000)
-- Platelet Count: 250,000/μL (Normal: 150,000-450,000)
-- Blood Glucose: 95 mg/dL (Normal: 70-100)
-- Cholesterol Total: 180 mg/dL (Normal: <200)
-- HDL Cholesterol: 55 mg/dL (Normal: >40)
-- LDL Cholesterol: 110 mg/dL (Normal: <100)
+    const response = await result.response;
+    let responseText = response.text().trim();
 
-VITAL SIGNS:
-- Blood Pressure: 120/80 mmHg
-- Heart Rate: 72 bpm
-- Temperature: 98.6°F
-- Respiratory Rate: 16/min
+    // Clean up response (remove markdown code blocks if present)
+    if (responseText.startsWith("```json")) {
+      responseText = responseText.slice(7);
+    }
+    if (responseText.startsWith("```")) {
+      responseText = responseText.slice(3);
+    }
+    if (responseText.endsWith("```")) {
+      responseText = responseText.slice(0, -3);
+    }
+    responseText = responseText.trim();
 
-NOTES:
-All values within normal ranges. Patient appears healthy.
-Recommend routine follow-up in 6 months.
+    const parsed = JSON.parse(responseText);
 
-File: ${fileName}
-Size: ${Math.round(fileSize / 1024)}KB`;
+    return {
+      raw_text: parsed.raw_text || "",
+      structured_data: parsed.structured_data || {
+        metrics: [],
+        problems_detected: [],
+        treatments: [],
+        summary: "",
+      },
+    };
+  } catch (error) {
+    console.error("Gemini Vision analysis failed:", error);
+    throw error;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -93,103 +164,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let rawText = "";
-
     try {
-      // Handle PDF files differently
+      // Handle PDF files
       if (file.type === "application/pdf") {
-        // For PDF files, we'll need to convert to image first
-        // This is a simplified approach - in production you'd use pdf2pic or similar
         return NextResponse.json(
           {
             error:
-              "PDF processing not yet implemented. Please upload an image file.",
+              "PDF processing not yet implemented. Please upload an image file (JPEG or PNG).",
           },
           { status: 400 }
         );
       }
 
-      // Process image files with server-side OCR
-      console.log("Starting OCR processing...");
+      // Use Gemini Vision API to analyze the image directly
+      console.log("Starting Gemini Vision analysis...");
+      const result = await analyzeReportWithGeminiVision(file);
+      console.log("Gemini Vision analysis completed successfully");
 
-      // Use server-compatible OCR processing
-      const ocrResult = await extractTextFromImageServer(file);
-      rawText = ocrResult.text;
+      return NextResponse.json(result);
+    } catch (analysisError) {
+      console.error("Report analysis failed:", analysisError);
 
-      console.log(
-        `OCR completed. Extracted ${rawText.length} characters with ${ocrResult.confidence}% confidence`
-      );
-    } catch (ocrError) {
-      console.error("OCR processing failed:", ocrError);
+      // Check if it's a quota/rate limit error - fall back to mock
+      const errorMessage =
+        analysisError instanceof Error
+          ? analysisError.message
+          : "Analysis failed";
+
+      if (
+        errorMessage.includes("429") ||
+        errorMessage.includes("quota") ||
+        errorMessage.includes("Too Many Requests") ||
+        errorMessage.includes("rate")
+      ) {
+        console.log("Gemini quota exceeded, falling back to mock analysis...");
+        try {
+          const mockResult = await generateMockReportAnalysis(file);
+          return NextResponse.json({
+            ...mockResult,
+            warning:
+              "AI service temporarily unavailable. Showing demo analysis.",
+          });
+        } catch (mockError) {
+          console.error("Mock analysis also failed:", mockError);
+        }
+      }
+
+      if (errorMessage.includes("GEMINI_API_KEY")) {
+        return NextResponse.json(
+          { error: "AI service not configured. Please contact support." },
+          { status: 500 }
+        );
+      }
+
       return NextResponse.json(
         {
           error:
-            "Failed to extract text from image. Please ensure the image is clear and readable.",
+            "Failed to analyze the report. Please ensure the image is clear and contains readable medical information.",
         },
         { status: 422 }
       );
     }
-
-    // Structure data using Gemini if we have text
-    let structuredData = null;
-
-    if (rawText && rawText.trim()) {
-      try {
-        console.log("Starting Gemini data structuring...");
-        let analyzer;
-
-        try {
-          analyzer = createGeminiAnalyzer();
-        } catch (initError) {
-          console.warn(
-            "Gemini API unavailable, using mock analyzer:",
-            initError
-          );
-          analyzer = createMockGeminiAnalyzer();
-        }
-
-        structuredData = await analyzer.structureOcrData(rawText);
-        console.log("Data structuring completed successfully");
-      } catch (geminiError) {
-        console.error("Data structuring failed:", geminiError);
-
-        // Check if it's a quota error and try mock analyzer
-        if (
-          geminiError instanceof Error &&
-          geminiError.message.includes("quota")
-        ) {
-          try {
-            console.log("Quota exceeded, falling back to mock analyzer...");
-            const mockAnalyzer = createMockGeminiAnalyzer();
-            structuredData = await mockAnalyzer.structureOcrData(rawText);
-            console.log("Mock analysis completed successfully");
-          } catch (mockError) {
-            console.error("Mock analysis also failed:", mockError);
-            return NextResponse.json({
-              raw_text: rawText,
-              structured_data: null,
-              warning:
-                "Text extracted but AI structuring failed. Raw text is available.",
-            });
-          }
-        } else {
-          // Return OCR results even if Gemini fails
-          return NextResponse.json({
-            raw_text: rawText,
-            structured_data: null,
-            warning:
-              "Text extracted but AI structuring failed. Raw text is available.",
-          });
-        }
-      }
-    } else {
-      console.warn("No text extracted from image");
-    }
-
-    return NextResponse.json({
-      raw_text: rawText,
-      structured_data: structuredData,
-    });
   } catch (error) {
     console.error("Report analysis error:", error);
     return NextResponse.json(

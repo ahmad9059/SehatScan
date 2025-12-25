@@ -19,8 +19,8 @@
   --color-on-primary: #ffffff;
   --shadow-soft: 0 12px 28px rgba(15, 23, 42, 0.08);
   --shadow-strong: 0 22px 45px rgba(15, 23, 42, 0.12);
-  --hero-grid-dot: rgba(3, 123, 252, 0.08);
-  --hero-grid-accent: rgba(3, 123, 252, 0.12);
+  --hero-grid-dot: rgba(3, 123, 252, 0.12);
+  --hero-grid-accent: rgba(3, 123, 252, 0.18);
 }
 
 .dark {

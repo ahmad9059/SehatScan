@@ -9,8 +9,8 @@ export default function HeroSection() {
         style={{
           backgroundColor: "var(--color-bg)",
           backgroundImage:
-            "radial-gradient(circle at 1px 1px, var(--hero-grid-dot) 1px, transparent 0)",
-          backgroundSize: "32px 32px",
+            "radial-gradient(circle at 1px 1px, var(--hero-grid-dot) 1.2px, transparent 0)",
+          backgroundSize: "28px 28px",
         }}
       >
         <div className="absolute left-1/2 top-1/3 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--hero-grid-accent),transparent_60%)] blur-3xl opacity-60" />
@@ -44,8 +44,7 @@ export default function HeroSection() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-balance text-[var(--color-heading)]">
             One Tool To Manage{" "}
             <span className="text-[var(--color-primary)]">Health Reports</span>{" "}
-            And Your
-            Wellness
+            And Your Wellness
           </h1>
           <p className="mt-6 sm:mt-8 text-base sm:text-lg md:text-xl font-medium text-pretty text-[var(--color-subtle)] px-4 sm:px-0">
             Transform your medical reports and photos into actionable health

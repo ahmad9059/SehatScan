@@ -65,6 +65,7 @@ interface SidebarProps {
   setSidebarOpen: (open: boolean) => void;
   compact: boolean;
   onToggleCompact: () => void;
+  onOpenSearch: () => void;
   avatar?: string | null;
   userInitial?: string;
 }
@@ -74,6 +75,7 @@ function Sidebar({
   setSidebarOpen,
   compact,
   onToggleCompact,
+  onOpenSearch,
   avatar,
   userInitial,
 }: SidebarProps) {
@@ -111,6 +113,10 @@ function Sidebar({
               onClose={() => setSidebarOpen(false)}
               isMobile={true}
               compact={false}
+              onOpenSearch={() => {
+                setSidebarOpen(false);
+                onOpenSearch();
+              }}
               avatar={avatar}
               userInitial={userInitial}
             />
@@ -137,6 +143,7 @@ function Sidebar({
             isMobile={false}
             compact={compact}
             onToggleCompact={onToggleCompact}
+            onOpenSearch={onOpenSearch}
             avatar={avatar}
             userInitial={userInitial}
           />
@@ -153,6 +160,7 @@ interface SidebarContentProps {
   isMobile?: boolean;
   compact?: boolean;
   onToggleCompact?: () => void;
+  onOpenSearch?: () => void;
   avatar?: string | null;
   userInitial?: string;
 }
@@ -164,6 +172,7 @@ function SidebarContent({
   isMobile = false,
   compact = false,
   onToggleCompact,
+  onOpenSearch,
   avatar,
   userInitial,
 }: SidebarContentProps) {
@@ -230,21 +239,26 @@ function SidebarContent({
         <div
           className={classNames("w-full", compact ? "flex justify-center" : "")}
         >
-          <div
+          <button
+            type="button"
+            onClick={onOpenSearch}
             className={classNames(
-              "flex items-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] transition-all duration-200",
+              "flex items-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] transition-all duration-200 hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] cursor-pointer",
               compact ? "h-12 w-12 justify-center" : "px-3 py-2.5 gap-3 w-full"
             )}
           >
             <MagnifyingGlassIcon className="h-5 w-5 text-[var(--color-muted)]" />
             {!compact && (
-              <input
-                type="text"
-                placeholder="Search"
-                className="w-full bg-transparent text-sm text-[var(--color-heading)] placeholder:text-[var(--color-subtle)] focus:outline-none"
-              />
+              <span className="flex-1 text-left text-sm text-[var(--color-subtle)]">
+                Search
+              </span>
             )}
-          </div>
+            {!compact && (
+              <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-[var(--color-border)] bg-[var(--color-card)] px-1.5 py-0.5 text-xs text-[var(--color-muted)]">
+                ⌘ K
+              </kbd>
+            )}
+          </button>
         </div>
       )}
 
@@ -392,12 +406,12 @@ export default function DashboardLayout({
         ? `${user.firstName} ${user.lastName}`
         : user.firstName || user.username || "User",
     email: user.emailAddresses[0]?.emailAddress || "",
-  avatar:
-    (
-      (user.unsafeMetadata as Record<string, unknown> | undefined) ||
-      (user.publicMetadata as Record<string, unknown> | undefined)
-    )?.avatarUrl?.toString() || null,
-  image: user.imageUrl || null,
+    avatar:
+      (
+        (user.unsafeMetadata as Record<string, unknown> | undefined) ||
+        (user.publicMetadata as Record<string, unknown> | undefined)
+      )?.avatarUrl?.toString() || null,
+    image: user.imageUrl || null,
     initial:
       user.firstName?.charAt(0).toUpperCase() ||
       user.emailAddresses[0]?.emailAddress?.charAt(0).toUpperCase() ||
@@ -411,6 +425,7 @@ export default function DashboardLayout({
         setSidebarOpen={setSidebarOpen}
         compact={compactSidebar}
         onToggleCompact={() => setCompactSidebar((prev) => !prev)}
+        onOpenSearch={() => setSearchOpen(true)}
         avatar={userForComponents.avatar || userForComponents.image || null}
         userInitial={userForComponents.initial}
       />

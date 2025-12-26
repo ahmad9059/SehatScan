@@ -106,8 +106,8 @@ function RiskAssessmentPageContent() {
   const [faceUploadProgress, setFaceUploadProgress] = useState(0);
   const [isUploadingReport, setIsUploadingReport] = useState(false);
   const [isUploadingFace, setIsUploadingFace] = useState(false);
-  const [includeReport, setIncludeReport] = useState(true);
-  const [includeFace, setIncludeFace] = useState(true);
+  const [includeReport, setIncludeReport] = useState(false);
+  const [includeFace, setIncludeFace] = useState(false);
   const [sourceMenuOpen, setSourceMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -153,23 +153,7 @@ function RiskAssessmentPageContent() {
     loadAnalyses();
   }, [user]);
 
-  useEffect(() => {
-    if (!selectedFace && faceAnalyses.length > 0) {
-      const firstWithId = faceAnalyses.find((a) => a?.id);
-      if (firstWithId?.id) {
-        setSelectedFace(String(firstWithId.id));
-      }
-    }
-  }, [faceAnalyses, selectedFace]);
-
-  useEffect(() => {
-    if (!selectedReport && reportAnalyses.length > 0) {
-      const firstWithId = reportAnalyses.find((a) => a?.id);
-      if (firstWithId?.id) {
-        setSelectedReport(String(firstWithId.id));
-      }
-    }
-  }, [reportAnalyses, selectedReport]);
+  // No auto-selection; user may optionally pick from dropdowns
 
   const handleSymptomChange = (symptom: string, checked: boolean) => {
     setUserFormData((prev) => ({
@@ -218,6 +202,7 @@ function RiskAssessmentPageContent() {
           };
           setReportAnalyses((prev) => [newAnalysis, ...prev]);
           setSelectedReport(data.analysisId);
+          setIncludeReport(true);
         },
       });
 
@@ -272,6 +257,7 @@ function RiskAssessmentPageContent() {
           };
           setFaceAnalyses((prev) => [newAnalysis, ...prev]);
           setSelectedFace(data.analysisId);
+          setIncludeFace(true);
         },
       });
 
@@ -357,8 +343,8 @@ function RiskAssessmentPageContent() {
 
     try {
       const result = await generateRiskAssessment(
-        selectedReport,
-        selectedFace,
+        includeReport ? selectedReport : "",
+        includeFace ? selectedFace : "",
         {
           ...userFormData,
           age: parseInt(userFormData.age),
@@ -375,7 +361,9 @@ function RiskAssessmentPageContent() {
       });
 
       if (!success && result.error) {
-        console.error("Risk assessment error:", result);
+        console.error("Risk assessment error:", result.error, result);
+      } else if (!success) {
+        console.error("Risk assessment failed with unknown error:", result);
       }
     } catch (error) {
       console.error("Risk assessment unexpected error:", error);
@@ -387,14 +375,13 @@ function RiskAssessmentPageContent() {
     }
   };
 
-  const hasAnySource = includeReport || includeFace;
+  const hasAtLeastOneSource =
+    (includeReport && !!selectedReport) || (includeFace && !!selectedFace);
   const canSubmit =
     !isLoading &&
     !isUploadingReport &&
     !isUploadingFace &&
-    hasAnySource &&
-    (!includeReport || !!selectedReport) &&
-    (!includeFace || !!selectedFace) &&
+    hasAtLeastOneSource &&
     !!userFormData.age.trim() &&
     !!userFormData.gender.trim();
 
@@ -456,10 +443,10 @@ function RiskAssessmentPageContent() {
                     {includeFace && includeReport
                       ? "Face + Report"
                       : includeFace
-                        ? "Face only"
-                        : includeReport
-                          ? "Report only"
-                          : "None selected"}
+                      ? "Face only"
+                      : includeReport
+                      ? "Report only"
+                      : "None selected"}
                   </span>
                 </button>
                 {sourceMenuOpen && (
@@ -487,7 +474,7 @@ function RiskAssessmentPageContent() {
                           Use report analysis
                         </span>
                       </label>
-                      {!hasAnySource && (
+                      {!hasAtLeastOneSource && (
                         <p className="text-xs text-[var(--color-danger)]">
                           Select at least one source
                         </p>
@@ -496,7 +483,9 @@ function RiskAssessmentPageContent() {
                   </div>
                 )}
               </div>
-              {analysisId && <span className={chip}>Saved ID: {analysisId}</span>}
+              {analysisId && (
+                <span className={chip}>Saved ID: {analysisId}</span>
+              )}
             </div>
           </div>
 
@@ -512,7 +501,7 @@ function RiskAssessmentPageContent() {
                     <div>
                       <h3 className={sectionTitle}>Select face analysis</h3>
                       <p className={`${subheading} text-sm`}>
-                        Pair a facial analysis with your report.
+                        Choose from history or upload new. Optional.
                       </p>
                     </div>
                   </div>
@@ -541,60 +530,37 @@ function RiskAssessmentPageContent() {
                       size="sm"
                     />
                   </div>
-                ) : faceAnalyses.length === 0 ? (
-                  <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 text-center rounded-xl">
-                    <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      No face analyses yet
-                    </p>
-                    <p className={`${subheading} mt-1 text-sm`}>
-                      Upload a clear portrait to generate a risk assessment.
-                    </p>
-                  </div>
                 ) : (
                   <div className="space-y-3">
-                    {faceAnalyses.map((analysis, index) => (
-                      <label
-                        key={analysis.id || `face-${index}`}
-                        className={`flex cursor-pointer items-start justify-between border p-4 rounded-xl transition-all duration-200 ${
-                          selectedFace === analysis.id && includeFace
-                            ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
-                            : "border-[var(--color-border)] bg-[var(--color-card)]/60 hover:border-[var(--color-primary)]"
-                        }`}
-                      >
-                        <div className="flex flex-1 items-start gap-3">
-                          <input
-                            type="radio"
-                            name="face"
-                            value={analysis.id}
-                            checked={selectedFace === analysis.id}
-                            onChange={(e) => {
-                              setSelectedFace(e.target.value);
-                              if (validationErrors.faceAnalysisId) {
-                                setValidationErrors((prev) => {
-                                  const {
-                                    faceAnalysisId: _faceAnalysisId,
-                                    ...rest
-                                  } = prev;
-                                  return rest;
-                                });
-                              }
-                            }}
-                            className="mt-1 h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                          />
-                          <div>
-                            <p className="text-sm font-semibold text-[var(--color-heading)]">
-                              Face analysis
-                            </p>
-                            <p className={`${subheading} text-sm`}>
-                              {getAnalysisPreview(analysis)}
-                            </p>
-                          </div>
-                        </div>
-                        <span className={`${chip} whitespace-nowrap`}>
-                          {formatAnalysisDate(analysis.createdAt)}
-                        </span>
-                      </label>
-                    ))}
+                    <label className="block text-sm font-semibold text-[var(--color-foreground)]">
+                      Face analysis from history (optional)
+                    </label>
+                    <select
+                      value={selectedFace}
+                      onChange={(e) => {
+                        setSelectedFace(e.target.value);
+                        setIncludeFace(!!e.target.value);
+                        if (validationErrors.faceAnalysisId) {
+                          setValidationErrors((prev) => {
+                            const { faceAnalysisId: _f, ...rest } = prev;
+                            return rest;
+                          });
+                        }
+                      }}
+                      className="w-full rounded-xl border px-4 py-3 text-[var(--color-foreground)] bg-[var(--color-card)] border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    >
+                      <option value="">Select face analysis (optional)</option>
+                      {faceAnalyses.map((analysis, index) => (
+                        <option
+                          key={analysis.id || `face-${index}`}
+                          value={analysis.id}
+                        >
+                          {`Face: ${getAnalysisPreview(
+                            analysis
+                          )} — ${formatAnalysisDate(analysis.createdAt)}`}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
 
@@ -615,7 +581,7 @@ function RiskAssessmentPageContent() {
                     <div>
                       <h3 className={sectionTitle}>Select report analysis</h3>
                       <p className={`${subheading} text-sm`}>
-                        Choose an existing report or upload a new one.
+                        Choose from history or upload new. Optional.
                       </p>
                     </div>
                   </div>
@@ -644,60 +610,39 @@ function RiskAssessmentPageContent() {
                       size="sm"
                     />
                   </div>
-                ) : reportAnalyses.length === 0 ? (
-                  <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 text-center rounded-xl">
-                    <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      No report analyses yet
-                    </p>
-                    <p className={`${subheading} mt-1 text-sm`}>
-                      Upload a medical report to begin a risk assessment.
-                    </p>
-                  </div>
                 ) : (
                   <div className="space-y-3">
-                    {reportAnalyses.map((analysis, index) => (
-                      <label
-                        key={analysis.id || `report-${index}`}
-                        className={`flex cursor-pointer items-start justify-between border p-4 rounded-xl transition-all duration-200 ${
-                          selectedReport === analysis.id && includeReport
-                            ? "border-[var(--color-primary)] bg-[var(--color-primary-soft)]"
-                            : "border-[var(--color-border)] bg-[var(--color-card)]/60 hover:border-[var(--color-primary)]"
-                        }`}
-                      >
-                        <div className="flex flex-1 items-start gap-3">
-                          <input
-                            type="radio"
-                            name="report"
-                            value={analysis.id}
-                            checked={selectedReport === analysis.id}
-                            onChange={(e) => {
-                              setSelectedReport(e.target.value);
-                              if (validationErrors.reportAnalysisId) {
-                                setValidationErrors((prev) => {
-                                  const {
-                                    reportAnalysisId: _reportAnalysisId,
-                                    ...rest
-                                  } = prev;
-                                  return rest;
-                                });
-                              }
-                            }}
-                            className="mt-1 h-4 w-4 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
-                          />
-                          <div>
-                            <p className="text-sm font-semibold text-[var(--color-heading)]">
-                              Report analysis
-                            </p>
-                            <p className={`${subheading} text-sm`}>
-                              {getAnalysisPreview(analysis)}
-                            </p>
-                          </div>
-                        </div>
-                        <span className={`${chip} whitespace-nowrap`}>
-                          {formatAnalysisDate(analysis.createdAt)}
-                        </span>
-                      </label>
-                    ))}
+                    <label className="block text-sm font-semibold text-[var(--color-foreground)]">
+                      Report analysis from history (optional)
+                    </label>
+                    <select
+                      value={selectedReport}
+                      onChange={(e) => {
+                        setSelectedReport(e.target.value);
+                        setIncludeReport(!!e.target.value);
+                        if (validationErrors.reportAnalysisId) {
+                          setValidationErrors((prev) => {
+                            const { reportAnalysisId: _r, ...rest } = prev;
+                            return rest;
+                          });
+                        }
+                      }}
+                      className="w-full rounded-xl border px-4 py-3 text-[var(--color-foreground)] bg-[var(--color-card)] border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                    >
+                      <option value="">
+                        Select report analysis (optional)
+                      </option>
+                      {reportAnalyses.map((analysis, index) => (
+                        <option
+                          key={analysis.id || `report-${index}`}
+                          value={analysis.id}
+                        >
+                          {`Report: ${getAnalysisPreview(
+                            analysis
+                          )} — ${formatAnalysisDate(analysis.createdAt)}`}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 )}
 

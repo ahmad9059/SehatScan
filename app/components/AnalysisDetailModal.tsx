@@ -10,6 +10,7 @@ import {
   ExclamationTriangleIcon,
   ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
+import ReactMarkdown from "react-markdown";
 import {
   ResponsiveContainer,
   PieChart,
@@ -104,20 +105,50 @@ export default function AnalysisDetailModal({
     );
   }, [analysis]);
 
-  const hasProblems =
+  // Face-specific problems and treatments
+  const hasFaceProblems =
     analysis?.type === "face" &&
     Array.isArray(analysis?.problemsDetected) &&
     analysis.problemsDetected.length > 0;
 
-  const hasTreatments =
+  const hasFaceTreatments =
     analysis?.type === "face" &&
     Array.isArray(analysis?.treatments) &&
     analysis.treatments.length > 0;
 
+  // Report-specific problems and treatments
+  const hasReportProblems =
+    analysis?.type === "report" &&
+    Array.isArray(analysis?.structuredData?.problems_detected) &&
+    analysis.structuredData.problems_detected.length > 0;
+
+  const hasReportTreatments =
+    analysis?.type === "report" &&
+    Array.isArray(analysis?.structuredData?.treatments) &&
+    analysis.structuredData.treatments.length > 0;
+
   const hasRisk = analysis?.type === "risk" && analysis?.riskAssessment;
 
-  const hasRawText =
-    analysis?.type === "report" && typeof analysis?.rawData === "string";
+  // Check for raw text - could be string or inside an object
+  const getRawText = () => {
+    if (!analysis?.rawData) return null;
+    if (typeof analysis.rawData === "string") return analysis.rawData;
+    if (typeof analysis.rawData === "object") {
+      // Check common keys where raw text might be stored
+      if (analysis.rawData.raw_text) return analysis.rawData.raw_text;
+      if (analysis.rawData.text) return analysis.rawData.text;
+      if (analysis.rawData.extracted_text)
+        return analysis.rawData.extracted_text;
+    }
+    return null;
+  };
+
+  const rawText = getRawText();
+  const hasRawText = analysis?.type === "report" && !!rawText;
+
+  // Check if report has any displayable content
+  const hasReportSummary =
+    analysis?.type === "report" && analysis?.structuredData?.summary;
 
   return (
     <Transition appear show as={Fragment}>
@@ -398,7 +429,7 @@ export default function AnalysisDetailModal({
                       </div>
                     )}
 
-                    {hasProblems && (
+                    {hasFaceProblems && (
                       <div className={sectionBox}>
                         <div className="flex items-center gap-2">
                           <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
@@ -464,7 +495,7 @@ export default function AnalysisDetailModal({
                       </div>
                     )}
 
-                    {hasTreatments && (
+                    {hasFaceTreatments && (
                       <div className={sectionBox}>
                         <div className="flex items-center gap-2">
                           <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
@@ -537,9 +568,11 @@ export default function AnalysisDetailModal({
                             Risk assessment
                           </p>
                         </div>
-                        <p className="text-sm leading-relaxed text-[var(--color-foreground)] whitespace-pre-wrap">
-                          {analysis.riskAssessment}
-                        </p>
+                        <div className="prose prose-sm max-w-none text-[var(--color-foreground)] prose-headings:text-[var(--color-heading)] prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-strong:text-[var(--color-heading)]">
+                          <ReactMarkdown>
+                            {analysis.riskAssessment}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     )}
 
@@ -554,7 +587,134 @@ export default function AnalysisDetailModal({
                           </div>
                         </div>
                         <div className="max-h-64 overflow-auto rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3 text-sm leading-relaxed text-[var(--color-foreground)]">
-                          {analysis.rawData}
+                          {rawText}
+                        </div>
+                      </div>
+                    )}
+
+                    {hasReportSummary && (
+                      <div className={sectionBox}>
+                        <div className="flex items-center gap-2">
+                          <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                          <p className="text-sm font-semibold text-[var(--color-heading)]">
+                            Summary
+                          </p>
+                        </div>
+                        <div className="prose prose-sm max-w-none text-[var(--color-foreground)] prose-headings:text-[var(--color-heading)] prose-headings:font-semibold prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-li:my-0.5 prose-strong:text-[var(--color-heading)]">
+                          <ReactMarkdown>
+                            {analysis.structuredData.summary}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )}
+
+                    {hasReportProblems && (
+                      <div className={sectionBox}>
+                        <div className="flex items-center gap-2">
+                          <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
+                          <p className="text-sm font-semibold text-[var(--color-heading)]">
+                            Health concerns detected
+                          </p>
+                        </div>
+                        <div className="space-y-3">
+                          {analysis.structuredData.problems_detected.map(
+                            (problem: any, idx: number) => (
+                              <div
+                                key={`report-problem-${idx}`}
+                                className={`rounded-lg border px-3 py-3 ${
+                                  problem.severity === "severe"
+                                    ? "border-[var(--color-danger)]/60 bg-[var(--color-danger)]/10"
+                                    : problem.severity === "moderate"
+                                    ? "border-[var(--color-warning)]/60 bg-[var(--color-warning)]/10"
+                                    : "border-[var(--color-success)]/60 bg-[var(--color-success)]/10"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-heading)]" />
+                                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                      {problem.type}
+                                    </p>
+                                  </div>
+                                  <span className={chipStyles}>
+                                    {problem.severity}
+                                  </span>
+                                </div>
+                                <p className="mt-2 text-sm text-[var(--color-foreground)]">
+                                  {problem.description}
+                                </p>
+                                {problem.confidence && (
+                                  <div className="mt-3 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
+                                    <span className="font-semibold text-[var(--color-heading)]">
+                                      Confidence
+                                    </span>
+                                    <div className="h-2 w-28 rounded-full bg-[var(--color-card)] border border-[var(--color-border)]">
+                                      <div
+                                        className="h-full rounded-full bg-[var(--color-primary)]"
+                                        style={{
+                                          width: `${Math.min(
+                                            100,
+                                            Math.round(problem.confidence * 100)
+                                          )}%`,
+                                        }}
+                                      />
+                                    </div>
+                                    <span className="text-[var(--color-heading)] font-semibold">
+                                      {Math.round(problem.confidence * 100)}%
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {hasReportTreatments && (
+                      <div className={sectionBox}>
+                        <div className="flex items-center gap-2">
+                          <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                          <p className="text-sm font-semibold text-[var(--color-heading)]">
+                            Recommended actions
+                          </p>
+                        </div>
+                        <div className="space-y-3">
+                          {analysis.structuredData.treatments
+                            .sort((a: any, b: any) => {
+                              const order: Record<string, number> = {
+                                high: 3,
+                                medium: 2,
+                                low: 1,
+                              };
+                              return (
+                                (order[b.priority] || 0) -
+                                (order[a.priority] || 0)
+                              );
+                            })
+                            .map((treatment: any, idx: number) => (
+                              <div
+                                key={`report-treatment-${idx}`}
+                                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-3"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-primary)]" />
+                                    <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                      {treatment.category}
+                                    </p>
+                                  </div>
+                                  <span className={chipStyles}>
+                                    {treatment.priority}
+                                    {treatment.timeframe &&
+                                      ` · ${treatment.timeframe}`}
+                                  </span>
+                                </div>
+                                <p className="mt-2 text-sm text-[var(--color-foreground)]">
+                                  {treatment.recommendation}
+                                </p>
+                              </div>
+                            ))}
                         </div>
                       </div>
                     )}

@@ -16,16 +16,13 @@ export async function POST(request: NextRequest) {
 
     const { lab_data, visual_metrics, user_data } = requestData;
 
-    if (!lab_data) {
+    // At least one data source must be provided
+    if (!lab_data && !visual_metrics) {
       return NextResponse.json(
-        { error: "Missing required field: lab_data" },
-        { status: 400 }
-      );
-    }
-
-    if (!visual_metrics) {
-      return NextResponse.json(
-        { error: "Missing required field: visual_metrics" },
+        {
+          error:
+            "At least one data source (lab_data or visual_metrics) is required",
+        },
         { status: 400 }
       );
     }

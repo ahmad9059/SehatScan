@@ -641,14 +641,14 @@ Would you like me to guide you through uploading your first health report?`;
    */
   async generateRiskAssessment(
     labData: any,
-    visualMetrics: VisualMetrics,
+    visualMetrics: VisualMetrics | null,
     userData: UserData
   ): Promise<string> {
-    if (!labData) {
-      throw new Error("Lab data is required");
-    }
-    if (!visualMetrics) {
-      throw new Error("Visual metrics are required");
+    // At least one data source is required
+    if (!labData && !visualMetrics) {
+      throw new Error(
+        "At least one data source (lab data or visual metrics) is required"
+      );
     }
     if (!userData) {
       throw new Error("User data is required");

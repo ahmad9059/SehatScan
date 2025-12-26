@@ -326,14 +326,15 @@ export function validateRiskAssessmentForm(data: {
 }): ValidationResult {
   const errors: Record<string, string> = {};
 
-  const includeReport = data.includeReport ?? true;
-  const includeFace = data.includeFace ?? true;
+  const includeReport = data.includeReport ?? false;
+  const includeFace = data.includeFace ?? false;
 
+  // At least one source must be selected
   if (!includeReport && !includeFace) {
-    errors.reportAnalysisId = "Select at least one analysis source";
-    errors.faceAnalysisId = "Select at least one analysis source";
+    errors.source = "Select at least one analysis source (face or report)";
   }
 
+  // Validate selected sources have IDs
   if (includeReport && !data.reportAnalysisId) {
     errors.reportAnalysisId = "Please select a report analysis";
   }

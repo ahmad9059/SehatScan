@@ -67,6 +67,18 @@ function getAnalysisTypeLabel(type: string): string {
   }
 }
 
+// Helper function to strip markdown formatting for preview text
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "$1") // Bold
+    .replace(/\*(.+?)\*/g, "$1") // Italic
+    .replace(/#{1,6}\s+/g, "") // Headers
+    .replace(/[-*+]\s+/g, "") // List items
+    .replace(/\n+/g, " ") // Newlines to spaces
+    .replace(/\s+/g, " ") // Multiple spaces to single
+    .trim();
+}
+
 function getAnalysisPreview(analysis: any): string {
   if (analysis.type === "report" && analysis.structuredData?.metrics) {
     const metrics = analysis.structuredData.metrics;
@@ -103,10 +115,9 @@ function getAnalysisPreview(analysis: any): string {
   }
 
   if (analysis.type === "risk" && analysis.riskAssessment) {
-    const preview = analysis.riskAssessment.substring(0, 100);
-    return preview.length < analysis.riskAssessment.length
-      ? `${preview}...`
-      : preview;
+    const cleanText = stripMarkdown(analysis.riskAssessment);
+    const preview = cleanText.substring(0, 100);
+    return preview.length < cleanText.length ? `${preview}...` : preview;
   }
 
   return "Analysis completed";

@@ -166,31 +166,50 @@ IMPORTANT:
    */
   async generateRiskAssessment(
     labData: any,
-    visualMetrics: VisualMetrics,
+    visualMetrics: VisualMetrics | null,
     userData: UserData
   ): Promise<string> {
-    if (!labData) {
-      throw new Error("Lab data is required");
-    }
-    if (!visualMetrics) {
-      throw new Error("Visual metrics are required");
+    // At least one data source is required
+    if (!labData && !visualMetrics) {
+      throw new Error(
+        "At least one data source (lab data or visual metrics) is required"
+      );
     }
     if (!userData) {
       throw new Error("User data is required");
     }
 
+    // Build dynamic prompt based on available data
+    let dataSection = "";
+    const focusPoints: string[] = [];
+
+    if (labData) {
+      dataSection += `Lab Report Data: ${JSON.stringify(labData, null, 2)}\n`;
+      focusPoints.push("Any lab values outside normal ranges");
+    }
+
+    if (visualMetrics) {
+      dataSection += `Facial Analysis: ${JSON.stringify(
+        visualMetrics,
+        null,
+        2
+      )}\n`;
+      focusPoints.push(
+        "Visual indicators (high redness or yellowness percentages)"
+      );
+    }
+
+    dataSection += `Patient Info: ${JSON.stringify(userData, null, 2)}`;
+    focusPoints.push("Potential health risks based on the available data");
+    focusPoints.push("Recommendations for follow-up or medical consultation");
+
     const prompt = `Based on the following patient data, provide a health risk assessment:
 
-Lab Report Data: ${JSON.stringify(labData, null, 2)}
-Facial Analysis: ${JSON.stringify(visualMetrics, null, 2)}
-Patient Info: ${JSON.stringify(userData, null, 2)}
+${dataSection}
 
 Provide a concise health risk assessment highlighting any concerning indicators.
 Focus on:
-1. Any lab values outside normal ranges
-2. Visual indicators (high redness or yellowness percentages)
-3. Potential health risks based on the combination of data
-4. Recommendations for follow-up or medical consultation
+${focusPoints.map((p, i) => `${i + 1}. ${p}`).join("\n")}
 
 Keep the assessment professional, clear, and actionable.`;
 

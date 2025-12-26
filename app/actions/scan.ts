@@ -486,19 +486,14 @@ export async function generateRiskAssessment(
   const startTime = Date.now();
 
   try {
-    // Validate input parameters
-    if (!reportAnalysisId || typeof reportAnalysisId !== "string") {
-      return {
-        success: false,
-        error: "Report analysis ID is required",
-        errorType: "validation",
-      };
-    }
+    // At least one analysis ID must be provided
+    const hasReport = reportAnalysisId && typeof reportAnalysisId === "string";
+    const hasFace = faceAnalysisId && typeof faceAnalysisId === "string";
 
-    if (!faceAnalysisId || typeof faceAnalysisId !== "string") {
+    if (!hasReport && !hasFace) {
       return {
         success: false,
-        error: "Face analysis ID is required",
+        error: "At least one analysis (report or face) is required",
         errorType: "validation",
       };
     }
@@ -525,13 +520,14 @@ export async function generateRiskAssessment(
     }
 
     // Fetch the selected analyses from database
-    let reportAnalysis, faceAnalysis;
+    let reportAnalysis = null;
+    let faceAnalysis = null;
     try {
       const { getAnalysisById } = await import("@/lib/analysis");
 
       [reportAnalysis, faceAnalysis] = await Promise.all([
-        getAnalysisById(reportAnalysisId, user.id!),
-        getAnalysisById(faceAnalysisId, user.id!),
+        hasReport ? getAnalysisById(reportAnalysisId, user.id!) : null,
+        hasFace ? getAnalysisById(faceAnalysisId, user.id!) : null,
       ]);
     } catch (dbError) {
       logError("generateRiskAssessment - Database fetch failed", dbError, {
@@ -546,7 +542,8 @@ export async function generateRiskAssessment(
       };
     }
 
-    if (!reportAnalysis) {
+    // Validate that requested analyses were found
+    if (hasReport && !reportAnalysis) {
       logError("generateRiskAssessment - Report analysis not found", null, {
         reportAnalysisId,
         userId: user.id,
@@ -559,7 +556,7 @@ export async function generateRiskAssessment(
       };
     }
 
-    if (!faceAnalysis) {
+    if (hasFace && !faceAnalysis) {
       logError("generateRiskAssessment - Face analysis not found", null, {
         faceAnalysisId,
         userId: user.id,
@@ -572,23 +569,21 @@ export async function generateRiskAssessment(
       };
     }
 
-    // Validate analysis data
-    const labData = reportAnalysis.structuredData || reportAnalysis.rawData;
-    const visualMetrics = faceAnalysis.visualMetrics || {};
+    // Validate analysis data - at least one source must have usable data
+    const labData =
+      reportAnalysis?.structuredData || reportAnalysis?.rawData || null;
+    const visualMetrics = faceAnalysis?.visualMetrics || null;
 
-    if (
-      !labData ||
-      (typeof labData === "object" && Object.keys(labData).length === 0)
-    ) {
+    if (!labData && !visualMetrics) {
       return {
         success: false,
         error:
-          "Selected report analysis contains no usable data. Please select a different report.",
+          "No usable data found in selected analyses. Please select different analyses.",
         errorType: "validation",
       };
     }
 
-    // Prepare combined data payload
+    // Prepare combined data payload (allow null values)
     const requestData = {
       lab_data: labData,
       visual_metrics: visualMetrics,

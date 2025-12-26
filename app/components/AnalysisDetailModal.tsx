@@ -378,9 +378,19 @@ export default function AnalysisDetailModal({
                                 }}
                               />
                               <Bar dataKey="value">
-                                {healthMetrics.map((entry: { name: string; value: number; unit: string; color: string }, index: number) => (
-                                  <Cell key={index} fill={entry.color} />
-                                ))}
+                                {healthMetrics.map(
+                                  (
+                                    entry: {
+                                      name: string;
+                                      value: number;
+                                      unit: string;
+                                      color: string;
+                                    },
+                                    index: number
+                                  ) => (
+                                    <Cell key={index} fill={entry.color} />
+                                  )
+                                )}
                               </Bar>
                             </BarChart>
                           </ResponsiveContainer>

@@ -125,13 +125,13 @@ export default function HeroSection() {
           <div className="relative group">
             <div className="w-8 h-8 flex items-center justify-center">
               <img
-                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg"
-                alt="React"
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/supabase/supabase-original.svg"
+                alt="Supabase"
                 className="w-full h-full object-contain group-hover:opacity-100 transition-opacity cursor-pointer"
               />
             </div>
             <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[var(--color-foreground)] text-[var(--color-bg)] text-xs font-medium px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
-              React
+              Supabase
             </div>
           </div>
         </div>

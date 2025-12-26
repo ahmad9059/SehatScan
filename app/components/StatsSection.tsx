@@ -1,15 +1,15 @@
 export default function StatsSection() {
   const stats = [
     {
-      value: "2021",
+      value: "2025",
       label: "Founded",
     },
     {
-      value: "50K+",
+      value: "1K+",
       label: "Reports Analyzed",
     },
     {
-      value: "1k+",
+      value: "500+",
       label: "Active Users",
     },
   ];

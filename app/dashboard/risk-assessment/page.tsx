@@ -387,16 +387,12 @@ function RiskAssessmentPageContent() {
 
   if (loadingAnalyses) {
     return (
-      <div className={pageContainer}>
-        <div className={contentWidth}>
-          <section className={`${fullWidthSection} space-y-4`}>
-            <div className="flex items-center gap-3">
-              <LoadingSpinner size="lg" />
-              <p className={`${mutedText} text-sm`}>
-                Loading your report and face analyses...
-              </p>
-            </div>
-          </section>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <LoadingSpinner size="lg" />
+          <p className={`${mutedText} text-sm`}>
+            Loading your report and face analyses...
+          </p>
         </div>
       </div>
     );

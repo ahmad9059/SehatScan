@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   generateRiskAssessment,
   analyzeReport,
@@ -25,7 +25,10 @@ import {
   ChartBarIcon,
   HeartIcon,
   CloudArrowUpIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import {
   chip,
   contentWidth,
@@ -81,6 +84,7 @@ const commonSymptoms = [
 function RiskAssessmentPageContent() {
   const { user } = useUser();
   const router = useRouter();
+  const reportRef = useRef<HTMLDivElement>(null);
   const [reportAnalyses, setReportAnalyses] = useState<Analysis[]>([]);
   const [faceAnalyses, setFaceAnalyses] = useState<Analysis[]>([]);
   const [selectedReport, setSelectedReport] = useState<string>("");
@@ -99,6 +103,7 @@ function RiskAssessmentPageContent() {
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string>
   >({});
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const [reportFile, setReportFile] = useState<File | null>(null);
   const [faceFile, setFaceFile] = useState<File | null>(null);
@@ -372,6 +377,84 @@ function RiskAssessmentPageContent() {
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!reportRef.current || !riskAssessment) return;
+
+    setIsGeneratingPdf(true);
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        useCORS: true,
+        logging: false,
+        background: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 10;
+
+      // Add title
+      pdf.setFontSize(18);
+      pdf.setTextColor(33, 33, 33);
+      pdf.text("Health Risk Assessment Report", pdfWidth / 2, 15, {
+        align: "center",
+      });
+
+      // Add date
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(
+        `Generated on: ${new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`,
+        pdfWidth / 2,
+        22,
+        { align: "center" }
+      );
+
+      // Calculate scaled dimensions for the content
+      const contentWidth = pdfWidth - 20;
+      const contentHeight = (imgHeight * contentWidth) / imgWidth;
+
+      // Add the report content
+      pdf.addImage(imgData, "PNG", 10, 30, contentWidth, contentHeight);
+
+      // Add disclaimer at the bottom
+      const disclaimerY = Math.min(30 + contentHeight + 10, pdfHeight - 20);
+      pdf.setFontSize(8);
+      pdf.setTextColor(150, 150, 150);
+      pdf.text(
+        "Disclaimer: This assessment is AI-generated for informational purposes only. Consult a healthcare provider for medical advice.",
+        pdfWidth / 2,
+        disclaimerY,
+        { align: "center", maxWidth: pdfWidth - 20 }
+      );
+
+      pdf.save(
+        `health-risk-assessment-${new Date().toISOString().split("T")[0]}.pdf`
+      );
+    } catch (error) {
+      console.error("PDF generation error:", error);
+      showErrorToast("Failed to generate PDF. Please try again.");
+    } finally {
+      setIsGeneratingPdf(false);
     }
   };
 
@@ -837,16 +920,39 @@ function RiskAssessmentPageContent() {
                     </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => router.push("/dashboard/history")}
-                  className={secondaryButton}
-                >
-                  View in history
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownloadPdf}
+                    disabled={isGeneratingPdf}
+                    className={secondaryButton}
+                  >
+                    {isGeneratingPdf ? (
+                      <>
+                        <LoadingSpinner size="sm" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <ArrowDownTrayIcon className="h-4 w-4" />
+                        Download PDF
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => router.push("/dashboard/history")}
+                    className={secondaryButton}
+                  >
+                    View in history
+                  </button>
+                </div>
               </div>
 
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 prose prose-sm max-w-none text-[var(--color-foreground)] dark:prose-invert">
+              <div
+                ref={reportRef}
+                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4 prose prose-sm max-w-none text-[var(--color-foreground)] dark:prose-invert"
+              >
                 <ReactMarkdown>{riskAssessment}</ReactMarkdown>
               </div>
 

@@ -93,7 +93,7 @@ export default function Navbar() {
               <img
                 src={user.imageUrl}
                 alt={user.fullName || "Profile"}
-                className="h-8 w-8 rounded-full object-cover border-2 border-[var(--color-primary)]"
+                className="h-9 w-9 rounded-full object-cover  "
               />
             </Link>
           ) : (

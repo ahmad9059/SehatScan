@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { useClerk } from "@clerk/nextjs";
 import {
   UserIcon,
-  Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  BellIcon,
-  ShieldCheckIcon,
   QuestionMarkCircleIcon,
+  ChatBubbleLeftRightIcon,
+  ClockIcon,
+  CameraIcon,
 } from "@heroicons/react/24/outline";
 
 interface ProfileDropdownProps {
@@ -64,22 +64,22 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
       href: "/dashboard/profile",
     },
     {
-      icon: Cog6ToothIcon,
-      label: "Settings",
-      description: "Preferences and privacy",
-      href: "/dashboard/settings",
+      icon: ChatBubbleLeftRightIcon,
+      label: "AI Assistant",
+      description: "Chat with health AI",
+      href: "/dashboard/chatbot",
     },
     {
-      icon: BellIcon,
-      label: "Notifications",
-      description: "Manage notifications",
-      href: "/dashboard/notifications",
+      icon: ClockIcon,
+      label: "History",
+      description: "View past analyses",
+      href: "/dashboard/history",
     },
     {
-      icon: ShieldCheckIcon,
-      label: "Security",
-      description: "Password and security",
-      href: "/dashboard/security",
+      icon: CameraIcon,
+      label: "Scan Face",
+      description: "Analyze facial health",
+      href: "/dashboard/scan-face",
     },
     {
       icon: QuestionMarkCircleIcon,

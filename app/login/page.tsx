@@ -1,10 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { SignIn } from "@clerk/nextjs";
+import { SignIn, useUser } from "@clerk/nextjs";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function LoginPage() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      router.push("/dashboard");
+    }
+  }, [isLoaded, user, router]);
+
+  // Show loading state while checking auth or redirecting
+  if (!isLoaded || user) {
+    return (
+      <div className="min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center px-4 py-12">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin" />
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {user ? "Redirecting to dashboard..." : "Loading..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">

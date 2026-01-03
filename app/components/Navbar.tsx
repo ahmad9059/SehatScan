@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./ThemeToggle";
+import { useUser } from "@clerk/nextjs";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isLoaded } = useUser();
 
   return (
     <header className="absolute inset-x-0 top-0 z-50">
@@ -81,12 +83,27 @@ export default function Navbar() {
         {/* Desktop CTA + Theme Toggle */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end items-center gap-x-4">
           <ThemeToggle />
-          <Link
-            href="/login"
-            className="text-sm/6 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-primary)]"
-          >
-            Log in <span aria-hidden="true">&rarr;</span>
-          </Link>
+          {!isLoaded ? (
+            <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          ) : user ? (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 text-sm/6 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-primary)]"
+            >
+              <img
+                src={user.imageUrl}
+                alt={user.fullName || "Profile"}
+                className="h-8 w-8 rounded-full object-cover border-2 border-[var(--color-primary)]"
+              />
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="text-sm/6 font-semibold text-[var(--color-foreground)] hover:text-[var(--color-primary)]"
+            >
+              Log in <span aria-hidden="true">&rarr;</span>
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -159,12 +176,33 @@ export default function Navbar() {
                   </Link>
                 </div>
                 <div className="py-6">
-                  <Link
-                    href="/login"
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
-                  >
-                    Log in
-                  </Link>
+                  {!isLoaded ? (
+                    <div className="flex items-center gap-3 px-3 py-2.5">
+                      <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                      <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+                    </div>
+                  ) : user ? (
+                    <Link
+                      href="/dashboard"
+                      className="-mx-3 flex items-center gap-3 rounded-lg px-3 py-2.5 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <img
+                        src={user.imageUrl}
+                        alt={user.fullName || "Profile"}
+                        className="h-8 w-8 rounded-full object-cover border-2 border-[var(--color-primary)]"
+                      />
+                      <span>Dashboard</span>
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Log in
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

@@ -172,14 +172,8 @@ function ProfilePageContent() {
 
   if (!isLoaded) {
     return (
-      <div className={pageContainer}>
-        <div className={contentWidth}>
-          <section
-            className={`${fullWidthSection} flex items-center justify-center pb-[10%]`}
-          >
-            <LogoSpinner message="Loading profile..." />
-          </section>
-        </div>
+      <div className="flex min-h-[60vh] items-center justify-center pb-[10%]">
+        <LogoSpinner message="Loading profile..." />
       </div>
     );
   }

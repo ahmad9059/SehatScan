@@ -185,7 +185,7 @@ function ChatbotPageContent() {
 
   if (loadingAnalyses) {
     return (
-      <div className="flex h-[calc(100vh-80px)] items-center justify-center pb-[20%] bg-[var(--color-bg)]">
+      <div className="flex min-h-[60vh] items-center justify-center pb-[10%]">
         <LogoSpinner message="Preparing your AI health assistant..." />
       </div>
     );

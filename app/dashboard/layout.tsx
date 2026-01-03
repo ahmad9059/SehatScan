@@ -389,7 +389,7 @@ export default function DashboardLayout({
   // Show loading state while checking authentication
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center pb-[20%]">
+      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center pb-[10%]">
         <LogoSpinner message="Loading dashboard..." />
       </div>
     );

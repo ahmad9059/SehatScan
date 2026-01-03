@@ -13,6 +13,7 @@ import { ProfileDropdown } from "../components/ProfileDropdown";
 import { LanguageSelector } from "../components/LanguageSelector";
 import { NotificationsDropdown } from "../components/NotificationsDropdown";
 import { useSimpleLanguage } from "../components/SimpleLanguageContext";
+import LogoSpinner from "../components/LogoSpinner";
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -388,8 +389,8 @@ export default function DashboardLayout({
   // Show loading state while checking authentication
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#037BFC]"></div>
+      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center pb-[20%]">
+        <LogoSpinner message="Loading dashboard..." />
       </div>
     );
   }

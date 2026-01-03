@@ -6,6 +6,7 @@ import { getUserStats } from "@/app/actions/profile";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
+import LogoSpinner from "@/app/components/LogoSpinner";
 import {
   UserIcon,
   ChartBarIcon,
@@ -174,9 +175,9 @@ function ProfilePageContent() {
       <div className={pageContainer}>
         <div className={contentWidth}>
           <section
-            className={`${fullWidthSection} flex items-center justify-center`}
+            className={`${fullWidthSection} flex items-center justify-center pb-[10%]`}
           >
-            <LoadingSpinner size="lg" />
+            <LogoSpinner message="Loading profile..." />
           </section>
         </div>
       </div>

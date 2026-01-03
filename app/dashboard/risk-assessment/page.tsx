@@ -15,6 +15,7 @@ import {
 } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
+import LogoSpinner from "@/app/components/LogoSpinner";
 import ProgressBar from "@/app/components/ProgressBar";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
@@ -470,13 +471,8 @@ function RiskAssessmentPageContent() {
 
   if (loadingAnalyses) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <LoadingSpinner size="lg" />
-          <p className={`${mutedText} text-sm`}>
-            Loading your report and face analyses...
-          </p>
-        </div>
+      <div className="flex min-h-[60vh] items-center justify-center pb-[10%]">
+        <LogoSpinner message="Loading your report and face analyses..." />
       </div>
     );
   }

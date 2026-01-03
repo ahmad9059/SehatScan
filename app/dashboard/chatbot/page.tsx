@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { showErrorToast } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
+import LogoSpinner from "@/app/components/LogoSpinner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -45,9 +46,12 @@ function ChatbotPageContent() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const avatarUrl =
-    ((user?.unsafeMetadata as Record<string, unknown> | undefined) ||
-      (user?.publicMetadata as Record<string, unknown> | undefined))
-      ?.avatarUrl as string | undefined || user?.imageUrl || null;
+    ((
+      (user?.unsafeMetadata as Record<string, unknown> | undefined) ||
+      (user?.publicMetadata as Record<string, unknown> | undefined)
+    )?.avatarUrl as string | undefined) ||
+    user?.imageUrl ||
+    null;
   const userInitial = user?.firstName
     ? user.firstName.charAt(0).toUpperCase()
     : user?.emailAddresses?.[0]?.emailAddress?.charAt(0).toUpperCase() || "U";
@@ -181,13 +185,8 @@ function ChatbotPageContent() {
 
   if (loadingAnalyses) {
     return (
-      <div className="flex h-[calc(100vh-80px)] items-center justify-center bg-[var(--color-bg)]">
-        <div className="flex items-center gap-3">
-          <LoadingSpinner size="lg" />
-          <p className={`${mutedText} text-sm`}>
-            Preparing your AI health assistant...
-          </p>
-        </div>
+      <div className="flex h-[calc(100vh-80px)] items-center justify-center pb-[20%] bg-[var(--color-bg)]">
+        <LogoSpinner message="Preparing your AI health assistant..." />
       </div>
     );
   }

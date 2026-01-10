@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
-import { Outfit, Noto_Nastaliq_Urdu } from "next/font/google";
+import { Inter, Poppins, Noto_Nastaliq_Urdu } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
-const outfit = Outfit({
+const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const poppins = Poppins({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
@@ -51,7 +57,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${outfit.variable} ${notoNastaliqUrdu.variable} font-sans antialiased`}
+          className={`${inter.variable} ${poppins.variable} ${notoNastaliqUrdu.variable} font-sans antialiased`}
         >
           <SimpleLanguageProvider>
             <ThemeProvider

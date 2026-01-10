@@ -61,7 +61,7 @@
   --color-warning: var(--color-warning);
   --color-danger: var(--color-danger);
   --font-sans: var(--font-sans);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-heading);
 }
 
 /* Base styles */
@@ -69,7 +69,6 @@ body {
   background-color: var(--color-bg);
   color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
-  letter-spacing: -0.01em;
 }
 
 h1,
@@ -78,10 +77,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
-  font-weight: 700;
+  font-family: var(--font-heading), system-ui, -apple-system, sans-serif;
+  font-weight: 600;
   color: var(--color-heading);
-  letter-spacing: -0.02em;
 }
 
 /* Remove gradients globally */

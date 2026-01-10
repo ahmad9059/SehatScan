@@ -37,6 +37,7 @@ export default function DashboardCharts({
   const { t } = useSimpleLanguage();
   const [leftTimeRange, setLeftTimeRange] = useState<TimeRange>("1w");
   const [rightTimeRange, setRightTimeRange] = useState<TimeRange>("1w");
+  const [hoveredBar, setHoveredBar] = useState<string | null>(null);
 
   // Prepare data for area chart (analyses over time)
   const getAnalysesOverTime = () => {
@@ -88,9 +89,21 @@ export default function DashboardCharts({
   // Prepare data for horizontal bar chart (top analysis types)
   const getTopAnalyses = () => {
     const types = [
-      { name: t("charts.reports"), count: stats.reports, icon: "📄" },
-      { name: t("charts.faceAnalysis"), count: stats.faces, icon: "👤" },
-      { name: t("charts.riskAssessment"), count: stats.risks, icon: "⚠️" },
+      {
+        name: t("charts.reports"),
+        count: stats.reports,
+        icon: "/ic-document-red.svg",
+      },
+      {
+        name: t("charts.faceAnalysis"),
+        count: stats.faces,
+        icon: "/ic-happy.svg",
+      },
+      {
+        name: t("charts.riskAssessment"),
+        count: stats.risks,
+        icon: "/ic-risk-overview-red.svg",
+      },
     ];
 
     // Sort by count descending
@@ -248,37 +261,72 @@ export default function DashboardCharts({
         </div>
 
         <div className="space-y-4">
-          {barData.map((item, index) => (
-            <div key={item.name} className="flex items-center gap-3">
+          {barData.map((item) => {
+            const isHovered = hoveredBar === item.name;
+            const isDimmed = hoveredBar !== null && hoveredBar !== item.name;
+            const percentage =
+              Math.round((item.count / stats.total) * 100) || 0;
+
+            return (
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs shrink-0 ${
-                  index === 0
-                    ? "bg-red-500"
-                    : index === 1
-                    ? "bg-blue-500"
-                    : "bg-orange-500"
-                } text-white`}
+                key={item.name}
+                className={`flex items-center gap-3 transition-all duration-300 cursor-pointer ${
+                  isDimmed ? "opacity-40" : "opacity-100"
+                }`}
+                onMouseEnter={() => setHoveredBar(item.name)}
+                onMouseLeave={() => setHoveredBar(null)}
               >
-                {item.icon}
-              </div>
-              <div className="flex-1 h-9 bg-[var(--color-surface)] rounded-lg overflow-hidden relative">
                 <div
-                  className="h-full rounded-lg transition-all duration-500 flex items-center px-3"
-                  style={{
-                    width: `${Math.max((item.count / maxCount) * 100, 25)}%`,
-                    backgroundColor: COLORS.primary,
-                  }}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 bg-[var(--color-primary-soft)] p-2 transition-transform duration-300 ${
+                    isHovered ? "scale-110" : ""
+                  }`}
                 >
-                  <span className="text-white text-sm font-medium truncate">
-                    {item.name}
-                  </span>
+                  <img src={item.icon} alt="" className="w-4 h-4" />
                 </div>
+                <div className="flex-1 h-9 bg-[var(--color-surface)] rounded-lg overflow-visible relative group">
+                  <div
+                    className={`h-full rounded-lg transition-all duration-500 flex items-center px-3 ${
+                      isHovered ? "shadow-lg" : ""
+                    }`}
+                    style={{
+                      width: `${Math.max((item.count / maxCount) * 100, 25)}%`,
+                      backgroundColor: COLORS.primary,
+                    }}
+                  >
+                    <span className="text-white text-sm font-medium truncate">
+                      {item.name}
+                    </span>
+                  </div>
+
+                  {/* Tooltip on hover */}
+                  <div
+                    className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-2 bg-[var(--color-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 shadow-lg z-50 whitespace-nowrap transition-all duration-200 pointer-events-none ${
+                      isHovered
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-2"
+                    }`}
+                  >
+                    <p className="text-sm font-medium text-[var(--color-heading)]">
+                      {item.count} {item.name.toLowerCase()}
+                    </p>
+                    <p className="text-xs text-[var(--color-muted)]">
+                      {percentage}% of total
+                    </p>
+                    <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-[var(--color-card)] border-r border-b border-[var(--color-border)] rotate-45" />
+                  </div>
+                </div>
+                <span
+                  className={`text-sm font-medium w-8 text-right shrink-0 transition-all duration-300 ${
+                    isHovered
+                      ? "text-[var(--color-primary)] font-bold"
+                      : "text-[var(--color-heading)]"
+                  }`}
+                >
+                  {item.count}
+                </span>
               </div>
-              <span className="text-[var(--color-heading)] text-sm font-medium w-8 text-right shrink-0">
-                {item.count}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

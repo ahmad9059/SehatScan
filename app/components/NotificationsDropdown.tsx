@@ -1,14 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import {
-  BellIcon,
-  CheckIcon,
-  XMarkIcon,
-  ExclamationTriangleIcon,
-  InformationCircleIcon,
-  CheckCircleIcon,
-} from "@heroicons/react/24/outline";
+import { BellIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 
 interface Notification {
   id: string;
@@ -25,7 +18,7 @@ const mockNotifications: Notification[] = [
     type: "success",
     title: "Analysis Complete",
     message: "Your facial health analysis has been completed successfully.",
-    timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+    timestamp: new Date(Date.now() - 5 * 60 * 1000),
     read: false,
   },
   {
@@ -33,7 +26,7 @@ const mockNotifications: Notification[] = [
     type: "info",
     title: "New Feature Available",
     message: "Risk assessment tool now includes cardiovascular health metrics.",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
     read: false,
   },
   {
@@ -42,15 +35,7 @@ const mockNotifications: Notification[] = [
     title: "Profile Incomplete",
     message:
       "Please complete your health profile for better analysis accuracy.",
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-    read: true,
-  },
-  {
-    id: "4",
-    type: "info",
-    title: "Weekly Report Ready",
-    message: "Your weekly health summary is now available for download.",
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
     read: true,
   },
 ];
@@ -71,25 +56,18 @@ export function NotificationsDropdown() {
         setIsOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const markAsRead = (id: string) => {
     setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === id ? { ...notification, read: true } : notification
-      )
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
   };
 
   const markAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notification) => ({ ...notification, read: true }))
-    );
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
   const deleteNotification = (id: string) => {
@@ -99,13 +77,77 @@ export function NotificationsDropdown() {
   const getNotificationIcon = (type: Notification["type"]) => {
     switch (type) {
       case "success":
-        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-500/10 ring-1 ring-emerald-500/20">
+            <svg
+              className="w-5 h-5 text-emerald-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          </div>
+        );
       case "warning":
-        return <ExclamationTriangleIcon className="h-5 w-5 text-yellow-500" />;
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-amber-50 dark:bg-amber-500/10 ring-1 ring-amber-500/20">
+            <svg
+              className="w-5 h-5 text-amber-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+        );
       case "error":
-        return <XMarkIcon className="h-5 w-5 text-red-500" />;
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-red-50 dark:bg-red-500/10 ring-1 ring-red-500/20">
+            <svg
+              className="w-5 h-5 text-red-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </div>
+        );
       default:
-        return <InformationCircleIcon className="h-5 w-5 text-blue-500" />;
+        return (
+          <div className="flex items-center justify-center w-9 h-9 rounded-full bg-blue-50 dark:bg-blue-500/10 ring-1 ring-blue-500/20">
+            <svg
+              className="w-5 h-5 text-blue-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </div>
+        );
     }
   };
 
@@ -116,13 +158,9 @@ export function NotificationsDropdown() {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-    if (minutes < 60) {
-      return `${minutes}m ago`;
-    } else if (hours < 24) {
-      return `${hours}h ago`;
-    } else {
-      return `${days}d ago`;
-    }
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
   };
 
   return (
@@ -135,88 +173,104 @@ export function NotificationsDropdown() {
       >
         <BellIcon className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-200" />
         {unreadCount > 0 && (
-          <div className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-[var(--color-danger)] rounded-full flex items-center justify-center ring-2 ring-[var(--color-card)]">
-            <span className="text-[10px] text-white font-bold">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
-          </div>
+          <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-primary)] opacity-50"></span>
+            <span className="relative inline-flex items-center justify-center rounded-full h-4 w-4 bg-[var(--color-primary)] ring-2 ring-[var(--color-card)]"></span>
+          </span>
         )}
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu - Redesigned */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-[var(--color-card)] rounded-xl shadow-[var(--shadow-soft)] border border-[var(--color-border)] z-50 animate-fade-in">
+        <div className="absolute right-0 mt-2 w-[400px] bg-[var(--color-card)] rounded-2xl shadow-2xl border border-[var(--color-border)] z-50 overflow-hidden animate-fade-in">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-[var(--color-border)]">
+          <div className="px-5 py-4 bg-gradient-to-r from-[var(--color-card)] to-[var(--color-surface)]/30">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-[var(--color-heading)]">
-                Notifications
-              </h3>
+              <div>
+                <h3 className="text-lg font-bold text-[var(--color-heading)]">
+                  Notifications
+                </h3>
+                <p className="text-sm text-[var(--color-muted)] mt-0.5">
+                  {unreadCount > 0
+                    ? `You have ${unreadCount} unread notification${
+                        unreadCount !== 1 ? "s" : ""
+                      }`
+                    : "All caught up!"}
+                </p>
+              </div>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-medium"
+                  className="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-semibold transition-colors px-3 py-1.5 rounded-lg hover:bg-[var(--color-primary)]/10"
                 >
                   Mark all read
                 </button>
               )}
             </div>
-            {unreadCount > 0 && (
-              <p className="text-sm text-[var(--color-subtle)] mt-1">
-                You have {unreadCount} unread notification
-                {unreadCount !== 1 ? "s" : ""}
-              </p>
-            )}
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[420px] overflow-y-auto">
             {notifications.length > 0 ? (
-              <div className="py-2">
-                {notifications.map((notification) => (
+              <div>
+                {notifications.map((notification, index) => (
                   <div
                     key={notification.id}
-                    className={`px-6 py-4 hover:bg-[var(--color-surface)] transition-colors border-l-4 ${
-                      notification.read
-                        ? "border-transparent"
-                        : "border-[var(--color-primary)] bg-[color-mix(in srgb, var(--color-primary) 10%, transparent)]"
+                    className={`relative px-5 py-4 transition-all duration-200 hover:bg-[var(--color-surface)]/50 group/item ${
+                      index !== notifications.length - 1
+                        ? "border-b border-[var(--color-border)]/50"
+                        : ""
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">
+                    {/* Unread indicator bar */}
+                    {!notification.read && (
+                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--color-primary)] rounded-r-full" />
+                    )}
+
+                    <div className="flex gap-4">
+                      {/* Icon */}
+                      <div className="shrink-0 mt-0.5">
                         {getNotificationIcon(notification.type)}
                       </div>
+
+                      {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="text-sm font-semibold text-[var(--color-heading)]">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <p
+                              className={`text-sm font-semibold text-[var(--color-heading)] ${
+                                !notification.read ? "" : "opacity-80"
+                              }`}
+                            >
                               {notification.title}
                             </p>
-                            <p className="text-sm text-[var(--color-foreground)] mt-1">
+                            <p className="text-sm text-[var(--color-muted)] mt-1.5 leading-relaxed">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-[var(--color-subtle)] mt-2">
+                            <p className="text-xs text-[var(--color-muted)]/70 mt-2 font-medium">
                               {formatTimestamp(notification.timestamp)}
                             </p>
                           </div>
-                          <div className="flex items-center gap-1 ml-2">
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity">
                             {!notification.read && (
                               <button
                                 onClick={() => markAsRead(notification.id)}
-                                className="p-1 rounded-lg hover:bg-[var(--color-surface)] transition-colors"
+                                className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-emerald-500 hover:bg-emerald-500/10 transition-all"
                                 title="Mark as read"
                               >
-                                <CheckIcon className="h-4 w-4 text-[var(--color-muted)]" />
+                                <CheckIcon className="h-4 w-4" />
                               </button>
                             )}
                             <button
                               onClick={() =>
                                 deleteNotification(notification.id)
                               }
-                              className="p-1 rounded-lg hover:bg-[var(--color-surface)] transition-colors"
-                              title="Delete notification"
+                              className="p-1.5 rounded-lg text-[var(--color-muted)] hover:text-red-500 hover:bg-red-500/10 transition-all"
+                              title="Dismiss"
                             >
-                              <XMarkIcon className="h-4 w-4 text-[var(--color-muted)]" />
+                              <XMarkIcon className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
@@ -226,10 +280,15 @@ export function NotificationsDropdown() {
                 ))}
               </div>
             ) : (
-              <div className="px-6 py-8 text-center">
-                <BellIcon className="h-12 w-12 text-[var(--color-muted)] mx-auto mb-4" />
-                <p className="text-[var(--color-subtle)]">
+              <div className="px-5 py-12 text-center">
+                <div className="w-14 h-14 rounded-full bg-[var(--color-surface)] flex items-center justify-center mx-auto mb-4">
+                  <BellIcon className="h-7 w-7 text-[var(--color-muted)]" />
+                </div>
+                <p className="text-sm font-medium text-[var(--color-muted)]">
                   No notifications yet
+                </p>
+                <p className="text-xs text-[var(--color-muted)]/70 mt-1">
+                  We&apos;ll notify you when something arrives
                 </p>
               </div>
             )}
@@ -237,8 +296,8 @@ export function NotificationsDropdown() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-6 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
-              <button className="w-full text-center text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-medium">
+            <div className="px-5 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface)]/30">
+              <button className="w-full text-center text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-semibold transition-colors py-1.5 rounded-lg hover:bg-[var(--color-primary)]/10">
                 View all notifications
               </button>
             </div>

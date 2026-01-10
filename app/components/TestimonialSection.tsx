@@ -28,12 +28,12 @@ export default function TestimonialSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:space-x-4">
             <img
               src="/creator_arron.png"
-              alt="Dr. Sarah Johnson"
+              alt="Dr. Ahmed Raza Khan"
               className="w-16 h-16 sm:w-16 sm:h-16 rounded-full shadow-lg object-cover"
             />
             <div className="text-center sm:text-left">
               <p className="font-bold text-[var(--color-heading)] text-base sm:text-lg">
-                Dr. Sarah Johnson
+                Dr. Ahmed Raza Khan
               </p>
               <p className="text-xs sm:text-sm text-[var(--color-subtle)]">
                 Chief Medical Officer, HealthTech Solutions

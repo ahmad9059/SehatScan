@@ -16,7 +16,19 @@ export function ThemeToggle({ className, elevated = true }: ThemeToggleProps) {
     setMounted(true);
   }, []);
 
-  const isDark = mounted && resolvedTheme === "dark";
+  // Don't render anything until mounted to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div
+        className={`relative inline-flex items-center justify-center rounded-full ${
+          className ?? ""
+        }`}
+        style={{ width: 52, height: 28 }}
+      />
+    );
+  }
+
+  const isDark = resolvedTheme === "dark";
   const nextTheme = isDark ? "light" : "dark";
 
   return (
@@ -47,9 +59,9 @@ export function ThemeToggle({ className, elevated = true }: ThemeToggleProps) {
         aria-hidden="true"
       />
 
-      {/* Icons */}
+      {/* Sun Icon */}
       <span
-        className="absolute sun"
+        className="absolute animate-spin-slow"
         style={{ top: 4, left: 30, width: 18, height: 18, zIndex: 1 }}
         aria-hidden="true"
       >
@@ -65,15 +77,16 @@ export function ThemeToggle({ className, elevated = true }: ThemeToggleProps) {
           </g>
         </svg>
       </span>
+
+      {/* Moon Icon */}
       <span
-        className="absolute moon"
+        className="absolute animate-tilt"
         style={{
           top: 4,
           left: 4,
           width: 18,
           height: 18,
           zIndex: 1,
-          fill: "#73C0FC",
         }}
         aria-hidden="true"
       >
@@ -82,6 +95,7 @@ export function ThemeToggle({ className, elevated = true }: ThemeToggleProps) {
           viewBox="0 0 384 512"
           width="18"
           height="18"
+          fill="#73C0FC"
         >
           <path d="m223.5 32c-123.5 0-223.5 100.3-223.5 224s100 224 223.5 224c60.6 0 115.5-24.2 155.8-63.4 5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6-96.9 0-175.5-78.8-175.5-176 0-65.8 36-123.1 89.3-153.3 6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z" />
         </svg>
@@ -102,37 +116,6 @@ export function ThemeToggle({ className, elevated = true }: ThemeToggleProps) {
         }}
         aria-hidden="true"
       />
-
-      <style jsx>{`
-        @keyframes rotateSun {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-        @keyframes tiltMoon {
-          0% {
-            transform: rotate(0deg);
-          }
-          25% {
-            transform: rotate(-10deg);
-          }
-          75% {
-            transform: rotate(10deg);
-          }
-          100% {
-            transform: rotate(0deg);
-          }
-        }
-        .sun svg {
-          animation: rotateSun 15s linear infinite;
-        }
-        .moon svg {
-          animation: tiltMoon 5s linear infinite;
-        }
-      `}</style>
     </button>
   );
 }

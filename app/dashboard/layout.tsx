@@ -276,7 +276,7 @@ function SidebarContent({
             <img src="/logo.svg" alt="SehatScan Logo" className="h-6 w-6" />
           </div>
           {!compact && (
-            <span className="font-poppins font-bold text-xl text-[var(--color-heading)]">
+            <span className=" font-bold text-xl text-[var(--color-heading)]">
               SehatScan
             </span>
           )}
@@ -670,7 +670,7 @@ export default function DashboardLayout({
           <span className="sr-only">Open sidebar</span>
           <Bars3Icon className="h-5 w-5" aria-hidden="true" />
         </button>
-        <div className="flex-1 text-lg font-semibold leading-6 text-[var(--color-heading)] font-poppins">
+        <div className="flex-1 text-lg font-semibold leading-6 text-[var(--color-heading)] ">
           {pageInfo.title}
         </div>
 
@@ -696,7 +696,7 @@ export default function DashboardLayout({
               {/* Left side - Dynamic page title */}
               <div className="flex items-center gap-4">
                 <div className="hidden lg:block">
-                  <h1 className="text-2xl font-bold text-[var(--color-heading)] font-poppins">
+                  <h1 className="text-2xl font-bold text-[var(--color-heading)] ">
                     {pageInfo.title}
                   </h1>
                   <p className="text-sm text-[var(--color-subtle)] mt-1">
@@ -706,14 +706,15 @@ export default function DashboardLayout({
               </div>
 
               {/* Right side - Actions and user info */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 {/* Notifications */}
                 <NotificationsDropdown />
 
                 {/* Search */}
                 <button
                   onClick={() => setSearchOpen(true)}
-                  className="group relative p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-200 hover:-translate-y-[1px]"
+                  className="group relative p-2.5 rounded-xl bg-[var(--color-surface)] hover:bg-[var(--color-primary-soft)] transition-all duration-200"
+                  title="Search (⌘K)"
                 >
                   <svg
                     className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-200"
@@ -730,11 +731,17 @@ export default function DashboardLayout({
                   </svg>
                 </button>
 
+                {/* Divider */}
+                <div className="h-8 w-px bg-[var(--color-border)] mx-1" />
+
                 {/* Language Selector */}
                 <LanguageSelector />
 
                 {/* Theme Toggle */}
                 <ThemeToggle />
+
+                {/* Divider */}
+                <div className="h-8 w-px bg-[var(--color-border)] mx-1" />
 
                 {/* Profile Dropdown */}
                 <ProfileDropdown user={userForComponents || {}} />

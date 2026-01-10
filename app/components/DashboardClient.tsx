@@ -361,7 +361,7 @@ export default function DashboardClient({
 
         {/* Charts Section */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins mb-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white  mb-4">
             {t("analytics.overview")}
           </h2>
           <DashboardCharts stats={stats} recentAnalyses={recentAnalyses} />
@@ -370,7 +370,7 @@ export default function DashboardClient({
         {/* Recent Analyses */}
         <div className="animate-fade-in">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white ">
               {t("recent.analyses")}
             </h2>
             {recentAnalyses.length > 0 && (
@@ -448,7 +448,7 @@ export default function DashboardClient({
 
         {/* Quick Actions */}
         <div className="mb-8 mt-8 ">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white font-poppins mb-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white  mb-4">
             {t("actions.quickActions")}
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">

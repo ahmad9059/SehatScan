@@ -67,7 +67,7 @@ class ErrorBoundary extends Component<Props, State> {
               <ExclamationTriangleIcon className="h-16 w-16 text-red-500" />
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 font-poppins">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 ">
               Something went wrong
             </h2>
 

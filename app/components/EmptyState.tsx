@@ -30,7 +30,7 @@ export default function EmptyState({
     <div className={`text-center py-12 ${className}`}>
       {icon && <div className="flex justify-center mb-4">{icon}</div>}
 
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 font-poppins">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 ">
         {title}
       </h3>
 

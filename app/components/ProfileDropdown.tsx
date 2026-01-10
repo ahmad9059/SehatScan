@@ -94,9 +94,9 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
       {/* Profile Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 p-2 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] transition-all duration-300 hover:scale-105 hover:shadow-[var(--shadow-soft)]"
+        className="group flex items-center gap-2.5 py-1.5 pl-1.5 pr-3 rounded-full bg-[var(--color-surface)] hover:bg-[var(--color-primary-soft)] border border-[var(--color-border)] hover:border-[var(--color-primary-soft)] transition-all duration-200"
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] font-semibold text-sm shadow-lg group-hover:scale-110 transition-transform duration-300 overflow-hidden">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-white font-semibold text-sm overflow-hidden">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -109,13 +109,16 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
           )}
         </div>
         <div className="hidden sm:block text-left">
-          <p className="text-sm font-semibold text-[var(--color-foreground)] group-hover:text-[var(--color-primary)] transition-colors duration-300">
+          <p className="text-sm font-semibold text-[var(--color-foreground)] leading-tight">
             {user?.name || "User"}
           </p>
-          <p className="text-xs text-[var(--color-subtle)]">Online</p>
+          <p className="text-xs text-[var(--color-success)] flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]"></span>
+            Online
+          </p>
         </div>
         <svg
-          className={`h-4 w-4 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-all duration-300 ${
+          className={`h-4 w-4 text-[var(--color-muted)] transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
           fill="none"

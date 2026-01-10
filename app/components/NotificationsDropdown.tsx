@@ -130,12 +130,13 @@ export function NotificationsDropdown() {
       {/* Notifications Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-150 hover:-translate-y-[1px]"
+        className="group relative p-2.5 rounded-xl bg-[var(--color-surface)] hover:bg-[var(--color-primary-soft)] transition-all duration-200"
+        title="Notifications"
       >
-        <BellIcon className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-150" />
+        <BellIcon className="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-200" />
         {unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 h-5 w-5 bg-[var(--color-danger)] rounded-full flex items-center justify-center">
-            <span className="text-xs text-white font-semibold">
+          <div className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-[var(--color-danger)] rounded-full flex items-center justify-center ring-2 ring-[var(--color-card)]">
+            <span className="text-[10px] text-white font-bold">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
           </div>

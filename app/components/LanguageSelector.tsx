@@ -77,16 +77,14 @@ export function LanguageSelector() {
       {/* Language Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="group relative p-2 rounded-lg bg-[var(--color-card)] border border-[var(--color-border)] hover:border-[var(--color-primary)] transition-all duration-150 hover:-translate-y-[1px]"
+        className="group relative p-1.5 rounded-xl bg-[var(--color-surface)] hover:bg-[var(--color-primary-soft)] transition-all duration-200 flex items-center gap-1.5"
         title={`Current language: ${selectedLanguage.name}`}
       >
-        <div className="flex items-center gap-2">
-          <FlagIcon
-            src={selectedLanguage.flag}
-            alt={`${selectedLanguage.name} flag`}
-          />
-          <LanguageIcon className="h-4 w-4 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-150" />
-        </div>
+        <FlagIcon
+          src={selectedLanguage.flag}
+          alt={`${selectedLanguage.name} flag`}
+        />
+        <LanguageIcon className="h-4 w-4 text-[var(--color-muted)] group-hover:text-[var(--color-primary)] transition-colors duration-200" />
       </button>
 
       {/* Dropdown Menu */}

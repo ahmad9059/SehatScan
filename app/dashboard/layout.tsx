@@ -538,10 +538,57 @@ export default function DashboardLayout({
 }) {
   const { user, isLoaded } = useUser();
   const router = useRouter();
+  const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [compactSidebar, setCompactSidebar] = useState(false);
   const { t } = useSimpleLanguage();
+
+  // Get page title and subtitle based on current route
+  const getPageInfo = () => {
+    const routes: Record<string, { title: string; subtitle: string }> = {
+      "/dashboard": {
+        title: t("nav.dashboard"),
+        subtitle: t("dashboard.subtitle"),
+      },
+      "/dashboard/scan-face": {
+        title: t("nav.scanFace"),
+        subtitle: "Analyze your face for health insights",
+      },
+      "/dashboard/scan-report": {
+        title: t("nav.scanReport"),
+        subtitle: "Upload and analyze medical reports",
+      },
+      "/dashboard/risk-assessment": {
+        title: t("nav.riskAssessment"),
+        subtitle: "Evaluate your health risks",
+      },
+      "/dashboard/chatbot": {
+        title: t("nav.chatbot"),
+        subtitle: "Get AI-powered health advice",
+      },
+      "/dashboard/history": {
+        title: t("nav.history"),
+        subtitle: "View your past analyses",
+      },
+      "/dashboard/profile": {
+        title: t("nav.profile"),
+        subtitle: "Manage your account settings",
+      },
+      "/dashboard/help": {
+        title: "Help & Support",
+        subtitle: "Get help and contact support",
+      },
+    };
+    return (
+      routes[pathname] || {
+        title: t("nav.dashboard"),
+        subtitle: t("dashboard.subtitle"),
+      }
+    );
+  };
+
+  const pageInfo = getPageInfo();
 
   useEffect(() => {
     if (!isLoaded) return; // Still loading
@@ -624,7 +671,7 @@ export default function DashboardLayout({
           <Bars3Icon className="h-5 w-5" aria-hidden="true" />
         </button>
         <div className="flex-1 text-lg font-semibold leading-6 text-[var(--color-heading)] font-poppins">
-          {t("dashboard.title")}
+          {pageInfo.title}
         </div>
 
         {/* Mobile user avatar */}
@@ -646,14 +693,14 @@ export default function DashboardLayout({
         <div className="sticky top-0 z-30 backdrop-blur-md bg-[var(--color-card)]/95 border-b border-[var(--color-border)]">
           <div className="px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
-              {/* Left side - Page title and breadcrumb */}
+              {/* Left side - Dynamic page title */}
               <div className="flex items-center gap-4">
                 <div className="hidden lg:block">
                   <h1 className="text-2xl font-bold text-[var(--color-heading)] font-poppins">
-                    {t("dashboard.title")}
+                    {pageInfo.title}
                   </h1>
                   <p className="text-sm text-[var(--color-subtle)] mt-1">
-                    {t("dashboard.subtitle")}
+                    {pageInfo.subtitle}
                   </p>
                 </div>
               </div>

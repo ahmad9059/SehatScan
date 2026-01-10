@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import DashboardCharts from "@/app/components/DashboardCharts";
 import AnalysisDetailModal from "@/app/components/AnalysisDetailModal";
@@ -182,27 +181,6 @@ export default function DashboardClient({
   return (
     <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
       <div className="mx-auto max-w-7xl">
-        {/* Welcome Section with Logo */}
-        <div className="mb-8 flex items-center gap-4">
-          <div className="shrink-0">
-            <Image
-              src="/logo.svg"
-              alt="SehatScan Logo"
-              width={60}
-              height={60}
-              className="rounded-lg"
-            />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white font-poppins">
-              {t("dashboard.welcome").replace("{{name}}", user.name || "User")}
-            </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
-              {t("dashboard.welcomeSubtitle")}
-            </p>
-          </div>
-        </div>
-
         {/* Error Alert */}
         {hasError && (
           <div className="mb-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 animate-fade-in">

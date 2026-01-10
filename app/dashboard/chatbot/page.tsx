@@ -14,6 +14,7 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { mutedText } from "@/app/components/dashboardStyles";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 
 interface Message {
   id: string;
@@ -38,6 +39,7 @@ const userBubble =
 
 function ChatbotPageContent() {
   const { user } = useUser();
+  const { t } = useSimpleLanguage();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -186,7 +188,7 @@ function ChatbotPageContent() {
   if (loadingAnalyses) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center pb-[10%]">
-        <LogoSpinner message="Preparing your AI health assistant..." />
+        <LogoSpinner message={t("chatbot.preparingAssistant")} />
       </div>
     );
   }
@@ -200,11 +202,10 @@ function ChatbotPageContent() {
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <SparklesIcon className="h-12 w-12 text-[var(--color-primary)] mb-4" />
               <h2 className="text-2xl font-medium text-[var(--color-heading)] mb-2">
-                What can I help with?
+                {t("chatbot.whatCanIHelp")}
               </h2>
               <p className="text-[var(--color-subtle)] max-w-md">
-                Ask me anything about your health data, reports, or general
-                health questions.
+                {t("chatbot.askAnything")}
               </p>
             </div>
           )}
@@ -229,7 +230,7 @@ function ChatbotPageContent() {
                 {message.isLoading ? (
                   <div className="flex items-center gap-3">
                     <LoadingSpinner size="sm" />
-                    <span className={mutedText}>Thinking...</span>
+                    <span className={mutedText}>{t("chatbot.thinking")}</span>
                   </div>
                 ) : (
                   <div className="prose prose-sm max-w-none text-[var(--color-foreground)] dark:prose-invert">
@@ -299,19 +300,18 @@ function ChatbotPageContent() {
         {/* Suggested questions - only show when no messages */}
         {messages.length === 0 && (
           <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto mb-3">
-            {[
-              "Explain my latest health report",
-              "What trends do you see in my data?",
-            ].map((question) => (
-              <button
-                key={question}
-                type="button"
-                onClick={() => handleSendMessage(question)}
-                className="px-4 py-2 text-sm rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] transition-all duration-200"
-              >
-                {question}
-              </button>
-            ))}
+            {[t("chatbot.explainReport"), t("chatbot.whatTrends")].map(
+              (question) => (
+                <button
+                  key={question}
+                  type="button"
+                  onClick={() => handleSendMessage(question)}
+                  className="px-4 py-2 text-sm rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-foreground)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary-soft)] transition-all duration-200"
+                >
+                  {question}
+                </button>
+              )
+            )}
           </div>
         )}
         <div className="flex items-center gap-2 w-full max-w-2xl mx-auto rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 shadow-sm focus-within:border-[var(--color-primary)] focus-within:ring-1 focus-within:ring-[var(--color-primary)] transition-all">
@@ -323,7 +323,7 @@ function ChatbotPageContent() {
             rows={1}
             autoFocus
             className="flex-1 min-h-[24px] max-h-32 resize-none bg-transparent text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none text-base"
-            placeholder="Ask anything..."
+            placeholder={t("chatbot.askAnythingPlaceholder")}
           />
           <button
             type="button"
@@ -340,8 +340,7 @@ function ChatbotPageContent() {
           </button>
         </div>
         <p className="text-center text-[10px] text-[var(--color-subtle)] py-1">
-          AI can make mistakes. Verify important health information with a
-          professional.
+          {t("chatbot.aiDisclaimer")}
         </p>
       </div>
     </div>

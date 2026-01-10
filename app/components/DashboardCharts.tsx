@@ -188,7 +188,7 @@ export default function DashboardCharts({
         <div className="flex items-center justify-between mb-6">
           <div>
             <span className="text-[var(--color-muted)] text-sm">
-              Total analyses:
+              {t("charts.totalAnalyses")}
             </span>
             <span className="text-[var(--color-heading)] text-xl font-bold ml-2">
               {totalAnalyses}
@@ -249,10 +249,14 @@ export default function DashboardCharts({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <span className="text-[var(--color-heading)] text-sm font-medium">
-              Reports
+              {t("charts.reports")}
             </span>
-            <span className="text-[var(--color-muted)] text-sm">Faces</span>
-            <span className="text-[var(--color-muted)] text-sm">Risks</span>
+            <span className="text-[var(--color-muted)] text-sm">
+              {t("charts.faces")}
+            </span>
+            <span className="text-[var(--color-muted)] text-sm">
+              {t("charts.risks")}
+            </span>
           </div>
           <TimeRangeSelector
             selected={rightTimeRange}
@@ -310,7 +314,7 @@ export default function DashboardCharts({
                       {item.count} {item.name.toLowerCase()}
                     </p>
                     <p className="text-xs text-[var(--color-muted)]">
-                      {percentage}% of total
+                      {percentage}% {t("common.ofTotal")}
                     </p>
                     <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-[var(--color-card)] border-r border-b border-[var(--color-border)] rotate-45" />
                   </div>

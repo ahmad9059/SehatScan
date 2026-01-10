@@ -11,6 +11,7 @@ import {
   ClockIcon,
   CameraIcon,
 } from "@heroicons/react/24/outline";
+import { useSimpleLanguage } from "./SimpleLanguageContext";
 
 interface ProfileDropdownProps {
   user: {
@@ -26,6 +27,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { signOut } = useClerk();
+  const { t } = useSimpleLanguage();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,32 +61,32 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
   const menuItems = [
     {
       icon: UserIcon,
-      label: "Profile",
-      description: "Manage your account",
+      labelKey: "nav.profile",
+      descriptionKey: "page.profileSubtitle",
       href: "/dashboard/profile",
     },
     {
       icon: ChatBubbleLeftRightIcon,
-      label: "AI Assistant",
-      description: "Chat with health AI",
+      labelKey: "nav.chatbot",
+      descriptionKey: "page.chatbotSubtitle",
       href: "/dashboard/chatbot",
     },
     {
       icon: ClockIcon,
-      label: "History",
-      description: "View past analyses",
+      labelKey: "nav.history",
+      descriptionKey: "page.historySubtitle",
       href: "/dashboard/history",
     },
     {
       icon: CameraIcon,
-      label: "Scan Face",
-      description: "Analyze facial health",
+      labelKey: "nav.scanFace",
+      descriptionKey: "page.scanFaceSubtitle",
       href: "/dashboard/scan-face",
     },
     {
       icon: QuestionMarkCircleIcon,
-      label: "Help & Support",
-      description: "Get help and support",
+      labelKey: "nav.helpSupport",
+      descriptionKey: "page.helpSubtitle",
       href: "/dashboard/help",
     },
   ];
@@ -114,7 +116,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
           </p>
           <p className="text-xs text-[var(--color-success)] flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-success)]"></span>
-            Online
+            {t("common.online")}
           </p>
         </div>
         <svg
@@ -167,7 +169,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
           <div className="py-2">
             {menuItems.map((item) => (
               <button
-                key={item.label}
+                key={item.labelKey}
                 onClick={() => {
                   router.push(item.href);
                   setIsOpen(false);
@@ -179,10 +181,10 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[var(--color-foreground)]">
-                    {item.label}
+                    {t(item.labelKey)}
                   </p>
                   <p className="text-xs text-[var(--color-subtle)]">
-                    {item.description}
+                    {t(item.descriptionKey)}
                   </p>
                 </div>
               </button>
@@ -199,8 +201,7 @@ export function ProfileDropdown({ user }: ProfileDropdownProps) {
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-sm font-medium">Sign out</p>
-                <p className="text-xs opacity-75">Sign out of your account</p>
+                <p className="text-sm font-medium">{t("nav.logout")}</p>
               </div>
             </button>
           </div>

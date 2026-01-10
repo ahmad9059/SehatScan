@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { BellIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useSimpleLanguage } from "./SimpleLanguageContext";
 
 interface Notification {
   id: string;
   type: "info" | "success" | "warning" | "error";
-  title: string;
-  message: string;
+  titleKey: string;
+  messageKey: string;
   timestamp: Date;
   read: boolean;
 }
@@ -16,24 +17,25 @@ const mockNotifications: Notification[] = [
   {
     id: "1",
     type: "success",
-    title: "Analysis Complete",
-    message: "Your facial health analysis has been completed successfully.",
+    titleKey: "notifications.analysisComplete",
+    messageKey: "Your facial health analysis has been completed successfully.",
     timestamp: new Date(Date.now() - 5 * 60 * 1000),
     read: false,
   },
   {
     id: "2",
     type: "info",
-    title: "New Feature Available",
-    message: "Risk assessment tool now includes cardiovascular health metrics.",
+    titleKey: "notifications.newFeature",
+    messageKey:
+      "Risk assessment tool now includes cardiovascular health metrics.",
     timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
     read: false,
   },
   {
     id: "3",
     type: "warning",
-    title: "Profile Incomplete",
-    message:
+    titleKey: "notifications.profileIncomplete",
+    messageKey:
       "Please complete your health profile for better analysis accuracy.",
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
     read: true,
@@ -44,6 +46,7 @@ export function NotificationsDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t, language } = useSimpleLanguage();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -158,6 +161,12 @@ export function NotificationsDropdown() {
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
+    if (language === "ur") {
+      if (minutes < 60) return `${minutes} منٹ پہلے`;
+      if (hours < 24) return `${hours} گھنٹے پہلے`;
+      return `${days} دن پہلے`;
+    }
+
     if (minutes < 60) return `${minutes}m ago`;
     if (hours < 24) return `${hours}h ago`;
     return `${days}d ago`;
@@ -188,14 +197,20 @@ export function NotificationsDropdown() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-[var(--color-heading)]">
-                  Notifications
+                  {t("notifications.title")}
                 </h3>
                 <p className="text-sm text-[var(--color-muted)] mt-0.5">
                   {unreadCount > 0
-                    ? `You have ${unreadCount} unread notification${
-                        unreadCount !== 1 ? "s" : ""
-                      }`
-                    : "All caught up!"}
+                    ? unreadCount === 1
+                      ? t("notifications.unreadCount").replace(
+                          "{{count}}",
+                          String(unreadCount)
+                        )
+                      : t("notifications.unreadCountPlural").replace(
+                          "{{count}}",
+                          String(unreadCount)
+                        )
+                    : t("notifications.allCaughtUp")}
                 </p>
               </div>
               {unreadCount > 0 && (
@@ -203,7 +218,7 @@ export function NotificationsDropdown() {
                   onClick={markAllAsRead}
                   className="text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-semibold transition-colors px-3 py-1.5 rounded-lg hover:bg-[var(--color-primary)]/10"
                 >
-                  Mark all read
+                  {t("notifications.markAllRead")}
                 </button>
               )}
             </div>
@@ -242,10 +257,10 @@ export function NotificationsDropdown() {
                                 !notification.read ? "" : "opacity-80"
                               }`}
                             >
-                              {notification.title}
+                              {t(notification.titleKey)}
                             </p>
                             <p className="text-sm text-[var(--color-muted)] mt-1.5 leading-relaxed">
-                              {notification.message}
+                              {notification.messageKey}
                             </p>
                             <p className="text-xs text-[var(--color-muted)]/70 mt-2 font-medium">
                               {formatTimestamp(notification.timestamp)}
@@ -285,10 +300,7 @@ export function NotificationsDropdown() {
                   <BellIcon className="h-7 w-7 text-[var(--color-muted)]" />
                 </div>
                 <p className="text-sm font-medium text-[var(--color-muted)]">
-                  No notifications yet
-                </p>
-                <p className="text-xs text-[var(--color-muted)]/70 mt-1">
-                  We&apos;ll notify you when something arrives
+                  {t("notifications.noNotifications")}
                 </p>
               </div>
             )}
@@ -298,7 +310,7 @@ export function NotificationsDropdown() {
           {notifications.length > 0 && (
             <div className="px-5 py-3 border-t border-[var(--color-border)] bg-[var(--color-surface)]/30">
               <button className="w-full text-center text-sm text-[var(--color-primary)] hover:text-[var(--color-primary-strong)] font-semibold transition-colors py-1.5 rounded-lg hover:bg-[var(--color-primary)]/10">
-                View all notifications
+                {t("notifications.viewAll")}
               </button>
             </div>
           )}

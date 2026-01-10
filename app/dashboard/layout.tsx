@@ -42,6 +42,7 @@ import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 // Notification Card Component for Sidebar
 function NotificationCard() {
   const [isVisible, setIsVisible] = useState(true);
+  const { t } = useSimpleLanguage();
 
   if (!isVisible) return null;
 
@@ -56,21 +57,21 @@ function NotificationCard() {
       </button>
 
       <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-green-500/20 text-green-500 mb-3">
-        New
+        {t("sidebar.new")}
       </span>
 
       <h4 className="font-semibold text-[var(--color-heading)] text-sm mb-1">
-        AI Health Insights
+        {t("sidebar.aiHealthInsights")}
       </h4>
       <p className="text-xs text-[var(--color-muted)] mb-3">
-        Get personalized health recommendations powered by AI
+        {t("sidebar.aiHealthInsightsDesc")}
       </p>
 
       <a
         href="/dashboard/chatbot"
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] text-xs font-medium text-[var(--color-foreground)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
       >
-        Try it out
+        {t("sidebar.tryItOut")}
         <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-3 w-3" />
       </a>
     </div>
@@ -326,7 +327,7 @@ function SidebarContent({
             />
             {!compact && (
               <span className="flex-1 text-left text-sm text-[var(--color-subtle)]">
-                Search
+                {t("nav.search")}
               </span>
             )}
             {!compact && (
@@ -381,7 +382,9 @@ function SidebarContent({
                           </span>
                           {!compact && (
                             <>
-                              <span className="flex-1 text-left">Scan</span>
+                              <span className="flex-1 text-left">
+                                {t("nav.scan")}
+                              </span>
                               <FontAwesomeIcon
                                 icon={
                                   scanMenuOpen ? faChevronDown : faChevronRight
@@ -504,7 +507,7 @@ function SidebarContent({
                   aria-hidden="true"
                 />
               </span>
-              {!compact && <span>Help & Support</span>}
+              {!compact && <span>{t("nav.helpSupport")}</span>}
             </Link>
             <button
               onClick={onLogout}
@@ -522,7 +525,7 @@ function SidebarContent({
                   aria-hidden="true"
                 />
               </span>
-              {!compact && <span>Logout</span>}
+              {!compact && <span>{t("nav.logout")}</span>}
             </button>
           </li>
         </ul>
@@ -553,31 +556,31 @@ export default function DashboardLayout({
       },
       "/dashboard/scan-face": {
         title: t("nav.scanFace"),
-        subtitle: "Analyze your face for health insights",
+        subtitle: t("page.scanFaceSubtitle"),
       },
       "/dashboard/scan-report": {
         title: t("nav.scanReport"),
-        subtitle: "Upload and analyze medical reports",
+        subtitle: t("page.scanReportSubtitle"),
       },
       "/dashboard/risk-assessment": {
         title: t("nav.riskAssessment"),
-        subtitle: "Evaluate your health risks",
+        subtitle: t("page.riskAssessmentSubtitle"),
       },
       "/dashboard/chatbot": {
         title: t("nav.chatbot"),
-        subtitle: "Get AI-powered health advice",
+        subtitle: t("page.chatbotSubtitle"),
       },
       "/dashboard/history": {
         title: t("nav.history"),
-        subtitle: "View your past analyses",
+        subtitle: t("page.historySubtitle"),
       },
       "/dashboard/profile": {
         title: t("nav.profile"),
-        subtitle: "Manage your account settings",
+        subtitle: t("page.profileSubtitle"),
       },
       "/dashboard/help": {
-        title: "Help & Support",
-        subtitle: "Get help and contact support",
+        title: t("nav.helpSupport"),
+        subtitle: t("page.helpSubtitle"),
       },
     };
     return (
@@ -618,7 +621,7 @@ export default function DashboardLayout({
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center pb-[10%]">
-        <LogoSpinner message="Loading dashboard..." />
+        <LogoSpinner message={t("dashboard.loadingDashboard")} />
       </div>
     );
   }

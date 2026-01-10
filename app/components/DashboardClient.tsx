@@ -53,16 +53,19 @@ function getAnalysisIcon(type: string) {
   }
 }
 
-function getAnalysisTypeLabel(type: string): string {
+function getAnalysisTypeLabel(
+  type: string,
+  t: (key: string) => string
+): string {
   switch (type) {
     case "report":
-      return "Report Analysis";
+      return t("recent.reportAnalysis");
     case "face":
-      return "Face Analysis";
+      return t("recent.faceAnalysis");
     case "risk":
-      return "Risk Assessment";
+      return t("recent.riskAssessment");
     default:
-      return "Analysis";
+      return t("recent.analysis");
   }
 }
 
@@ -188,11 +191,10 @@ export default function DashboardClient({
               <ExclamationCircleIcon className="h-5 w-5 text-red-500 shrink-0" />
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
-                  Unable to load dashboard data
+                  {t("error.unableToLoad")}
                 </h3>
                 <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                  Some information may not be up to date. Please refresh the
-                  page or try again later.
+                  {t("error.notUpToDate")}
                 </p>
               </div>
             </div>
@@ -213,7 +215,7 @@ export default function DashboardClient({
                     {stats.total}
                   </div>
                   <div className="text-xs text-[var(--color-primary)] font-medium">
-                    +12% this month
+                    {t("stats.thisMonth")}
                   </div>
                 </div>
               </div>
@@ -224,7 +226,7 @@ export default function DashboardClient({
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-[var(--color-subtle)]">
-                    <span>Progress</span>
+                    <span>{t("stats.progress")}</span>
                     <span>{progressData.totalProgress}%</span>
                   </div>
                   <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
@@ -253,7 +255,7 @@ export default function DashboardClient({
                     {stats.reports}
                   </div>
                   <div className="text-xs text-[var(--color-primary)] font-medium">
-                    +8% this week
+                    {t("stats.thisWeek")}
                   </div>
                 </div>
               </div>
@@ -264,7 +266,7 @@ export default function DashboardClient({
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-[var(--color-subtle)]">
-                    <span>Accuracy</span>
+                    <span>{t("stats.accuracy")}</span>
                     <span>{progressData.reportsAccuracy}%</span>
                   </div>
                   <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
@@ -293,7 +295,7 @@ export default function DashboardClient({
                     {stats.faces}
                   </div>
                   <div className="text-xs text-[var(--color-primary)] font-medium">
-                    +15% today
+                    {t("stats.today")}
                   </div>
                 </div>
               </div>
@@ -304,7 +306,7 @@ export default function DashboardClient({
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-[var(--color-subtle)]">
-                    <span>Detection Rate</span>
+                    <span>{t("stats.detectionRate")}</span>
                     <span>{progressData.faceDetectionRate}%</span>
                   </div>
                   <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
@@ -333,7 +335,9 @@ export default function DashboardClient({
                     {stats.risks}
                   </div>
                   <div className="text-xs text-[var(--color-primary)] font-medium">
-                    {stats.risks > 0 ? "+5% this week" : "Start assessing"}
+                    {stats.risks > 0
+                      ? t("stats.thisWeek")
+                      : t("stats.startAssessing")}
                   </div>
                 </div>
               </div>
@@ -344,7 +348,7 @@ export default function DashboardClient({
                 </h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs text-[var(--color-subtle)]">
-                    <span>Completion</span>
+                    <span>{t("stats.completion")}</span>
                     <span>{progressData.riskCompletion}%</span>
                   </div>
                   <div className="w-full bg-[var(--color-surface)] rounded-full h-2 overflow-hidden">
@@ -402,7 +406,7 @@ export default function DashboardClient({
                         </div>
                         <div className="min-w-0 flex-1">
                           <h3 className="text-lg font-semibold text-[var(--color-heading)] truncate group-hover:text-[var(--color-primary)] transition-colors duration-300">
-                            {getAnalysisTypeLabel(analysis.type)}
+                            {getAnalysisTypeLabel(analysis.type, t)}
                           </h3>
                           <p className="text-sm text-[var(--color-subtle)] mt-1 line-clamp-2 group-hover:text-[var(--color-foreground)] transition-colors duration-300">
                             {getAnalysisPreview(analysis)}
@@ -430,14 +434,14 @@ export default function DashboardClient({
                 icon={
                   <ClipboardDocumentListIcon className="h-12 w-12 text-[var(--color-muted)]" />
                 }
-                title="No analyses yet"
-                description="Get started by uploading a medical report or taking a photo for analysis. Our AI will help you understand your health data better."
+                title={t("empty.noAnalysesYet")}
+                description={t("empty.getStartedDesc")}
                 action={{
-                  label: "Upload Your First Report",
+                  label: t("empty.uploadFirstReport"),
                   href: "/dashboard/scan-report",
                 }}
                 secondaryAction={{
-                  label: "Take a Photo",
+                  label: t("empty.takePhoto"),
                   href: "/dashboard/scan-face",
                 }}
                 className="p-12"

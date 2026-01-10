@@ -27,7 +27,49 @@ import {
   ChatBubbleLeftRightIcon,
   ArrowLeftStartOnRectangleIcon,
   MagnifyingGlassIcon,
+  XMarkIcon as XIcon,
+  SparklesIcon,
+  ArrowTopRightOnSquareIcon,
+  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
+
+// Notification Card Component for Sidebar
+function NotificationCard() {
+  const [isVisible, setIsVisible] = useState(true);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="relative p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)]">
+      <button
+        onClick={() => setIsVisible(false)}
+        className="absolute top-2 right-2 p-1 rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-card)] transition-colors"
+        aria-label="Dismiss notification"
+      >
+        <XIcon className="h-4 w-4" />
+      </button>
+
+      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-green-500/20 text-green-500 mb-3">
+        New
+      </span>
+
+      <h4 className="font-semibold text-[var(--color-heading)] text-sm mb-1">
+        AI Health Insights
+      </h4>
+      <p className="text-xs text-[var(--color-muted)] mb-3">
+        Get personalized health recommendations powered by AI
+      </p>
+
+      <a
+        href="/dashboard/chatbot"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] text-xs font-medium text-[var(--color-foreground)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+      >
+        Try it out
+        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+      </a>
+    </div>
+  );
+}
 
 interface NavigationItem {
   nameKey: string;
@@ -268,15 +310,11 @@ function SidebarContent({
         <ul role="list" className="flex flex-1 flex-col gap-y-6 w-full">
           <li>
             <ul role="list" className="space-y-2 w-full">
-              {navigationItems.map((item, index) => {
+              {navigationItems.map((item) => {
                 const isActive = pathname === item.href;
                 const isProfile = item.href === "/dashboard/profile";
                 return (
-                  <li
-                    key={item.nameKey}
-                    className="animate-slide-in-left"
-                    style={{ animationDelay: `${index * 0.08}s` }}
-                  >
+                  <li key={item.nameKey}>
                     <Link
                       href={item.href}
                       onClick={isMobile ? onClose : undefined}
@@ -295,14 +333,14 @@ function SidebarContent({
                           src={avatar}
                           alt="Profile avatar"
                           className={classNames(
-                            "h-6 w-6 shrink-0 rounded-full object-cover transition-transform duration-200",
+                            "h-6 w-6 shrink-0 rounded-full object-cover",
                             isActive ? "ring-2 ring-white/70" : ""
                           )}
                         />
                       ) : (
                         <item.icon
                           className={classNames(
-                            "h-5 w-5 shrink-0 transition-colors duration-200",
+                            "h-5 w-5 shrink-0",
                             isActive
                               ? "text-white"
                               : "text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
@@ -310,11 +348,7 @@ function SidebarContent({
                           aria-hidden="true"
                         />
                       )}
-                      {!compact && (
-                        <span className="group-hover:translate-x-1 transition-transform duration-150">
-                          {t(item.nameKey)}
-                        </span>
-                      )}
+                      {!compact && <span>{t(item.nameKey)}</span>}
                     </Link>
                   </li>
                 );
@@ -322,8 +356,29 @@ function SidebarContent({
             </ul>
           </li>
 
-          {/* Logout button at bottom */}
-          <li className="mt-auto pt-2">
+          {/* Notification Card */}
+          {!compact && (
+            <li className="mt-auto">
+              <NotificationCard />
+            </li>
+          )}
+
+          {/* Support and Logout buttons grouped together */}
+          <li className={compact ? "mt-auto space-y-1" : "space-y-1"}>
+            <Link
+              href="/dashboard/help"
+              className={classNames(
+                "group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-semibold leading-6 border border-transparent transition-all duration-200",
+                compact ? "justify-center" : "gap-3",
+                "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-heading)] hover:border-[var(--color-border)]"
+              )}
+            >
+              <QuestionMarkCircleIcon
+                className="h-5 w-5 shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
+                aria-hidden="true"
+              />
+              {!compact && <span>Help & Support</span>}
+            </Link>
             <button
               onClick={onLogout}
               className={classNames(
@@ -334,14 +389,10 @@ function SidebarContent({
               aria-label="Sign out of your account"
             >
               <ArrowRightOnRectangleIcon
-                className="h-5 w-5 shrink-0 transition-colors duration-200 group-hover:text-[var(--color-danger)] text-[var(--color-muted)]"
+                className="h-5 w-5 shrink-0 group-hover:text-[var(--color-danger)] text-[var(--color-muted)]"
                 aria-hidden="true"
               />
-              {!compact && (
-                <span className="group-hover:translate-x-1 transition-transform duration-150">
-                  Logout
-                </span>
-              )}
+              {!compact && <span>Logout</span>}
             </button>
           </li>
         </ul>

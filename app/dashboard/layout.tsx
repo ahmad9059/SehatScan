@@ -15,23 +15,29 @@ import { NotificationsDropdown } from "../components/NotificationsDropdown";
 import { useSimpleLanguage } from "../components/SimpleLanguageContext";
 import LogoSpinner from "../components/LogoSpinner";
 import {
-  HomeIcon,
-  DocumentTextIcon,
-  CameraIcon,
-  ExclamationTriangleIcon,
-  ClockIcon,
-  UserIcon,
-  ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  ChatBubbleLeftRightIcon,
-  ArrowLeftStartOnRectangleIcon,
-  MagnifyingGlassIcon,
   XMarkIcon as XIcon,
-  SparklesIcon,
-  ArrowTopRightOnSquareIcon,
-  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHouse,
+  faCamera,
+  faFileLines,
+  faTriangleExclamation,
+  faClockRotateLeft,
+  faUser,
+  faHeadset,
+  faRightFromBracket,
+  faArrowRightFromBracket,
+  faMagnifyingGlass,
+  faArrowUpRightFromSquare,
+  faMessage,
+  faQrcode,
+  faChevronDown,
+  faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 // Notification Card Component for Sidebar
 function NotificationCard() {
@@ -65,7 +71,7 @@ function NotificationCard() {
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] text-xs font-medium text-[var(--color-foreground)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
       >
         Try it out
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+        <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-3 w-3" />
       </a>
     </div>
   );
@@ -73,30 +79,43 @@ function NotificationCard() {
 
 interface NavigationItem {
   nameKey: string;
-  href: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  href?: string;
+  icon: IconDefinition;
+  children?: { nameKey: string; href: string; icon: IconDefinition }[];
+  hasDividerAfter?: boolean;
 }
 
 const navigationItems: NavigationItem[] = [
-  { nameKey: "nav.dashboard", href: "/dashboard", icon: HomeIcon },
-  { nameKey: "nav.scanFace", href: "/dashboard/scan-face", icon: CameraIcon },
+  { nameKey: "nav.dashboard", href: "/dashboard", icon: faHouse },
   {
-    nameKey: "nav.scanReport",
-    href: "/dashboard/scan-report",
-    icon: DocumentTextIcon,
+    nameKey: "nav.scan",
+    icon: faQrcode,
+    children: [
+      { nameKey: "nav.scanFace", href: "/dashboard/scan-face", icon: faCamera },
+      {
+        nameKey: "nav.scanReport",
+        href: "/dashboard/scan-report",
+        icon: faFileLines,
+      },
+    ],
   },
   {
     nameKey: "nav.riskAssessment",
     href: "/dashboard/risk-assessment",
-    icon: ExclamationTriangleIcon,
+    icon: faTriangleExclamation,
   },
   {
     nameKey: "nav.chatbot",
     href: "/dashboard/chatbot",
-    icon: ChatBubbleLeftRightIcon,
+    icon: faMessage,
   },
-  { nameKey: "nav.history", href: "/dashboard/history", icon: ClockIcon },
-  { nameKey: "nav.profile", href: "/dashboard/profile", icon: UserIcon },
+  {
+    nameKey: "nav.history",
+    href: "/dashboard/history",
+    icon: faClockRotateLeft,
+    hasDividerAfter: true, // Divider after History, before Profile
+  },
+  { nameKey: "nav.profile", href: "/dashboard/profile", icon: faUser },
 ];
 
 function classNames(...classes: string[]) {
@@ -220,6 +239,14 @@ function SidebarContent({
   userInitial,
 }: SidebarContentProps) {
   const { t } = useSimpleLanguage();
+  const [scanMenuOpen, setScanMenuOpen] = useState(true); // Open by default
+
+  // Auto-expand scan menu if on a scan page
+  useEffect(() => {
+    if (pathname.includes("/dashboard/scan-")) {
+      setScanMenuOpen(true);
+    }
+  }, [pathname]);
 
   const handleLogoClick = (e: React.MouseEvent) => {
     if (compact && !isMobile && onToggleCompact) {
@@ -262,7 +289,10 @@ function SidebarContent({
               className="hidden lg:inline-flex flex-none items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
               aria-label="Collapse sidebar"
             >
-              <ArrowLeftStartOnRectangleIcon className="h-5 w-5" />
+              <FontAwesomeIcon
+                icon={faArrowRightFromBracket}
+                className="h-4 w-4 rotate-180"
+              />
             </button>
           )}
           {isMobile && (
@@ -290,7 +320,10 @@ function SidebarContent({
               compact ? "h-12 w-12 justify-center" : "px-3 py-2.5 gap-3 w-full"
             )}
           >
-            <MagnifyingGlassIcon className="h-5 w-5 text-[var(--color-muted)]" />
+            <FontAwesomeIcon
+              icon={faMagnifyingGlass}
+              className="h-4 w-4 text-[var(--color-muted)]"
+            />
             {!compact && (
               <span className="flex-1 text-left text-sm text-[var(--color-subtle)]">
                 Search
@@ -307,49 +340,140 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="mt-4 flex flex-1 flex-col w-full">
-        <ul role="list" className="flex flex-1 flex-col gap-y-6 w-full">
+        <ul role="list" className="flex flex-1 flex-col gap-y-4 w-full">
           <li>
             <ul role="list" className="space-y-2 w-full">
-              {navigationItems.map((item) => {
-                const isActive = pathname === item.href;
+              {navigationItems.map((item, index) => {
                 const isProfile = item.href === "/dashboard/profile";
+                const isActive = item.href ? pathname === item.href : false;
+                const hasChildren = item.children && item.children.length > 0;
+                const isChildActive =
+                  hasChildren && item.children
+                    ? item.children.some((child) => pathname === child.href)
+                    : false;
+
                 return (
                   <li key={item.nameKey}>
-                    <Link
-                      href={item.href}
-                      onClick={isMobile ? onClose : undefined}
-                      className={classNames(
-                        "group relative flex items-center rounded-xl px-3 py-2.5 text-sm font-semibold leading-6 transition-all duration-200 border border-transparent w-full",
-                        compact ? "justify-center" : "gap-3",
-                        isActive
-                          ? "bg-[var(--color-primary)] text-white "
-                          : "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-heading)] hover:border-[var(--color-border)]"
-                      )}
-                      aria-current={isActive ? "page" : undefined}
-                    >
-                      {isProfile && avatar ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={avatar}
-                          alt="Profile avatar"
+                    {hasChildren ? (
+                      // Collapsible menu item
+                      <>
+                        <button
+                          onClick={() => setScanMenuOpen(!scanMenuOpen)}
                           className={classNames(
-                            "h-6 w-6 shrink-0 rounded-full object-cover",
-                            isActive ? "ring-2 ring-white/70" : ""
+                            "group relative flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 border border-transparent w-full",
+                            compact ? "justify-center" : "gap-3",
+                            isChildActive
+                              ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                              : "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-heading)] hover:border-[var(--color-border)]"
                           )}
-                        />
-                      ) : (
-                        <item.icon
-                          className={classNames(
-                            "h-5 w-5 shrink-0",
-                            isActive
-                              ? "text-white"
-                              : "text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
+                        >
+                          <span className="flex items-center justify-center w-5">
+                            <FontAwesomeIcon
+                              icon={item.icon}
+                              className={classNames(
+                                "h-[18px] w-[18px] shrink-0",
+                                isChildActive
+                                  ? "text-[var(--color-primary)]"
+                                  : "text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
+                              )}
+                              aria-hidden="true"
+                            />
+                          </span>
+                          {!compact && (
+                            <>
+                              <span className="flex-1 text-left">Scan</span>
+                              <FontAwesomeIcon
+                                icon={
+                                  scanMenuOpen ? faChevronDown : faChevronRight
+                                }
+                                className="h-3 w-3 text-[var(--color-muted)]"
+                              />
+                            </>
                           )}
-                          aria-hidden="true"
-                        />
-                      )}
-                      {!compact && <span>{t(item.nameKey)}</span>}
-                    </Link>
+                        </button>
+                        {/* Sub-menu items */}
+                        {scanMenuOpen && !compact && item.children && (
+                          <ul className="mt-1 ml-5 space-y-1 border-l border-[var(--color-border)] pl-3">
+                            {item.children.map((child) => {
+                              const isSubActive = pathname === child.href;
+                              return (
+                                <li key={child.nameKey}>
+                                  <Link
+                                    href={child.href}
+                                    onClick={isMobile ? onClose : undefined}
+                                    className={classNames(
+                                      "group relative flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 w-full",
+                                      "gap-3",
+                                      isSubActive
+                                        ? "bg-[var(--color-primary)] text-white"
+                                        : "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-heading)]"
+                                    )}
+                                  >
+                                    <span className="flex items-center justify-center w-4">
+                                      <FontAwesomeIcon
+                                        icon={child.icon}
+                                        className={classNames(
+                                          "h-[14px] w-[14px] shrink-0",
+                                          isSubActive
+                                            ? "text-white"
+                                            : "text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
+                                        )}
+                                        aria-hidden="true"
+                                      />
+                                    </span>
+                                    <span>{t(child.nameKey)}</span>
+                                  </Link>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        )}
+                      </>
+                    ) : (
+                      // Regular menu item
+                      <Link
+                        href={item.href!}
+                        onClick={isMobile ? onClose : undefined}
+                        className={classNames(
+                          "group relative flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 border border-transparent w-full",
+                          compact ? "justify-center" : "gap-3",
+                          isActive
+                            ? "bg-[var(--color-primary)] text-white "
+                            : "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-heading)] hover:border-[var(--color-border)]"
+                        )}
+                        aria-current={isActive ? "page" : undefined}
+                      >
+                        {isProfile && avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={avatar}
+                            alt="Profile avatar"
+                            className={classNames(
+                              "h-6 w-6 shrink-0 rounded-full object-cover",
+                              isActive ? "ring-2 ring-white/70" : ""
+                            )}
+                          />
+                        ) : (
+                          <span className="flex items-center justify-center w-5">
+                            <FontAwesomeIcon
+                              icon={item.icon}
+                              className={classNames(
+                                "h-[18px] w-[18px] shrink-0",
+                                isActive
+                                  ? "text-white"
+                                  : "text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
+                              )}
+                              aria-hidden="true"
+                            />
+                          </span>
+                        )}
+                        {!compact && <span>{t(item.nameKey)}</span>}
+                      </Link>
+                    )}
+                    {/* Divider after items with hasDividerAfter */}
+                    {item.hasDividerAfter && !compact && (
+                      <div className="my-4 mx-auto w-4/5 border-t border-[var(--color-border)]" />
+                    )}
                   </li>
                 );
               })}
@@ -368,30 +492,36 @@ function SidebarContent({
             <Link
               href="/dashboard/help"
               className={classNames(
-                "group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-semibold leading-6 border border-transparent transition-all duration-200",
+                "group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium border border-transparent transition-all duration-200",
                 compact ? "justify-center" : "gap-3",
                 "text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-heading)] hover:border-[var(--color-border)]"
               )}
             >
-              <QuestionMarkCircleIcon
-                className="h-5 w-5 shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
-                aria-hidden="true"
-              />
+              <span className="flex items-center justify-center w-5">
+                <FontAwesomeIcon
+                  icon={faHeadset}
+                  className="h-[18px] w-[18px] shrink-0 text-[var(--color-muted)] group-hover:text-[var(--color-primary)]"
+                  aria-hidden="true"
+                />
+              </span>
               {!compact && <span>Help & Support</span>}
             </Link>
             <button
               onClick={onLogout}
               className={classNames(
-                "group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-semibold leading-6 border border-transparent transition-all duration-200",
+                "group flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium border border-transparent transition-all duration-200",
                 compact ? "justify-center" : "gap-3",
                 "text-[var(--color-muted)] hover:text-[var(--color-danger)] hover:bg-[color-mix(in srgb, var(--color-danger) 8%, transparent)] hover:border-[var(--color-danger)]/30 focus:outline-none focus:ring-2 focus:ring-[var(--color-danger)] focus:ring-offset-2"
               )}
               aria-label="Sign out of your account"
             >
-              <ArrowRightOnRectangleIcon
-                className="h-5 w-5 shrink-0 group-hover:text-[var(--color-danger)] text-[var(--color-muted)]"
-                aria-hidden="true"
-              />
+              <span className="flex items-center justify-center w-5">
+                <FontAwesomeIcon
+                  icon={faRightFromBracket}
+                  className="h-[18px] w-[18px] shrink-0 group-hover:text-[var(--color-danger)] text-[var(--color-muted)]"
+                  aria-hidden="true"
+                />
+              </span>
               {!compact && <span>Logout</span>}
             </button>
           </li>

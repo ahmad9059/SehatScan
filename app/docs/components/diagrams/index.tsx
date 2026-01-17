@@ -1,6 +1,15 @@
-export { DiagramWrapper } from './DiagramWrapper'
-export { ArchitectureDiagram } from './ArchitectureDiagram'
-export { ReportAnalysisFlow, AuthenticationFlow, ChatbotContextFlow } from './DataFlowDiagram'
-export { AIArchitectureDiagram } from './AIArchitectureDiagram'
-export { DatabaseDiagram, DatabaseArchitectureDiagram } from './DatabaseDiagram'
-export { SecurityArchitectureDiagram } from './SecurityDiagram'
+export { DiagramWrapper } from "./DiagramWrapper";
+export { ArchitectureDiagram } from "./ArchitectureDiagram";
+export {
+  ReportAnalysisFlow,
+  AuthenticationFlow,
+  ChatbotContextFlow,
+} from "./DataFlowDiagram";
+export { AIArchitectureDiagram } from "./AIArchitectureDiagram";
+export {
+  DatabaseDiagram,
+  DatabaseArchitectureDiagram,
+} from "./DatabaseDiagram";
+export { SecurityArchitectureDiagram } from "./SecurityDiagram";
+export { DeploymentDiagram } from "./DeploymentDiagram";
+export { AuthenticationArchitectureDiagram } from "./AuthenticationDiagram";

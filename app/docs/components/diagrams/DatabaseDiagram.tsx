@@ -24,11 +24,11 @@ const archNodes: Node[] = [
     id: 'app-layer',
     position: { x: 50, y: 0 },
     data: { label: 'APPLICATION' },
-    style: { ...layerStyle, width: 400, height: 110, background: 'rgba(59, 130, 246, 0.05)' },
+    style: { ...layerStyle, width: 480, height: 110, background: 'rgba(59, 130, 246, 0.05)' },
   },
   {
     id: 'prisma-client',
-    position: { x: 130, y: 45 },
+    position: { x: 150, y: 45 },
     data: { label: '🔷 Prisma Client (Type-safe queries)' },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
@@ -38,11 +38,11 @@ const archNodes: Node[] = [
     id: 'pooler-layer',
     position: { x: 50, y: 160 },
     data: { label: 'SUPABASE POOLER' },
-    style: { ...layerStyle, width: 400, height: 110, background: 'rgba(16, 185, 129, 0.05)' },
+    style: { ...layerStyle, width: 480, height: 110, background: 'rgba(16, 185, 129, 0.05)' },
   },
   {
     id: 'pgbouncer',
-    position: { x: 100, y: 205 },
+    position: { x: 120, y: 205 },
     data: { label: '🔄 PgBouncer (Connection Pooling)' },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
@@ -52,23 +52,23 @@ const archNodes: Node[] = [
     id: 'postgres-layer',
     position: { x: 50, y: 320 },
     data: { label: 'POSTGRESQL' },
-    style: { ...layerStyle, width: 400, height: 110, background: 'rgba(139, 92, 246, 0.05)' },
+    style: { ...layerStyle, width: 480, height: 110, background: 'rgba(139, 92, 246, 0.05)' },
   },
   {
     id: 'users-table',
-    position: { x: 80, y: 365 },
+    position: { x: 100, y: 365 },
     data: { label: '👤 Users' },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'analyses-table',
-    position: { x: 200, y: 365 },
+    position: { x: 240, y: 365 },
     data: { label: '🔬 Analyses' },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'future-tables',
-    position: { x: 330, y: 365 },
+    position: { x: 390, y: 365 },
     data: { label: '📦 Future...' },
     style: { ...nodeStyle, background: '#f3e8ff', border: '1px dashed #8b5cf6', color: '#7c3aed' },
   },
@@ -225,7 +225,7 @@ const erNodes: Node[] = [
   },
   {
     id: 'analysis-table',
-    position: { x: 400, y: 30 },
+    position: { x: 450, y: 30 },
     data: { label: <AnalysisTable /> },
     style: { background: 'transparent', border: 'none', padding: 0 },
     sourcePosition: Position.Left,
@@ -233,7 +233,7 @@ const erNodes: Node[] = [
   },
   {
     id: 'relation-one',
-    position: { x: 280, y: 80 },
+    position: { x: 305, y: 80 },
     data: { label: '1' },
     style: {
       background: 'var(--color-primary)',
@@ -251,7 +251,7 @@ const erNodes: Node[] = [
   },
   {
     id: 'relation-many',
-    position: { x: 355, y: 80 },
+    position: { x: 390, y: 80 },
     data: { label: 'N' },
     style: {
       background: '#8b5cf6',

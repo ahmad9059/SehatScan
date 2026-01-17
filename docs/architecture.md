@@ -96,27 +96,28 @@ Server Actions provide type-safe, secure server-side operations directly callabl
 
 ```typescript
 // app/actions/scan.ts
-'use server'
+"use server";
 
 export async function analyzeReport(formData: FormData) {
   // 1. Validate authentication
-  const user = await requireAuth()
+  const user = await requireAuth();
 
   // 2. Extract and validate input
-  const file = formData.get('file') as File
+  const file = formData.get("file") as File;
 
   // 3. Process with AI service
-  const result = await geminiAnalyzer.structureOcrData(base64Data)
+  const result = await geminiAnalyzer.structureOcrData(base64Data);
 
   // 4. Persist to database
-  const analysis = await saveAnalysis(user.id, 'report', result)
+  const analysis = await saveAnalysis(user.id, "report", result);
 
   // 5. Return typed response
-  return { success: true, data: analysis }
+  return { success: true, data: analysis };
 }
 ```
 
 **Benefits:**
+
 - Type safety between client and server
 - Automatic form data handling
 - Built-in error boundaries
@@ -131,19 +132,19 @@ REST API endpoints for external integrations and complex operations.
 export async function POST(request: NextRequest) {
   try {
     // Authentication check
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Process request
-    const formData = await request.formData()
-    const result = await processReport(formData)
+    const formData = await request.formData();
+    const result = await processReport(formData);
 
     // Return response
-    return NextResponse.json(result)
+    return NextResponse.json(result);
   } catch (error) {
-    return NextResponse.json({ error: 'Analysis failed' }, { status: 500 })
+    return NextResponse.json({ error: "Analysis failed" }, { status: 500 });
   }
 }
 ```
@@ -156,30 +157,30 @@ Database operations abstracted through dedicated service functions.
 // lib/analysis.ts
 export async function getUserAnalyses(
   userId: string,
-  type?: 'face' | 'report' | 'risk'
+  type?: "face" | "report" | "risk",
 ): Promise<Analysis[]> {
   return db.analysis.findMany({
     where: {
       userId,
-      ...(type && { type })
+      ...(type && { type }),
     },
-    orderBy: { createdAt: 'desc' }
-  })
+    orderBy: { createdAt: "desc" },
+  });
 }
 
 export async function saveAnalysis(
   userId: string,
   type: string,
-  data: AnalysisData
+  data: AnalysisData,
 ): Promise<Analysis> {
   return db.analysis.create({
     data: {
       userId,
       type,
       rawData: data.raw,
-      structuredData: data.structured
-    }
-  })
+      structuredData: data.structured,
+    },
+  });
 }
 ```
 
@@ -190,15 +191,15 @@ External service integrations encapsulated in dedicated modules.
 ```typescript
 // lib/gemini.ts
 class GeminiAnalyzer {
-  private client: GoogleGenerativeAI
-  private model: GenerativeModel
+  private client: GoogleGenerativeAI;
+  private model: GenerativeModel;
 
   async structureOcrData(imageBase64: string): Promise<AnalysisResult> {
     const result = await this.model.generateContent([
       this.systemPrompt,
-      { inlineData: { mimeType: 'image/jpeg', data: imageBase64 }}
-    ])
-    return this.parseResponse(result)
+      { inlineData: { mimeType: "image/jpeg", data: imageBase64 } },
+    ]);
+    return this.parseResponse(result);
   }
 
   async generateRiskAssessment(context: RiskContext): Promise<string> {
@@ -241,12 +242,12 @@ Minimal client state managed through React hooks:
 
 ```typescript
 // Form state
-const [file, setFile] = useState<File | null>(null)
-const [isLoading, setIsLoading] = useState(false)
+const [file, setFile] = useState<File | null>(null);
+const [isLoading, setIsLoading] = useState(false);
 
 // UI state
-const [activeTab, setActiveTab] = useState('overview')
-const [isMenuOpen, setIsMenuOpen] = useState(false)
+const [activeTab, setActiveTab] = useState("overview");
+const [isMenuOpen, setIsMenuOpen] = useState(false);
 ```
 
 ### Authentication State
@@ -255,8 +256,8 @@ Managed by Clerk SDK:
 
 ```typescript
 // Clerk provides these hooks
-const { user, isSignedIn, isLoading } = useUser()
-const { signIn, signOut } = useClerk()
+const { user, isSignedIn, isLoading } = useUser();
+const { signIn, signOut } = useClerk();
 ```
 
 ---
@@ -271,19 +272,19 @@ const { signIn, signOut } = useClerk()
 
 ```typescript
 // File validation
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf']
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "application/pdf"];
 
 function validateFile(file: File): boolean {
-  if (file.size > MAX_FILE_SIZE) return false
-  if (!ALLOWED_TYPES.includes(file.type)) return false
-  return true
+  if (file.size > MAX_FILE_SIZE) return false;
+  if (!ALLOWED_TYPES.includes(file.type)) return false;
+  return true;
 }
 
 // Database queries use Prisma (SQL injection protected)
 const analysis = await db.analysis.findUnique({
-  where: { id: analysisId, userId: user.id } // Parameterized
-})
+  where: { id: analysisId, userId: user.id }, // Parameterized
+});
 ```
 
 ---
@@ -298,38 +299,38 @@ export async function analyzeReport(formData: FormData) {
   try {
     // Main logic
   } catch (error) {
-    console.error('Analysis failed:', error)
-    return { success: false, error: 'Analysis failed. Please try again.' }
+    console.error("Analysis failed:", error);
+    return { success: false, error: "Analysis failed. Please try again." };
   }
 }
 
 // 2. Service Level (with fallback)
 async function callGeminiAPI(data: string) {
   try {
-    return await gemini.analyze(data)
+    return await gemini.analyze(data);
   } catch (error) {
     if (error.status === 429) {
       // Rate limit - use mock fallback
-      return mockAnalyzer.analyze(data)
+      return mockAnalyzer.analyze(data);
     }
-    throw error
+    throw error;
   }
 }
 
 // 3. Component Level
 function AnalysisPage() {
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     try {
-      const result = await analyzeReport(formData)
+      const result = await analyzeReport(formData);
       if (!result.success) {
-        setError(result.error)
+        setError(result.error);
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError("An unexpected error occurred");
     }
-  }
+  };
 }
 ```
 
@@ -357,15 +358,15 @@ function AnalysisPage() {
 export async function getUserAnalysesPaginated(
   userId: string,
   page: number,
-  limit: number
+  limit: number,
 ) {
-  const skip = (page - 1) * limit
+  const skip = (page - 1) * limit;
   return db.analysis.findMany({
     where: { userId },
     skip,
     take: limit,
-    orderBy: { createdAt: 'desc' }
-  })
+    orderBy: { createdAt: "desc" },
+  });
 }
 ```
 
@@ -387,41 +388,23 @@ export async function getUserAnalysesPaginated(
 
 ## Deployment Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        VERCEL EDGE                          │
-│  ┌─────────────────────────────────────────────────────────┐│
-│  │                   Next.js Application                    ││
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     ││
-│  │  │   Pages     │  │    API      │  │   Static    │     ││
-│  │  │   (SSR)     │  │   Routes    │  │   Assets    │     ││
-│  │  └─────────────┘  └─────────────┘  └─────────────┘     ││
-│  └─────────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
-                              │
-              ┌───────────────┼───────────────┐
-              ▼               ▼               ▼
-┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│    Supabase     │ │     Clerk       │ │  Google Cloud   │
-│   PostgreSQL    │ │  Authentication │ │   Gemini API    │
-└─────────────────┘ └─────────────────┘ └─────────────────┘
-```
+<!-- DIAGRAM:DEPLOYMENT -->
 
 ---
 
 ## Technology Rationale
 
-| Technology | Why Chosen |
-|------------|------------|
-| **Next.js 16** | Server components, app router, excellent DX |
-| **React 19** | Latest features, concurrent rendering |
-| **TypeScript** | Type safety, better tooling, reduced bugs |
-| **Tailwind CSS** | Rapid styling, consistent design system |
-| **Prisma** | Type-safe ORM, excellent migrations |
-| **PostgreSQL** | Reliable, scalable, JSON support |
-| **Clerk** | Modern auth, easy integration, security |
-| **Gemini AI** | Multimodal (vision + text), cost-effective |
-| **Vercel** | Seamless Next.js deployment, edge network |
+| Technology       | Why Chosen                                  |
+| ---------------- | ------------------------------------------- |
+| **Next.js 16**   | Server components, app router, excellent DX |
+| **React 19**     | Latest features, concurrent rendering       |
+| **TypeScript**   | Type safety, better tooling, reduced bugs   |
+| **Tailwind CSS** | Rapid styling, consistent design system     |
+| **Prisma**       | Type-safe ORM, excellent migrations         |
+| **PostgreSQL**   | Reliable, scalable, JSON support            |
+| **Clerk**        | Modern auth, easy integration, security     |
+| **Gemini AI**    | Multimodal (vision + text), cost-effective  |
+| **Vercel**       | Seamless Next.js deployment, edge network   |
 
 ---
 

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logos/logo.svg" alt="SehatScan Logo" width="120" height="120">
+  <img src="https://sehat-scan.vercel.app/logo.svg" alt="SehatScan Logo" width="120" height="120">
 </p>
 
 <h1 align="center">SehatScan AI</h1>

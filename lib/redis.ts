@@ -17,12 +17,10 @@ function createRedisClient() {
   try {
     const client = new Redis(redisUrl, {
       maxRetriesPerRequest: 3,
-      retryDelayOnFailover: 100,
       lazyConnect: true,
-      // Connection pool settings for serverless
+      // Connection settings for serverless
       enableOfflineQueue: true,
       connectTimeout: 10000,
-      commandTimeout: 5000,
     });
 
     client.on("error", (err) => {

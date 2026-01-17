@@ -7,20 +7,10 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL,
-      },
-    },
+    // Reduce logging overhead - only errors in dev, nothing blocking
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-
-// Graceful shutdown
-process.on("beforeExit", async () => {
-  await prisma.$disconnect();
-});
+// Cache Prisma client in both dev AND production for serverless
+// This prevents creating new connections on every request
+globalForPrisma.prisma = prisma;

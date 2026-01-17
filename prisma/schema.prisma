@@ -29,4 +29,9 @@ model Analysis {
   treatments        Json?    // Array of treatment recommendations
   createdAt         DateTime @default(now())
   user              User     @relation(fields: [userId], references: [id])
+
+  // Indexes for faster queries
+  @@index([userId])
+  @@index([userId, type])
+  @@index([userId, createdAt(sort: Desc)])
 }

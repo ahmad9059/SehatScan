@@ -1,5 +1,4 @@
 import { requireAuth } from "@/lib/clerk-session";
-import { getUserAnalyses } from "@/lib/analysis";
 import { prisma } from "@/lib/db";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import DashboardClient from "@/app/components/DashboardClient";
@@ -14,44 +13,74 @@ interface AnalysisStats {
   risks: number;
 }
 
-async function getAnalysisStats(userId: string): Promise<AnalysisStats> {
+/**
+ * Get dashboard data with optimized single query using groupBy
+ * Instead of 4 separate COUNT queries, we use groupBy + findMany in parallel
+ */
+async function getDashboardData(userId: string) {
   try {
-    // Use aggregation instead of fetching all records
-    const [total, reports, faces, risks] = await Promise.all([
-      prisma.analysis.count({ where: { userId } }),
-      prisma.analysis.count({ where: { userId, type: "report" } }),
-      prisma.analysis.count({ where: { userId, type: "face" } }),
-      prisma.analysis.count({ where: { userId, type: "risk" } }),
+    const [typeCounts, recentAnalyses] = await Promise.all([
+      // Single groupBy query instead of 4 separate counts
+      prisma.analysis.groupBy({
+        by: ["type"],
+        where: { userId },
+        _count: { type: true },
+      }),
+      // Get recent analyses with only needed fields
+      prisma.analysis.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          type: true,
+          createdAt: true,
+          structuredData: true,
+          riskAssessment: true,
+          rawData: true,
+          visualMetrics: true,
+          problemsDetected: true,
+          treatments: true,
+        },
+      }),
     ]);
 
-    return { total, reports, faces, risks };
+    // Transform groupBy result to stats object
+    const stats: AnalysisStats = {
+      total: 0,
+      reports: 0,
+      faces: 0,
+      risks: 0,
+    };
+
+    for (const item of typeCounts) {
+      stats.total += item._count.type;
+      if (item.type === "report") stats.reports = item._count.type;
+      if (item.type === "face") stats.faces = item._count.type;
+      if (item.type === "risk") stats.risks = item._count.type;
+    }
+
+    return { stats, recentAnalyses, hasError: false };
   } catch (error) {
-    console.error("Error fetching analysis stats:", error);
-    return { total: 0, reports: 0, faces: 0, risks: 0 };
+    console.error("Error fetching dashboard data:", error);
+    return {
+      stats: { total: 0, reports: 0, faces: 0, risks: 0 },
+      recentAnalyses: [],
+      hasError: true,
+    };
   }
 }
 
 async function DashboardPageContent() {
-  const user = await requireAuth(); // This will ensure user exists in database
+  const user = await requireAuth();
 
-  let stats: AnalysisStats = { total: 0, reports: 0, faces: 0, risks: 0 };
-  let recentAnalyses: any[] = [];
-  let hasError = false;
-
-  if (user) {
-    try {
-      // Fetch stats and recent analyses with error handling
-      [stats, recentAnalyses] = await Promise.all([
-        getAnalysisStats(user.id),
-        getUserAnalyses(user.id),
-      ]);
-    } catch (error) {
-      console.error("Error loading dashboard data:", error);
-      hasError = true;
-      stats = { total: 0, reports: 0, faces: 0, risks: 0 };
-      recentAnalyses = [];
-    }
-  }
+  const { stats, recentAnalyses, hasError } = user
+    ? await getDashboardData(user.id)
+    : {
+        stats: { total: 0, reports: 0, faces: 0, risks: 0 },
+        recentAnalyses: [],
+        hasError: false,
+      };
 
   return (
     <DashboardClient

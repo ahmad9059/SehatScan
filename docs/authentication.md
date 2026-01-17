@@ -87,19 +87,19 @@ export default function RootLayout({
 
 ```typescript
 // middleware.ts
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)'])
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
 export default clerkMiddleware((auth, req) => {
   if (isProtectedRoute(req)) {
-    auth().protect()
+    auth().protect();
   }
-})
+});
 
 export const config = {
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)']
-}
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+};
 ```
 
 ---
@@ -110,41 +110,41 @@ export const config = {
 
 ```typescript
 // lib/clerk-session.ts
-import { currentUser } from '@clerk/nextjs/server'
-import { db } from './db'
+import { currentUser } from "@clerk/nextjs/server";
+import { db } from "./db";
 
 /**
  * Get the current authenticated user
  * Returns null if not authenticated
  */
 export async function getCurrentUser() {
-  const clerkUser = await currentUser()
+  const clerkUser = await currentUser();
 
   if (!clerkUser) {
-    return null
+    return null;
   }
 
   return {
     id: clerkUser.id,
-    email: clerkUser.emailAddresses[0]?.emailAddress || '',
+    email: clerkUser.emailAddresses[0]?.emailAddress || "",
     name: clerkUser.firstName
-      ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim()
+      ? `${clerkUser.firstName} ${clerkUser.lastName || ""}`.trim()
       : null,
-    imageUrl: clerkUser.imageUrl
-  }
+    imageUrl: clerkUser.imageUrl,
+  };
 }
 
 /**
  * Require authentication - throws error if not authenticated
  */
 export async function requireAuth() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    throw new Error('Authentication required')
+    throw new Error("Authentication required");
   }
 
-  return user
+  return user;
 }
 ```
 
@@ -220,33 +220,33 @@ Clerk manages user authentication, but SehatScan needs users in the local databa
  * Creates or updates as needed
  */
 export async function ensureUserInDatabase() {
-  const clerkUser = await currentUser()
+  const clerkUser = await currentUser();
 
   if (!clerkUser) {
-    return null
+    return null;
   }
 
-  const email = clerkUser.emailAddresses[0]?.emailAddress
+  const email = clerkUser.emailAddresses[0]?.emailAddress;
   const name = clerkUser.firstName
-    ? `${clerkUser.firstName} ${clerkUser.lastName || ''}`.trim()
-    : null
+    ? `${clerkUser.firstName} ${clerkUser.lastName || ""}`.trim()
+    : null;
 
   // Upsert: create if not exists, update if exists
   const user = await db.user.upsert({
     where: { id: clerkUser.id },
     update: {
-      email: email || '',
-      name: name
+      email: email || "",
+      name: name,
     },
     create: {
-      id: clerkUser.id,  // Use Clerk ID as database ID
-      email: email || '',
-      password: '',      // No password needed for Clerk users
-      name: name
-    }
-  })
+      id: clerkUser.id, // Use Clerk ID as database ID
+      email: email || "",
+      password: "", // No password needed for Clerk users
+      name: name,
+    },
+  });
 
-  return user
+  return user;
 }
 ```
 
@@ -262,10 +262,10 @@ The sync happens automatically:
 // Example: Sync before analysis creation
 export async function analyzeReport(formData: FormData) {
   // Ensure user exists in database
-  const dbUser = await ensureUserInDatabase()
+  const dbUser = await ensureUserInDatabase();
 
   if (!dbUser) {
-    return { success: false, error: 'Authentication required' }
+    return { success: false, error: "Authentication required" };
   }
 
   // Now safe to create analysis with user reference
@@ -273,8 +273,8 @@ export async function analyzeReport(formData: FormData) {
     data: {
       userId: dbUser.id,
       // ...
-    }
-  })
+    },
+  });
 }
 ```
 
@@ -288,10 +288,11 @@ The Clerk middleware automatically protects routes matching the pattern:
 
 ```typescript
 // Protected routes pattern
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)'])
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 ```
 
 This protects:
+
 - `/dashboard`
 - `/dashboard/scan-report`
 - `/dashboard/scan-face`
@@ -327,17 +328,14 @@ export default async function DashboardLayout({
 
 ```typescript
 // app/api/analyze/report/route.ts
-import { getCurrentUser } from '@/lib/clerk-session'
-import { NextResponse } from 'next/server'
+import { getCurrentUser } from "@/lib/clerk-session";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Process authenticated request
@@ -349,26 +347,26 @@ export async function POST(request: Request) {
 
 ```typescript
 // app/actions/scan.ts
-'use server'
+"use server";
 
-import { requireAuth, ensureUserInDatabase } from '@/lib/clerk-session'
+import { requireAuth, ensureUserInDatabase } from "@/lib/clerk-session";
 
 export async function analyzeReport(formData: FormData) {
   try {
     // This throws if not authenticated
-    await requireAuth()
+    await requireAuth();
 
     // This ensures database sync
-    const user = await ensureUserInDatabase()
+    const user = await ensureUserInDatabase();
 
     if (!user) {
-      return { success: false, error: 'User not found' }
+      return { success: false, error: "User not found" };
     }
 
     // Proceed with authenticated operation
     // ...
   } catch (error) {
-    return { success: false, error: 'Authentication required' }
+    return { success: false, error: "Authentication required" };
   }
 }
 ```
@@ -383,19 +381,19 @@ For API routes, Clerk provides session tokens:
 
 ```typescript
 // Client-side: Include token in requests
-import { useAuth } from '@clerk/nextjs'
+import { useAuth } from "@clerk/nextjs";
 
 function ApiClient() {
-  const { getToken } = useAuth()
+  const { getToken } = useAuth();
 
   async function fetchData() {
-    const token = await getToken()
+    const token = await getToken();
 
-    const response = await fetch('/api/analyses', {
+    const response = await fetch("/api/analyses", {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+        Authorization: `Bearer ${token}`,
+      },
+    });
   }
 }
 ```
@@ -404,21 +402,21 @@ function ApiClient() {
 
 ```typescript
 // app/api/analyses/route.ts
-import { auth } from '@clerk/nextjs/server'
+import { auth } from "@clerk/nextjs/server";
 
 export async function GET(request: Request) {
-  const { userId } = auth()
+  const { userId } = auth();
 
   if (!userId) {
-    return new Response('Unauthorized', { status: 401 })
+    return new Response("Unauthorized", { status: 401 });
   }
 
   // Fetch user's analyses
   const analyses = await db.analysis.findMany({
-    where: { userId }
-  })
+    where: { userId },
+  });
 
-  return Response.json(analyses)
+  return Response.json(analyses);
 }
 ```
 
@@ -431,16 +429,16 @@ export async function GET(request: Request) {
 ```typescript
 // BAD: No ownership check
 const analysis = await db.analysis.findUnique({
-  where: { id: analysisId }
-})
+  where: { id: analysisId },
+});
 
 // GOOD: Include user ownership
 const analysis = await db.analysis.findFirst({
   where: {
     id: analysisId,
-    userId: currentUser.id  // Ensure user owns this analysis
-  }
-})
+    userId: currentUser.id, // Ensure user owns this analysis
+  },
+});
 ```
 
 ### 2. Use Server-Side Validation
@@ -448,20 +446,20 @@ const analysis = await db.analysis.findFirst({
 ```typescript
 // Always validate on server, not just client
 export async function updateProfile(formData: FormData) {
-  const user = await requireAuth()
+  const user = await requireAuth();
 
-  const name = formData.get('name')
+  const name = formData.get("name");
 
   // Server-side validation
-  if (typeof name !== 'string' || name.length > 100) {
-    return { error: 'Invalid name' }
+  if (typeof name !== "string" || name.length > 100) {
+    return { error: "Invalid name" };
   }
 
   // Safe to update
   await db.user.update({
     where: { id: user.id },
-    data: { name }
-  })
+    data: { name },
+  });
 }
 ```
 
@@ -470,9 +468,9 @@ export async function updateProfile(formData: FormData) {
 ```typescript
 // BAD: Returning password hash
 const user = await db.user.findUnique({
-  where: { id: userId }
-})
-return user  // Includes password!
+  where: { id: userId },
+});
+return user; // Includes password!
 
 // GOOD: Select only needed fields
 const user = await db.user.findUnique({
@@ -481,10 +479,10 @@ const user = await db.user.findUnique({
     id: true,
     email: true,
     name: true,
-    createdAt: true
+    createdAt: true,
     // password: false (omitted)
-  }
-})
+  },
+});
 ```
 
 ### 4. Handle Authentication Errors Gracefully
@@ -492,14 +490,14 @@ const user = await db.user.findUnique({
 ```typescript
 export async function protectedAction() {
   try {
-    const user = await requireAuth()
+    const user = await requireAuth();
     // ... action logic
   } catch (error) {
     // Don't expose internal error details
     return {
       success: false,
-      error: 'Please sign in to continue'
-    }
+      error: "Please sign in to continue",
+    };
   }
 }
 ```
@@ -516,18 +514,18 @@ Clerk handles this by default, but ensure:
 
 ```typescript
 // Example rate limiting (consider using a library)
-import { Ratelimit } from '@upstash/ratelimit'
+import { Ratelimit } from "@upstash/ratelimit";
 
 const ratelimit = new Ratelimit({
-  limiter: Ratelimit.slidingWindow(10, '60 s')
-})
+  limiter: Ratelimit.slidingWindow(10, "60 s"),
+});
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser()
-  const { success } = await ratelimit.limit(user?.id || 'anonymous')
+  const user = await getCurrentUser();
+  const { success } = await ratelimit.limit(user?.id || "anonymous");
 
   if (!success) {
-    return new Response('Too many requests', { status: 429 })
+    return new Response("Too many requests", { status: 429 });
   }
 
   // Process request
@@ -544,15 +542,15 @@ For scenarios where Clerk is not used, a password authentication system is avail
 
 ```typescript
 // lib/auth.ts
-import bcrypt from 'bcryptjs'
+import bcrypt from "bcryptjs";
 
-const SALT_ROUNDS = 12
+const SALT_ROUNDS = 12;
 
 /**
  * Hash a plain text password
  */
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS)
+  return bcrypt.hash(password, SALT_ROUNDS);
 }
 
 /**
@@ -560,9 +558,9 @@ export async function hashPassword(password: string): Promise<string> {
  */
 export async function verifyPassword(
   password: string,
-  hash: string
+  hash: string,
 ): Promise<boolean> {
-  return bcrypt.compare(password, hash)
+  return bcrypt.compare(password, hash);
 }
 ```
 
@@ -570,47 +568,47 @@ export async function verifyPassword(
 
 ```typescript
 // app/api/register/route.ts
-import { hashPassword } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { hashPassword } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 export async function POST(request: Request) {
-  const { email, password, name } = await request.json()
+  const { email, password, name } = await request.json();
 
   // Validate input
   if (!email || !password) {
     return Response.json(
-      { error: 'Email and password required' },
-      { status: 400 }
-    )
+      { error: "Email and password required" },
+      { status: 400 },
+    );
   }
 
   // Check existing user
   const existing = await db.user.findUnique({
-    where: { email }
-  })
+    where: { email },
+  });
 
   if (existing) {
     return Response.json(
-      { error: 'Email already registered' },
-      { status: 400 }
-    )
+      { error: "Email already registered" },
+      { status: 400 },
+    );
   }
 
   // Hash password and create user
-  const hashedPassword = await hashPassword(password)
+  const hashedPassword = await hashPassword(password);
 
   const user = await db.user.create({
     data: {
       email,
       password: hashedPassword,
-      name
-    }
-  })
+      name,
+    },
+  });
 
   return Response.json({
     success: true,
-    userId: user.id
-  })
+    userId: user.id,
+  });
 }
 ```
 
@@ -693,9 +691,10 @@ export default function SignInPage() {
 Cause: User not synced to database
 
 Solution:
+
 ```typescript
 // Ensure sync happens on first protected page access
-const user = await ensureUserInDatabase()
+const user = await ensureUserInDatabase();
 ```
 
 **2. Clerk keys not found**
@@ -703,6 +702,7 @@ const user = await ensureUserInDatabase()
 Cause: Environment variables not set
 
 Solution: Check `.env` file has:
+
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
 CLERK_SECRET_KEY=sk_...
@@ -713,10 +713,11 @@ CLERK_SECRET_KEY=sk_...
 Cause: Incorrect matcher pattern
 
 Solution: Update `middleware.ts`:
+
 ```typescript
 export const config = {
-  matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)']
-}
+  matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+};
 ```
 
 **4. Session not persisting**
@@ -724,6 +725,7 @@ export const config = {
 Cause: Cookie issues or domain mismatch
 
 Solution:
+
 - Check browser cookies are enabled
 - Verify domain configuration in Clerk dashboard
 - Check for CORS issues
@@ -733,9 +735,10 @@ Solution:
 Cause: Clerk profile updated but database not synced
 
 Solution:
+
 ```typescript
 // Force sync on profile page or implement webhook
-await ensureUserInDatabase()
+await ensureUserInDatabase();
 ```
 
 ### Debug Mode

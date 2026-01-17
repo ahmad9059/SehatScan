@@ -1,6 +1,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db";
 import { cache } from "react";
+import { withCache, CACHE_KEYS, CACHE_TTL, deleteCache } from "@/lib/redis";
 
 /**
  * Get the current user from Clerk
@@ -35,44 +36,51 @@ export const getCurrentUser = cache(async () => {
 /**
  * Ensure user exists in database (create if not exists)
  * Uses upsert for single-query efficiency
- * Cached per request to prevent duplicate DB calls
+ * Cached in Redis for 1 hour to avoid repeated DB calls
  * @param clerkUser - Clerk user object
  * @returns Database user object
  */
 export const ensureUserInDatabase = cache(
   async (clerkUser: { id: string; email: string; name: string }) => {
-    try {
-      // Use upsert for single-query efficiency instead of find + create
-      const dbUser = await prisma.user.upsert({
-        where: { id: clerkUser.id },
-        update: {}, // No update needed, just ensure exists
-        create: {
-          id: clerkUser.id,
-          email: clerkUser.email,
-          name: clerkUser.name,
-          password: "", // Empty password since Clerk handles auth
-        },
-      });
+    // Use Redis cache to avoid DB call on every request
+    return withCache(
+      CACHE_KEYS.dbUser(clerkUser.id),
+      async () => {
+        try {
+          // Use upsert for single-query efficiency instead of find + create
+          const dbUser = await prisma.user.upsert({
+            where: { id: clerkUser.id },
+            update: {}, // No update needed, just ensure exists
+            create: {
+              id: clerkUser.id,
+              email: clerkUser.email,
+              name: clerkUser.name,
+              password: "", // Empty password since Clerk handles auth
+            },
+          });
 
-      return dbUser;
-    } catch (error) {
-      console.error("Error ensuring user in database:", error);
+          return dbUser;
+        } catch (error) {
+          console.error("Error ensuring user in database:", error);
 
-      // If unique constraint error (email exists with different ID), find by email
-      if (
-        error instanceof Error &&
-        error.message.includes("Unique constraint")
-      ) {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: clerkUser.email },
-        });
-        if (existingUser) {
-          return existingUser;
+          // If unique constraint error (email exists with different ID), find by email
+          if (
+            error instanceof Error &&
+            error.message.includes("Unique constraint")
+          ) {
+            const existingUser = await prisma.user.findUnique({
+              where: { email: clerkUser.email },
+            });
+            if (existingUser) {
+              return existingUser;
+            }
+          }
+
+          throw error;
         }
-      }
-
-      throw error;
-    }
+      },
+      CACHE_TTL.USER,
+    );
   },
 );
 

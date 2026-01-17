@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { deleteCache, CACHE_KEYS } from "./redis";
 
 export interface CreateAnalysisData {
   userId: string;
@@ -13,6 +14,7 @@ export interface CreateAnalysisData {
 
 /**
  * Save analysis results to the database
+ * Invalidates Redis cache for user's stats and analyses
  * @param data Analysis data to save
  * @returns Saved analysis with ID
  */
@@ -30,6 +32,12 @@ export async function saveAnalysis(data: CreateAnalysisData) {
         treatments: data.treatments,
       },
     });
+
+    // Invalidate user's cached stats and analyses so dashboard shows new data
+    await Promise.all([
+      deleteCache(CACHE_KEYS.stats(data.userId)),
+      deleteCache(CACHE_KEYS.analyses(data.userId)),
+    ]);
 
     return { success: true, analysis };
   } catch (error) {
@@ -71,7 +79,7 @@ export async function getAnalysisById(analysisId: string, userId: string) {
  */
 export async function getUserAnalyses(
   userId: string,
-  type?: "face" | "report" | "risk"
+  type?: "face" | "report" | "risk",
 ) {
   if (!userId) return [];
   // Ensure this runs server-side only
@@ -108,7 +116,7 @@ export async function getUserAnalysesPaginated(
     page?: number;
     limit?: number;
     type?: "face" | "report" | "risk";
-  } = {}
+  } = {},
 ) {
   try {
     const { page = 1, limit = 10, type } = options;

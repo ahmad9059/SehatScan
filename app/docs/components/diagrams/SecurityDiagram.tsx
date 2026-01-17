@@ -2,6 +2,27 @@
 
 import { Node, Edge, MarkerType } from '@xyflow/react'
 import { DiagramWrapper } from './DiagramWrapper'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faLock,
+  faEnvelope,
+  faIdCard,
+  faKey,
+  faShieldHalved,
+  faUser,
+  faCircleCheck,
+  faMagnifyingGlass,
+  faBan,
+} from '@fortawesome/free-solid-svg-icons'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+
+// Helper component for node labels with Font Awesome icons
+const NodeLabel = ({ icon, text, color }: { icon: IconDefinition; text: string; color: string }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <FontAwesomeIcon icon={icon} style={{ width: '14px', height: '14px', color }} />
+    <span>{text}</span>
+  </div>
+)
 
 const nodeStyle = {
   borderRadius: '8px',
@@ -23,82 +44,82 @@ const nodes: Node[] = [
     id: 'clerk-layer',
     position: { x: 50, y: 0 },
     data: { label: 'CLERK AUTHENTICATION' },
-    style: { ...layerStyle, width: 520, height: 110, background: 'rgba(139, 92, 246, 0.05)' },
+    style: { ...layerStyle, width: 560, height: 120, background: 'rgba(139, 92, 246, 0.05)' },
   },
   {
     id: 'oauth',
-    position: { x: 80, y: 45 },
-    data: { label: '🔐 OAuth' },
+    position: { x: 75, y: 50 },
+    data: { label: <NodeLabel icon={faLock} text="OAuth" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'email-pass',
-    position: { x: 190, y: 45 },
-    data: { label: '📧 Email/Pass' },
+    position: { x: 185, y: 50 },
+    data: { label: <NodeLabel icon={faEnvelope} text="Email/Pass" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'session-mgmt',
-    position: { x: 330, y: 45 },
-    data: { label: '🎫 Sessions' },
+    position: { x: 330, y: 50 },
+    data: { label: <NodeLabel icon={faIdCard} text="Sessions" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'jwt',
-    position: { x: 460, y: 45 },
-    data: { label: '🔑 JWT' },
+    position: { x: 470, y: 50 },
+    data: { label: <NodeLabel icon={faKey} text="JWT" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
 
   // Server Validation Layer
   {
     id: 'server-layer',
-    position: { x: 50, y: 160 },
+    position: { x: 50, y: 170 },
     data: { label: 'SERVER-SIDE VALIDATION' },
-    style: { ...layerStyle, width: 520, height: 110, background: 'rgba(16, 185, 129, 0.05)' },
+    style: { ...layerStyle, width: 560, height: 120, background: 'rgba(16, 185, 129, 0.05)' },
   },
   {
     id: 'require-auth',
-    position: { x: 100, y: 205 },
-    data: { label: '🛡️ requireAuth()' },
+    position: { x: 85, y: 220 },
+    data: { label: <NodeLabel icon={faShieldHalved} text="requireAuth()" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'get-user',
-    position: { x: 270, y: 205 },
-    data: { label: '👤 getCurrentUser()' },
+    position: { x: 265, y: 220 },
+    data: { label: <NodeLabel icon={faUser} text="getCurrentUser()" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'user-verify',
-    position: { x: 460, y: 205 },
-    data: { label: '✅ Verify ID' },
+    position: { x: 470, y: 220 },
+    data: { label: <NodeLabel icon={faCircleCheck} text="Verify ID" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
 
   // Data Isolation Layer
   {
     id: 'data-layer',
-    position: { x: 50, y: 320 },
+    position: { x: 50, y: 340 },
     data: { label: 'DATA ISOLATION' },
-    style: { ...layerStyle, width: 520, height: 110, background: 'rgba(59, 130, 246, 0.05)' },
+    style: { ...layerStyle, width: 560, height: 120, background: 'rgba(59, 130, 246, 0.05)' },
   },
   {
     id: 'user-filter',
-    position: { x: 100, y: 365 },
-    data: { label: '🔍 userId Filter' },
+    position: { x: 85, y: 390 },
+    data: { label: <NodeLabel icon={faMagnifyingGlass} text="userId Filter" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'row-security',
-    position: { x: 270, y: 365 },
-    data: { label: '🔒 Row Security' },
+    position: { x: 265, y: 390 },
+    data: { label: <NodeLabel icon={faLock} text="Row Security" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'no-cross',
-    position: { x: 440, y: 365 },
-    data: { label: '🚫 No Cross-User' },
+    position: { x: 445, y: 390 },
+    data: { label: <NodeLabel icon={faBan} text="No Cross-User" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
 ]
@@ -122,7 +143,7 @@ export function SecurityArchitectureDiagram() {
       nodes={nodes}
       edges={edges}
       title="Security Architecture Layers"
-      height="520px"
+      height="580px"
     />
   )
 }

@@ -2,6 +2,23 @@
 
 import { Node, Edge, MarkerType, Position } from '@xyflow/react'
 import { DiagramWrapper } from './DiagramWrapper'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faDatabase,
+  faRotate,
+  faUser,
+  faFlask,
+  faCube,
+} from '@fortawesome/free-solid-svg-icons'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+
+// Helper component for node labels with Font Awesome icons
+const NodeLabel = ({ icon, text, color }: { icon: IconDefinition; text: string; color: string }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <FontAwesomeIcon icon={icon} style={{ width: '14px', height: '14px', color }} />
+    <span>{text}</span>
+  </div>
+)
 
 const nodeStyle = {
   borderRadius: '8px',
@@ -24,52 +41,52 @@ const archNodes: Node[] = [
     id: 'app-layer',
     position: { x: 50, y: 0 },
     data: { label: 'APPLICATION' },
-    style: { ...layerStyle, width: 480, height: 110, background: 'rgba(59, 130, 246, 0.05)' },
+    style: { ...layerStyle, width: 520, height: 120, background: 'rgba(59, 130, 246, 0.05)' },
   },
   {
     id: 'prisma-client',
-    position: { x: 150, y: 45 },
-    data: { label: '🔷 Prisma Client (Type-safe queries)' },
+    position: { x: 130, y: 50 },
+    data: { label: <NodeLabel icon={faDatabase} text="Prisma Client (Type-safe queries)" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
 
   // Supabase Pooler Layer
   {
     id: 'pooler-layer',
-    position: { x: 50, y: 160 },
+    position: { x: 50, y: 170 },
     data: { label: 'SUPABASE POOLER' },
-    style: { ...layerStyle, width: 480, height: 110, background: 'rgba(16, 185, 129, 0.05)' },
+    style: { ...layerStyle, width: 520, height: 120, background: 'rgba(16, 185, 129, 0.05)' },
   },
   {
     id: 'pgbouncer',
-    position: { x: 120, y: 205 },
-    data: { label: '🔄 PgBouncer (Connection Pooling)' },
+    position: { x: 110, y: 220 },
+    data: { label: <NodeLabel icon={faRotate} text="PgBouncer (Connection Pooling)" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
 
   // PostgreSQL Layer
   {
     id: 'postgres-layer',
-    position: { x: 50, y: 320 },
+    position: { x: 50, y: 340 },
     data: { label: 'POSTGRESQL' },
-    style: { ...layerStyle, width: 480, height: 110, background: 'rgba(139, 92, 246, 0.05)' },
+    style: { ...layerStyle, width: 520, height: 120, background: 'rgba(139, 92, 246, 0.05)' },
   },
   {
     id: 'users-table',
-    position: { x: 100, y: 365 },
-    data: { label: '👤 Users' },
+    position: { x: 90, y: 390 },
+    data: { label: <NodeLabel icon={faUser} text="Users" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'analyses-table',
-    position: { x: 240, y: 365 },
-    data: { label: '🔬 Analyses' },
+    position: { x: 240, y: 390 },
+    data: { label: <NodeLabel icon={faFlask} text="Analyses" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'future-tables',
-    position: { x: 390, y: 365 },
-    data: { label: '📦 Future...' },
+    position: { x: 400, y: 390 },
+    data: { label: <NodeLabel icon={faCube} text="Future..." color="#7c3aed" /> },
     style: { ...nodeStyle, background: '#f3e8ff', border: '1px dashed #8b5cf6', color: '#7c3aed' },
   },
 ]
@@ -153,7 +170,10 @@ const fkStyle = {
 
 const UserTable = () => (
   <div style={tableStyle}>
-    <div style={headerStyle}>👤 User</div>
+    <div style={{ ...headerStyle, display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <FontAwesomeIcon icon={faUser} style={{ width: '14px', height: '14px' }} />
+      <span>User</span>
+    </div>
     <div style={fieldStyle}>
       <span>id: String</span>
       <span style={pkStyle}>PK</span>
@@ -176,7 +196,10 @@ const UserTable = () => (
 
 const AnalysisTable = () => (
   <div style={tableStyle}>
-    <div style={{ ...headerStyle, background: '#8b5cf6' }}>🔬 Analysis</div>
+    <div style={{ ...headerStyle, background: '#8b5cf6', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <FontAwesomeIcon icon={faFlask} style={{ width: '14px', height: '14px' }} />
+      <span>Analysis</span>
+    </div>
     <div style={fieldStyle}>
       <span>id: String</span>
       <span style={pkStyle}>PK</span>
@@ -306,7 +329,7 @@ export function DatabaseArchitectureDiagram() {
       nodes={archNodes}
       edges={archEdges}
       title="Database Architecture"
-      height="520px"
+      height="580px"
     />
   )
 }

@@ -162,7 +162,7 @@ export function ReportAnalysisFlow() {
       nodes={reportNodes}
       edges={reportEdges}
       title="Medical Report Analysis Flow"
-      height="250px"
+      height="280px"
     />
   )
 }
@@ -173,7 +173,7 @@ export function AuthenticationFlow() {
       nodes={authNodes}
       edges={authEdges}
       title="Authentication Flow"
-      height="250px"
+      height="280px"
     />
   )
 }
@@ -184,7 +184,7 @@ export function ChatbotContextFlow() {
       nodes={chatbotNodes}
       edges={chatbotEdges}
       title="Chatbot Context Flow (RAG)"
-      height="280px"
+      height="300px"
     />
   )
 }

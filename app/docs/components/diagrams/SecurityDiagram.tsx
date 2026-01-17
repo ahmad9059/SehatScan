@@ -23,29 +23,29 @@ const nodes: Node[] = [
     id: 'clerk-layer',
     position: { x: 50, y: 0 },
     data: { label: 'CLERK AUTHENTICATION' },
-    style: { ...layerStyle, width: 400, height: 130, background: 'rgba(139, 92, 246, 0.05)' },
+    style: { ...layerStyle, width: 420, height: 110, background: 'rgba(139, 92, 246, 0.05)' },
   },
   {
     id: 'oauth',
-    position: { x: 70, y: 40 },
+    position: { x: 70, y: 45 },
     data: { label: '🔐 OAuth' },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'email-pass',
-    position: { x: 160, y: 40 },
+    position: { x: 160, y: 45 },
     data: { label: '📧 Email/Pass' },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'session-mgmt',
-    position: { x: 260, y: 40 },
+    position: { x: 270, y: 45 },
     data: { label: '🎫 Sessions' },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'jwt',
-    position: { x: 350, y: 40 },
+    position: { x: 370, y: 45 },
     data: { label: '🔑 JWT' },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
@@ -55,23 +55,23 @@ const nodes: Node[] = [
     id: 'server-layer',
     position: { x: 50, y: 160 },
     data: { label: 'SERVER-SIDE VALIDATION' },
-    style: { ...layerStyle, width: 400, height: 100, background: 'rgba(16, 185, 129, 0.05)' },
+    style: { ...layerStyle, width: 420, height: 110, background: 'rgba(16, 185, 129, 0.05)' },
   },
   {
     id: 'require-auth',
-    position: { x: 80, y: 200 },
+    position: { x: 80, y: 205 },
     data: { label: '🛡️ requireAuth()' },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'get-user',
-    position: { x: 210, y: 200 },
+    position: { x: 220, y: 205 },
     data: { label: '👤 getCurrentUser()' },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'user-verify',
-    position: { x: 350, y: 200 },
+    position: { x: 370, y: 205 },
     data: { label: '✅ Verify ID' },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
@@ -79,25 +79,25 @@ const nodes: Node[] = [
   // Data Isolation Layer
   {
     id: 'data-layer',
-    position: { x: 50, y: 290 },
+    position: { x: 50, y: 320 },
     data: { label: 'DATA ISOLATION' },
-    style: { ...layerStyle, width: 400, height: 100, background: 'rgba(59, 130, 246, 0.05)' },
+    style: { ...layerStyle, width: 420, height: 110, background: 'rgba(59, 130, 246, 0.05)' },
   },
   {
     id: 'user-filter',
-    position: { x: 80, y: 330 },
+    position: { x: 80, y: 365 },
     data: { label: '🔍 userId Filter' },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'row-security',
-    position: { x: 210, y: 330 },
+    position: { x: 220, y: 365 },
     data: { label: '🔒 Row Security' },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'no-cross',
-    position: { x: 340, y: 330 },
+    position: { x: 360, y: 365 },
     data: { label: '🚫 No Cross-User' },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
@@ -122,7 +122,7 @@ export function SecurityArchitectureDiagram() {
       nodes={nodes}
       edges={edges}
       title="Security Architecture Layers"
-      height="450px"
+      height="520px"
     />
   )
 }

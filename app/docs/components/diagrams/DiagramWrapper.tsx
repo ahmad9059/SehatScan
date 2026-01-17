@@ -21,9 +21,9 @@ export function DiagramWrapper({
   showControls = true,
 }: DiagramWrapperProps) {
   return (
-    <div className="my-6 rounded-xl border border-[var(--color-border)] overflow-hidden bg-[var(--color-surface)]">
+    <div className="my-10 rounded-xl border border-[var(--color-border)] overflow-hidden bg-[var(--color-surface)] shadow-sm">
       {title && (
-        <div className="px-4 py-3 border-b border-[var(--color-border)] bg-[var(--color-card)]">
+        <div className="px-5 py-4 border-b border-[var(--color-border)] bg-[var(--color-card)]">
           <h4 className="text-sm font-semibold text-[var(--color-heading)]">{title}</h4>
         </div>
       )}
@@ -32,6 +32,7 @@ export function DiagramWrapper({
           nodes={nodes}
           edges={edges}
           fitView
+          fitViewOptions={{ padding: 0.2 }}
           attributionPosition="bottom-left"
           connectionMode={ConnectionMode.Loose}
           nodesDraggable={false}

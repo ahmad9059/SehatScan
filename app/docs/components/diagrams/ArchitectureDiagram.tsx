@@ -42,29 +42,29 @@ const nodes: Node[] = [
     type: 'default',
     position: { x: 50, y: 0 },
     data: { label: 'CLIENT LAYER' },
-    style: { ...layerStyle, width: 500, height: 100, background: 'rgba(59, 130, 246, 0.05)' },
+    style: { ...layerStyle, width: 520, height: 110, background: 'rgba(59, 130, 246, 0.05)' },
   },
   {
     id: 'landing',
-    position: { x: 70, y: 40 },
+    position: { x: 70, y: 45 },
     data: { label: '🏠 Landing Page' },
     style: serviceStyle,
   },
   {
     id: 'dashboard',
-    position: { x: 190, y: 40 },
+    position: { x: 190, y: 45 },
     data: { label: '📊 Dashboard' },
     style: serviceStyle,
   },
   {
     id: 'analysis',
-    position: { x: 310, y: 40 },
+    position: { x: 310, y: 45 },
     data: { label: '🔬 Analysis Pages' },
     style: serviceStyle,
   },
   {
     id: 'chatbot',
-    position: { x: 440, y: 40 },
+    position: { x: 450, y: 45 },
     data: { label: '🤖 Chatbot' },
     style: serviceStyle,
   },
@@ -73,19 +73,19 @@ const nodes: Node[] = [
   {
     id: 'nextjs-layer',
     type: 'default',
-    position: { x: 50, y: 140 },
+    position: { x: 50, y: 160 },
     data: { label: 'NEXT.JS APP ROUTER' },
-    style: { ...layerStyle, width: 500, height: 100, background: 'rgba(16, 185, 129, 0.05)' },
+    style: { ...layerStyle, width: 520, height: 110, background: 'rgba(16, 185, 129, 0.05)' },
   },
   {
     id: 'server-actions',
-    position: { x: 120, y: 180 },
+    position: { x: 130, y: 205 },
     data: { label: '⚡ Server Actions' },
     style: { ...serviceStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'api-routes',
-    position: { x: 320, y: 180 },
+    position: { x: 340, y: 205 },
     data: { label: '🔌 API Routes' },
     style: { ...serviceStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
@@ -94,25 +94,25 @@ const nodes: Node[] = [
   {
     id: 'service-layer',
     type: 'default',
-    position: { x: 50, y: 280 },
+    position: { x: 50, y: 320 },
     data: { label: 'SERVICE LAYER' },
-    style: { ...layerStyle, width: 500, height: 100, background: 'rgba(139, 92, 246, 0.05)' },
+    style: { ...layerStyle, width: 520, height: 110, background: 'rgba(139, 92, 246, 0.05)' },
   },
   {
     id: 'gemini-service',
-    position: { x: 80, y: 320 },
+    position: { x: 80, y: 365 },
     data: { label: '🧠 Gemini AI' },
     style: { ...serviceStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'clerk-service',
-    position: { x: 220, y: 320 },
+    position: { x: 230, y: 365 },
     data: { label: '🔐 Clerk Auth' },
     style: { ...serviceStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'prisma-service',
-    position: { x: 360, y: 320 },
+    position: { x: 380, y: 365 },
     data: { label: '🗄️ Prisma ORM' },
     style: { ...serviceStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
@@ -121,25 +121,25 @@ const nodes: Node[] = [
   {
     id: 'external-layer',
     type: 'default',
-    position: { x: 50, y: 420 },
+    position: { x: 50, y: 480 },
     data: { label: 'EXTERNAL SERVICES' },
-    style: { ...layerStyle, width: 500, height: 100, background: 'rgba(245, 158, 11, 0.05)' },
+    style: { ...layerStyle, width: 520, height: 110, background: 'rgba(245, 158, 11, 0.05)' },
   },
   {
     id: 'google-api',
-    position: { x: 80, y: 460 },
+    position: { x: 80, y: 525 },
     data: { label: '☁️ Google Gemini' },
     style: externalStyle,
   },
   {
     id: 'clerk-platform',
-    position: { x: 220, y: 460 },
+    position: { x: 230, y: 525 },
     data: { label: '🔑 Clerk Platform' },
     style: externalStyle,
   },
   {
     id: 'supabase',
-    position: { x: 360, y: 460 },
+    position: { x: 380, y: 525 },
     data: { label: '🐘 Supabase PG' },
     style: externalStyle,
   },
@@ -170,7 +170,7 @@ export function ArchitectureDiagram() {
       nodes={nodes}
       edges={edges}
       title="High-Level System Architecture"
-      height="600px"
+      height="700px"
       showControls={true}
     />
   )

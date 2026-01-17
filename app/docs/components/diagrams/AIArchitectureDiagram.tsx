@@ -23,29 +23,29 @@ const nodes: Node[] = [
     id: 'app-layer',
     position: { x: 50, y: 0 },
     data: { label: 'SEHATSCAN APPLICATION' },
-    style: { ...layerStyle, width: 450, height: 160, background: 'rgba(59, 130, 246, 0.05)' },
+    style: { ...layerStyle, width: 470, height: 170, background: 'rgba(59, 130, 246, 0.05)' },
   },
   {
     id: 'ai-layer-label',
-    position: { x: 70, y: 30 },
+    position: { x: 70, y: 35 },
     data: { label: 'AI SERVICE LAYER' },
-    style: { ...layerStyle, width: 410, height: 110, background: 'rgba(139, 92, 246, 0.08)', border: '1px dashed #8b5cf6' },
+    style: { ...layerStyle, width: 430, height: 115, background: 'rgba(139, 92, 246, 0.08)', border: '1px dashed #8b5cf6' },
   },
   {
     id: 'gemini-analyzer',
-    position: { x: 90, y: 70 },
+    position: { x: 95, y: 80 },
     data: { label: '🧠 Gemini Analyzer' },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'face-analyzer',
-    position: { x: 230, y: 70 },
+    position: { x: 245, y: 80 },
     data: { label: '👤 Face Analyzer' },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'mock-fallback',
-    position: { x: 370, y: 70 },
+    position: { x: 385, y: 80 },
     data: { label: '🔄 Mock Fallback' },
     style: { ...nodeStyle, background: '#fef3c7', border: '1px solid #f59e0b', color: '#92400e' },
   },
@@ -53,31 +53,31 @@ const nodes: Node[] = [
   // External Services
   {
     id: 'external-layer',
-    position: { x: 50, y: 200 },
+    position: { x: 50, y: 220 },
     data: { label: 'EXTERNAL AI SERVICES' },
-    style: { ...layerStyle, width: 450, height: 160, background: 'rgba(16, 185, 129, 0.05)' },
+    style: { ...layerStyle, width: 470, height: 170, background: 'rgba(16, 185, 129, 0.05)' },
   },
   {
     id: 'gemini-api-label',
-    position: { x: 70, y: 230 },
+    position: { x: 70, y: 255 },
     data: { label: 'GOOGLE GEMINI API' },
-    style: { ...layerStyle, width: 410, height: 110, background: 'rgba(16, 185, 129, 0.08)', border: '1px dashed #10b981' },
+    style: { ...layerStyle, width: 430, height: 115, background: 'rgba(16, 185, 129, 0.08)', border: '1px dashed #10b981' },
   },
   {
     id: 'vision-api',
-    position: { x: 90, y: 270 },
+    position: { x: 95, y: 300 },
     data: { label: '👁️ Vision (Images)' },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'text-api',
-    position: { x: 230, y: 270 },
+    position: { x: 245, y: 300 },
     data: { label: '📝 Text Generation' },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'multimodal-api',
-    position: { x: 370, y: 270 },
+    position: { x: 385, y: 300 },
     data: { label: '🔀 Multimodal' },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
@@ -99,7 +99,7 @@ export function AIArchitectureDiagram() {
       nodes={nodes}
       edges={edges}
       title="AI Architecture Overview"
-      height="420px"
+      height="480px"
     />
   )
 }

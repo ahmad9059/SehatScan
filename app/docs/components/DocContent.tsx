@@ -8,6 +8,7 @@ import {
   ChatbotContextFlow,
   AIArchitectureDiagram,
   DatabaseDiagram,
+  DatabaseArchitectureDiagram,
   SecurityArchitectureDiagram,
 } from './diagrams'
 
@@ -17,19 +18,21 @@ interface DocContentProps {
 }
 
 // Markers in markdown to indicate where diagrams should be inserted
-const DIAGRAM_MARKERS = {
-  '<!-- DIAGRAM:ARCHITECTURE -->': ArchitectureDiagram,
-  '<!-- DIAGRAM:REPORT_FLOW -->': ReportAnalysisFlow,
-  '<!-- DIAGRAM:AUTH_FLOW -->': AuthenticationFlow,
-  '<!-- DIAGRAM:CHATBOT_FLOW -->': ChatbotContextFlow,
-  '<!-- DIAGRAM:AI_ARCHITECTURE -->': AIArchitectureDiagram,
-  '<!-- DIAGRAM:DATABASE -->': DatabaseDiagram,
-  '<!-- DIAGRAM:SECURITY -->': SecurityArchitectureDiagram,
-}
+// Order matters: more specific markers must come before less specific ones
+const DIAGRAM_MARKERS: [string, React.ComponentType][] = [
+  ['<!-- DIAGRAM:ARCHITECTURE -->', ArchitectureDiagram],
+  ['<!-- DIAGRAM:REPORT_FLOW -->', ReportAnalysisFlow],
+  ['<!-- DIAGRAM:AUTH_FLOW -->', AuthenticationFlow],
+  ['<!-- DIAGRAM:CHATBOT_FLOW -->', ChatbotContextFlow],
+  ['<!-- DIAGRAM:AI_ARCHITECTURE -->', AIArchitectureDiagram],
+  ['<!-- DIAGRAM:DATABASE_ARCH -->', DatabaseArchitectureDiagram], // Must come before DATABASE
+  ['<!-- DIAGRAM:DATABASE -->', DatabaseDiagram],
+  ['<!-- DIAGRAM:SECURITY -->', SecurityArchitectureDiagram],
+]
 
 export function DocContent({ content, slug }: DocContentProps) {
   // Check if content contains diagram markers
-  const hasMarkers = Object.keys(DIAGRAM_MARKERS).some(marker => content.includes(marker))
+  const hasMarkers = DIAGRAM_MARKERS.some(([marker]) => content.includes(marker))
 
   if (!hasMarkers) {
     // No markers, render markdown as-is
@@ -40,7 +43,7 @@ export function DocContent({ content, slug }: DocContentProps) {
   const parts: { type: 'markdown' | 'diagram'; content: string; DiagramComponent?: React.ComponentType }[] = []
   let remainingContent = content
 
-  for (const [marker, DiagramComponent] of Object.entries(DIAGRAM_MARKERS)) {
+  for (const [marker, DiagramComponent] of DIAGRAM_MARKERS) {
     if (remainingContent.includes(marker)) {
       const [before, after] = remainingContent.split(marker)
       if (before.trim()) {

@@ -36,28 +36,35 @@ import {
   subheading,
 } from "@/app/components/dashboardStyles";
 
+interface FaceBoundingBox {
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  w?: number;
+  h?: number;
+  label?: string;
+}
+
 interface FaceAnalysisResult {
   face_detected: boolean;
   faces_count: number;
-  faces: Array<{
-    x: number;
-    y: number;
-    width?: number;
-    height?: number;
-    w?: number;
-    h?: number;
-  }>;
+  faces: FaceBoundingBox[];
+  problem_areas?: FaceBoundingBox[];
   image_width?: number;
   image_height?: number;
   visual_metrics: Array<{
     redness_percentage: number;
     yellowness_percentage: number;
+    skin_tone_analysis?: string;
+    overall_skin_health?: string;
   }>;
   problems_detected: Array<{
     type: string;
     severity: "mild" | "moderate" | "severe";
     description: string;
     confidence: number;
+    location?: string;
   }>;
   treatments: Array<{
     category: string;
@@ -493,42 +500,75 @@ function ScanFacePageContent() {
                   </div>
 
                   {visualMetrics ? (
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      {[
-                        {
-                          label: "Redness percentage",
-                          value: visualMetrics.redness_percentage,
-                          color: "bg-[var(--color-danger)]",
-                        },
-                        {
-                          label: "Yellowness percentage",
-                          value: visualMetrics.yellowness_percentage,
-                          color:
-                            visualMetrics.yellowness_percentage > 15
-                              ? "bg-[var(--color-warning)]"
-                              : "bg-[var(--color-success)]",
-                        },
-                      ].map((metric) => (
-                        <div
-                          key={metric.label}
-                          className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl"
-                        >
+                    <div className="space-y-4">
+                      {/* Overall Skin Health Indicator */}
+                      {visualMetrics.overall_skin_health && (
+                        <div className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl">
                           <div className="flex items-center justify-between">
                             <h4 className="text-sm font-semibold text-[var(--color-heading)]">
-                              {metric.label}
+                              Overall Skin Health
                             </h4>
-                            <span className={pill}>{metric.value}%</span>
+                            <span
+                              className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
+                                visualMetrics.overall_skin_health === "healthy"
+                                  ? "bg-[var(--color-primary-soft)] text-[var(--color-success)]"
+                                  : visualMetrics.overall_skin_health === "fair"
+                                    ? "bg-[var(--color-primary-soft)] text-[var(--color-primary)]"
+                                    : visualMetrics.overall_skin_health === "concerning"
+                                      ? "bg-[var(--color-surface)] text-[var(--color-warning)]"
+                                      : "bg-[var(--color-surface)] text-[var(--color-danger)]"
+                              }`}
+                            >
+                              {visualMetrics.overall_skin_health.charAt(0).toUpperCase() +
+                                visualMetrics.overall_skin_health.slice(1).replace("_", " ")}
+                            </span>
                           </div>
-                          <div className="mt-3 h-2 w-full rounded-full bg-[var(--color-surface)]">
-                            <div
-                              className={`h-2 rounded-full ${metric.color}`}
-                              style={{
-                                width: `${Math.min(metric.value, 100)}%`,
-                              }}
-                            />
-                          </div>
+                          {visualMetrics.skin_tone_analysis && (
+                            <p className={`${mutedText} mt-2 text-sm`}>
+                              {visualMetrics.skin_tone_analysis}
+                            </p>
+                          )}
                         </div>
-                      ))}
+                      )}
+
+                      {/* Redness and Yellowness Metrics */}
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {[
+                          {
+                            label: "Redness percentage",
+                            value: visualMetrics.redness_percentage,
+                            color: "bg-[var(--color-danger)]",
+                          },
+                          {
+                            label: "Yellowness percentage",
+                            value: visualMetrics.yellowness_percentage,
+                            color:
+                              visualMetrics.yellowness_percentage > 15
+                                ? "bg-[var(--color-warning)]"
+                                : "bg-[var(--color-success)]",
+                          },
+                        ].map((metric) => (
+                          <div
+                            key={metric.label}
+                            className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl"
+                          >
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-sm font-semibold text-[var(--color-heading)]">
+                                {metric.label}
+                              </h4>
+                              <span className={pill}>{metric.value}%</span>
+                            </div>
+                            <div className="mt-3 h-2 w-full rounded-full bg-[var(--color-surface)]">
+                              <div
+                                className={`h-2 rounded-full ${metric.color}`}
+                                style={{
+                                  width: `${Math.min(metric.value, 100)}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ) : (
                     <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-6 text-center rounded-xl">
@@ -558,6 +598,7 @@ function ScanFacePageContent() {
                       <div className="space-y-3">
                         {result.problems_detected.map((problem, idx) => {
                           const styles = severityStyles[problem.severity];
+                          const isHealthy = problem.type === "Healthy Skin";
                           return (
                             <div
                               key={`${problem.type}-${idx}`}
@@ -565,7 +606,11 @@ function ScanFacePageContent() {
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                  <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
+                                  {isHealthy ? (
+                                    <CheckCircleIcon className="h-5 w-5 text-[var(--color-success)]" />
+                                  ) : (
+                                    <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
+                                  )}
                                   <p className="text-sm font-semibold text-[var(--color-heading)]">
                                     {problem.type}
                                   </p>
@@ -576,9 +621,28 @@ function ScanFacePageContent() {
                                   {styles.label}
                                 </span>
                               </div>
+                              {problem.location && (
+                                <p className="mt-1 text-xs text-[var(--color-primary)] font-medium">
+                                  Location: {problem.location}
+                                </p>
+                              )}
                               <p className={`${mutedText} mt-2 text-sm`}>
                                 {problem.description}
                               </p>
+                              {problem.confidence > 0 && (
+                                <div className="mt-2 flex items-center gap-2">
+                                  <span className="text-xs text-[var(--color-muted)]">Confidence:</span>
+                                  <div className="flex-1 h-1.5 bg-[var(--color-surface)] rounded-full max-w-[100px]">
+                                    <div
+                                      className="h-1.5 bg-[var(--color-primary)] rounded-full"
+                                      style={{ width: `${Math.round(problem.confidence * 100)}%` }}
+                                    />
+                                  </div>
+                                  <span className="text-xs text-[var(--color-muted)]">
+                                    {Math.round(problem.confidence * 100)}%
+                                  </span>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
@@ -635,7 +699,12 @@ function ScanFacePageContent() {
                   <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-5 rounded-xl">
                     <div className="flex items-center justify-between">
                       <h3 className={sectionTitle}>Annotated image</h3>
-                      <span className={chip}>AI overlay</span>
+                      <div className="flex gap-2">
+                        <span className={chip}>AI overlay</span>
+                        {result.problem_areas && result.problem_areas.length > 0 && (
+                          <span className={chip}>{result.problem_areas.length} areas detected</span>
+                        )}
+                      </div>
                     </div>
                     <div className="relative overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-lg">
                       <img
@@ -657,6 +726,7 @@ function ScanFacePageContent() {
                         }}
                       />
 
+                      {/* Face bounding boxes */}
                       {result.faces && result.faces.length > 0 && (
                         <div className="pointer-events-none absolute inset-0">
                           {result.faces.map((face, idx) => {
@@ -703,12 +773,96 @@ function ScanFacePageContent() {
 
                             return (
                               <div
-                                key={`${face.x}-${face.y}-${idx}`}
+                                key={`face-${face.x}-${face.y}-${idx}`}
                                 style={boxStyle}
                                 className="flex items-start"
                               >
                                 <span className="m-2 rounded-md bg-[var(--color-card)] px-2 py-1 text-[10px] font-semibold text-[var(--color-primary)] shadow-sm">
-                                  Face {idx + 1}
+                                  {face.label || `Face ${idx + 1}`}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Problem area annotations */}
+                      {result.problem_areas && result.problem_areas.length > 0 && (
+                        <div className="pointer-events-none absolute inset-0">
+                          {result.problem_areas.map((area, idx) => {
+                            const imgW =
+                              result.image_width ||
+                              annotatedDims.naturalW ||
+                              annotatedDims.renderW ||
+                              1;
+                            const imgH =
+                              result.image_height ||
+                              annotatedDims.naturalH ||
+                              annotatedDims.renderH ||
+                              1;
+                            const scaleX = annotatedDims.renderW
+                              ? annotatedDims.renderW / imgW
+                              : 1;
+                            const scaleY = annotatedDims.renderH
+                              ? annotatedDims.renderH / imgH
+                              : 1;
+
+                            const rawWidth = area.width ?? area.w ?? 50;
+                            const rawHeight = area.height ?? area.h ?? 50;
+                            const rawX = area.x ?? 0;
+                            const rawY = area.y ?? 0;
+
+                            // Get severity color based on corresponding problem
+                            const problem = result.problems_detected?.find(
+                              (p) => p.type === area.label
+                            );
+                            const severity = problem?.severity || "mild";
+                            const severityColors = {
+                              mild: {
+                                border: "var(--color-success)",
+                                bg: "rgba(16, 185, 129, 0.15)",
+                                text: "var(--color-success)",
+                              },
+                              moderate: {
+                                border: "var(--color-warning)",
+                                bg: "rgba(245, 158, 11, 0.15)",
+                                text: "var(--color-warning)",
+                              },
+                              severe: {
+                                border: "var(--color-danger)",
+                                bg: "rgba(239, 68, 68, 0.15)",
+                                text: "var(--color-danger)",
+                              },
+                            };
+                            const colors = severityColors[severity];
+
+                            const boxStyle: CSSProperties = {
+                              left: rawX * scaleX,
+                              top: rawY * scaleY,
+                              width: rawWidth * scaleX,
+                              height: rawHeight * scaleY,
+                              border: `2px solid ${colors.border}`,
+                              boxShadow: `0 0 8px ${colors.bg}`,
+                              borderRadius: "8px",
+                              position: "absolute",
+                              background: colors.bg,
+                            };
+
+                            return (
+                              <div
+                                key={`problem-${area.x}-${area.y}-${idx}`}
+                                style={boxStyle}
+                                className="flex items-end justify-center"
+                              >
+                                <span
+                                  className="mb-[-20px] rounded-md px-2 py-1 text-[9px] font-semibold shadow-sm whitespace-nowrap"
+                                  style={{
+                                    backgroundColor: "var(--color-card)",
+                                    color: colors.text,
+                                    border: `1px solid ${colors.border}`,
+                                  }}
+                                >
+                                  {area.label || `Area ${idx + 1}`}
                                 </span>
                               </div>
                             );
@@ -716,6 +870,25 @@ function ScanFacePageContent() {
                         </div>
                       )}
                     </div>
+
+                    {/* Legend for problem areas */}
+                    {result.problem_areas && result.problem_areas.length > 0 && (
+                      <div className="flex flex-wrap gap-3 pt-2">
+                        <span className="text-xs text-[var(--color-muted)]">Legend:</span>
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-3 rounded border-2 border-[var(--color-success)] bg-[rgba(16,185,129,0.15)]" />
+                          <span className="text-xs text-[var(--color-muted)]">Mild</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-3 rounded border-2 border-[var(--color-warning)] bg-[rgba(245,158,11,0.15)]" />
+                          <span className="text-xs text-[var(--color-muted)]">Moderate</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className="w-3 h-3 rounded border-2 border-[var(--color-danger)] bg-[rgba(239,68,68,0.15)]" />
+                          <span className="text-xs text-[var(--color-muted)]">Severe</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

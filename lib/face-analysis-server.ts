@@ -1,13 +1,16 @@
 /**
  * Server-side face analysis utilities for health indicators
- * Uses server-compatible image processing without browser APIs
+ * Uses Gemini Vision API for accurate skin condition detection
  */
+
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export interface SkinProblem {
   type: string;
   severity: "mild" | "moderate" | "severe";
   description: string;
   confidence: number;
+  location?: string; // Area of face where problem is detected
 }
 
 export interface Treatment {
@@ -17,15 +20,19 @@ export interface Treatment {
   timeframe: string;
 }
 
+export interface FaceBoundingBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  label?: string; // Optional label for the detected area
+}
+
 export interface FaceDetectionResult {
   face_detected: boolean;
   faces_count: number;
-  faces: Array<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }>;
+  faces: FaceBoundingBox[];
+  problem_areas?: FaceBoundingBox[]; // Specific areas with detected problems
   image_width?: number;
   image_height?: number;
   visual_metrics: Array<{
@@ -33,101 +40,335 @@ export interface FaceDetectionResult {
     redness_percentage: number;
     yellowness_percentage: number;
     skin_tone_analysis: string;
+    overall_skin_health?: string;
   }>;
   problems_detected: SkinProblem[];
   treatments: Treatment[];
   annotated_image?: string; // Base64 encoded image
 }
 
+interface GeminiAnalysisResult {
+  face_detected: boolean;
+  faces_count: number;
+  face_bounds: {
+    x_percent: number;
+    y_percent: number;
+    width_percent: number;
+    height_percent: number;
+  };
+  skin_analysis: {
+    overall_health: string;
+    redness_level: number;
+    yellowness_level: number;
+    skin_tone: string;
+  };
+  detected_conditions: Array<{
+    condition: string;
+    severity: "mild" | "moderate" | "severe";
+    confidence: number;
+    description: string;
+    location: string;
+    area_bounds?: {
+      x_percent: number;
+      y_percent: number;
+      width_percent: number;
+      height_percent: number;
+    };
+  }>;
+  recommended_treatments: Array<{
+    category: string;
+    recommendation: string;
+    priority: "low" | "medium" | "high";
+    timeframe: string;
+  }>;
+}
+
 /**
- * Server-side face analysis using basic image processing
- * This is a simplified version that works without browser APIs
+ * Analyze face image using Gemini Vision API
+ */
+async function analyzeWithGemini(
+  base64Image: string,
+  mimeType: string
+): Promise<GeminiAnalysisResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable is not set");
+  }
+
+  const genai = new GoogleGenerativeAI(apiKey);
+  const model = genai.getGenerativeModel({
+    model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  });
+
+  const prompt = `You are a dermatology AI assistant analyzing a facial image for skin health indicators. Analyze this image carefully and provide accurate detection of any skin conditions visible.
+
+IMPORTANT: Analyze the ACTUAL image provided. Do not make up conditions that are not visible. Be accurate and honest about what you can see.
+
+Analyze the image and return a JSON response with this exact structure:
+{
+  "face_detected": true/false,
+  "faces_count": number,
+  "face_bounds": {
+    "x_percent": number (0-100, left edge of face as percentage of image width),
+    "y_percent": number (0-100, top edge of face as percentage of image height),
+    "width_percent": number (0-100, face width as percentage of image width),
+    "height_percent": number (0-100, face height as percentage of image height)
+  },
+  "skin_analysis": {
+    "overall_health": "healthy/fair/concerning/needs_attention",
+    "redness_level": number (0-100, actual observed redness),
+    "yellowness_level": number (0-100, actual observed yellowness/jaundice signs),
+    "skin_tone": "Description of observed skin tone and texture"
+  },
+  "detected_conditions": [
+    {
+      "condition": "Name of skin condition (e.g., Acne, Rosacea, Dry Skin, Dark Circles, Hyperpigmentation, Wrinkles, Eczema, Psoriasis, Moles, Sunspots, etc.)",
+      "severity": "mild/moderate/severe",
+      "confidence": number (0-1, your confidence in this detection),
+      "description": "Detailed description of what you observe",
+      "location": "Where on the face (e.g., forehead, cheeks, nose, chin, under eyes, T-zone, jawline)",
+      "area_bounds": {
+        "x_percent": number (0-100),
+        "y_percent": number (0-100),
+        "width_percent": number (0-100),
+        "height_percent": number (0-100)
+      }
+    }
+  ],
+  "recommended_treatments": [
+    {
+      "category": "Category (e.g., Skincare, Lifestyle, Medical Consultation, Immediate Care)",
+      "recommendation": "Specific actionable recommendation",
+      "priority": "low/medium/high",
+      "timeframe": "When to implement (e.g., Daily, Immediately, Within 1 week)"
+    }
+  ]
+}
+
+Guidelines:
+- If no face is detected, set face_detected to false and return minimal data
+- Only report conditions you can actually see in the image - do NOT fabricate conditions
+- Be specific about locations and provide accurate bounding boxes for problem areas
+- Provide realistic confidence scores based on image clarity and visibility
+- If skin appears healthy, say so - don't invent problems
+- Consider lighting conditions when assessing colors
+- Provide practical, actionable treatment recommendations
+
+Return ONLY valid JSON, no additional text or markdown.`;
+
+  try {
+    const result = await model.generateContent([
+      {
+        inlineData: {
+          mimeType,
+          data: base64Image,
+        },
+      },
+      prompt,
+    ]);
+
+    const response = await result.response;
+    let responseText = response.text().trim();
+
+    // Clean up response (remove markdown code blocks if present)
+    if (responseText.startsWith("```json")) {
+      responseText = responseText.slice(7);
+    }
+    if (responseText.startsWith("```")) {
+      responseText = responseText.slice(3);
+    }
+    if (responseText.endsWith("```")) {
+      responseText = responseText.slice(0, -3);
+    }
+    responseText = responseText.trim();
+
+    const analysisResult: GeminiAnalysisResult = JSON.parse(responseText);
+    return analysisResult;
+  } catch (error) {
+    console.error("Gemini analysis error:", error);
+    throw new Error(
+      `Gemini Vision API error: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
+}
+
+/**
+ * Server-side face analysis using Gemini Vision API
+ * Provides accurate skin condition detection from facial images
  */
 export async function analyzeFaceImageServer(
   file: File
 ): Promise<FaceDetectionResult> {
   try {
-    // Convert file to buffer for server-side processing
+    // Convert file to buffer for processing
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const dataUrl = `data:${file.type || "image/jpeg"};base64,${buffer.toString(
-      "base64"
-    )}`;
+    const base64Image = buffer.toString("base64");
+    const mimeType = file.type || "image/jpeg";
+    const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
-    // Best-effort image dimensions to scale overlay on the client
+    // Get image dimensions for scaling
     const { width: imgWidth, height: imgHeight } = getImageDimensions(buffer);
 
-    // For now, we'll create a mock analysis since we don't have access to
-    // image processing libraries like Sharp or Canvas in this environment
-    // In a production setup, you'd install and use libraries like:
-    // - sharp for image processing
-    // - @tensorflow/tfjs-node for face detection
-    // - canvas for drawing operations
+    // Analyze with Gemini Vision API
+    const geminiResult = await analyzeWithGemini(base64Image, mimeType);
 
-    // Simulate processing time
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Convert Gemini results to our interface format
+    const faces: FaceBoundingBox[] = [];
+    const problemAreas: FaceBoundingBox[] = [];
 
-    // Generate mock analysis based on file properties
-    const fileSize = buffer.length;
-    const fileName = file.name.toLowerCase();
+    if (geminiResult.face_detected && geminiResult.face_bounds) {
+      const fb = geminiResult.face_bounds;
+      faces.push({
+        x: Math.round((fb.x_percent / 100) * imgWidth),
+        y: Math.round((fb.y_percent / 100) * imgHeight),
+        width: Math.round((fb.width_percent / 100) * imgWidth),
+        height: Math.round((fb.height_percent / 100) * imgHeight),
+        label: "Face",
+      });
+    }
 
-    // Simple heuristics based on file characteristics
-    const mockRedness = Math.min(80, Math.max(10, (fileSize % 100) + 20));
-    const mockYellowness = Math.min(
-      70,
-      Math.max(5, (fileName.length % 50) + 15)
-    );
+    // Add problem area bounding boxes
+    for (const condition of geminiResult.detected_conditions || []) {
+      if (condition.area_bounds) {
+        const ab = condition.area_bounds;
+        problemAreas.push({
+          x: Math.round((ab.x_percent / 100) * imgWidth),
+          y: Math.round((ab.y_percent / 100) * imgHeight),
+          width: Math.round((ab.width_percent / 100) * imgWidth),
+          height: Math.round((ab.height_percent / 100) * imgHeight),
+          label: condition.condition,
+        });
+      }
+    }
 
-    // Generate detailed problem analysis and treatments
-    const problemsDetected = analyzeSkinProblems(mockRedness, mockYellowness);
-    const treatments = generateTreatmentRecommendations(problemsDetected);
+    // Convert detected conditions to our SkinProblem format
+    const problemsDetected: SkinProblem[] = (
+      geminiResult.detected_conditions || []
+    ).map((condition) => ({
+      type: condition.condition,
+      severity: condition.severity,
+      description: condition.description,
+      confidence: condition.confidence,
+      location: condition.location,
+    }));
 
-    // Create mock face detection result
-    const boxWidth = Math.max(180, Math.round(imgWidth * 0.45));
-    const boxHeight = Math.max(180, Math.round(imgHeight * 0.5));
-    const boxX = Math.max(0, Math.round((imgWidth - boxWidth) / 2));
-    const boxY = Math.max(0, Math.round((imgHeight - boxHeight) / 2.5));
+    // Convert treatments
+    const treatments: Treatment[] = (
+      geminiResult.recommended_treatments || []
+    ).map((treatment) => ({
+      category: treatment.category,
+      recommendation: treatment.recommendation,
+      priority: treatment.priority,
+      timeframe: treatment.timeframe,
+    }));
+
+    // If no problems detected, add a healthy skin message
+    if (problemsDetected.length === 0 && geminiResult.face_detected) {
+      problemsDetected.push({
+        type: "Healthy Skin",
+        severity: "mild",
+        description:
+          "No significant skin concerns detected. Your skin appears healthy with normal coloration and texture.",
+        confidence: 0.9,
+        location: "Overall face",
+      });
+
+      treatments.push({
+        category: "Maintenance",
+        recommendation:
+          "Continue your current skincare routine. Use SPF 30+ sunscreen daily, moisturize regularly, and stay hydrated.",
+        priority: "low",
+        timeframe: "Ongoing daily routine",
+      });
+    }
+
+    const skinAnalysis = geminiResult.skin_analysis || {
+      overall_health: "unknown",
+      redness_level: 0,
+      yellowness_level: 0,
+      skin_tone: "Unable to analyze",
+    };
 
     const result: FaceDetectionResult = {
-      face_detected: true,
-      faces_count: 1,
-      faces: [
-        {
-          x: boxX,
-          y: boxY,
-          width: boxWidth,
-          height: boxHeight,
-        },
-      ],
+      face_detected: geminiResult.face_detected,
+      faces_count: geminiResult.faces_count || (geminiResult.face_detected ? 1 : 0),
+      faces,
+      problem_areas: problemAreas,
       image_width: imgWidth,
       image_height: imgHeight,
       visual_metrics: [
         {
           face_index: 0,
-          redness_percentage: mockRedness,
-          yellowness_percentage: mockYellowness,
-          skin_tone_analysis: generateSkinToneAnalysis(
-            mockRedness,
-            mockYellowness
-          ),
+          redness_percentage: Math.round(skinAnalysis.redness_level),
+          yellowness_percentage: Math.round(skinAnalysis.yellowness_level),
+          skin_tone_analysis: skinAnalysis.skin_tone,
+          overall_skin_health: skinAnalysis.overall_health,
         },
       ],
       problems_detected: problemsDetected,
-      treatments: treatments,
-      // Send back the original image as a data URL so the UI can render it
-      // instead of a blank placeholder. In production, replace with a real
-      // annotated overlay image.
+      treatments,
       annotated_image: dataUrl,
     };
 
     return result;
   } catch (error) {
-    throw new Error(
-      `Server-side face analysis failed: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    // If Gemini fails, fall back to basic analysis
+    console.error("Gemini analysis failed, using fallback:", error);
+    return fallbackAnalysis(file);
   }
+}
+
+/**
+ * Fallback analysis when Gemini API is unavailable
+ */
+async function fallbackAnalysis(file: File): Promise<FaceDetectionResult> {
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const dataUrl = `data:${file.type || "image/jpeg"};base64,${buffer.toString("base64")}`;
+  const { width: imgWidth, height: imgHeight } = getImageDimensions(buffer);
+
+  // Create centered face box as fallback
+  const boxWidth = Math.max(180, Math.round(imgWidth * 0.45));
+  const boxHeight = Math.max(180, Math.round(imgHeight * 0.5));
+  const boxX = Math.max(0, Math.round((imgWidth - boxWidth) / 2));
+  const boxY = Math.max(0, Math.round((imgHeight - boxHeight) / 2.5));
+
+  return {
+    face_detected: true,
+    faces_count: 1,
+    faces: [{ x: boxX, y: boxY, width: boxWidth, height: boxHeight }],
+    image_width: imgWidth,
+    image_height: imgHeight,
+    visual_metrics: [
+      {
+        face_index: 0,
+        redness_percentage: 0,
+        yellowness_percentage: 0,
+        skin_tone_analysis:
+          "Unable to analyze - AI service temporarily unavailable. Please try again.",
+      },
+    ],
+    problems_detected: [
+      {
+        type: "Analysis Unavailable",
+        severity: "mild",
+        description:
+          "The AI analysis service is temporarily unavailable. Please try again in a moment for accurate skin condition detection.",
+        confidence: 1,
+      },
+    ],
+    treatments: [
+      {
+        category: "Retry",
+        recommendation:
+          "Please try uploading your image again for accurate analysis.",
+        priority: "medium",
+        timeframe: "Now",
+      },
+    ],
+    annotated_image: dataUrl,
+  };
 }
 
 function getImageDimensions(buffer: Buffer): { width: number; height: number } {
@@ -165,254 +406,3 @@ function getImageDimensions(buffer: Buffer): { width: number; height: number } {
   return { width: 800, height: 600 };
 }
 
-/**
- * Analyze skin problems based on color percentages
- */
-function analyzeSkinProblems(
-  redness: number,
-  yellowness: number
-): SkinProblem[] {
-  const problems: SkinProblem[] = [];
-
-  // Analyze redness levels
-  if (redness > 70) {
-    problems.push({
-      type: "Severe Inflammation",
-      severity: "severe",
-      description:
-        "High levels of redness detected, indicating possible severe inflammation, acute dermatitis, or allergic reaction. This may be accompanied by swelling, pain, or burning sensation.",
-      confidence: 0.85,
-    });
-  } else if (redness > 50) {
-    problems.push({
-      type: "Moderate Inflammation",
-      severity: "moderate",
-      description:
-        "Moderate redness detected, suggesting inflammation, irritation, or possible rosacea. This could be due to sun exposure, skincare products, or underlying skin conditions.",
-      confidence: 0.75,
-    });
-  } else if (redness > 30) {
-    problems.push({
-      type: "Mild Irritation",
-      severity: "mild",
-      description:
-        "Mild redness detected, which may indicate minor skin irritation, sensitivity, or recent sun exposure. This is often temporary and may resolve on its own.",
-      confidence: 0.65,
-    });
-  }
-
-  // Analyze yellowness levels
-  if (yellowness > 60) {
-    problems.push({
-      type: "Possible Jaundice",
-      severity: "severe",
-      description:
-        "Significant yellowness detected in the skin, which may indicate jaundice - a condition often related to liver dysfunction, bile duct problems, or blood disorders. Immediate medical consultation is recommended.",
-      confidence: 0.8,
-    });
-  } else if (yellowness > 40) {
-    problems.push({
-      type: "Mild Yellowing",
-      severity: "moderate",
-      description:
-        "Moderate yellowness detected, which could indicate early signs of jaundice, carotenemia (excess beta-carotene), or certain medications' side effects.",
-      confidence: 0.7,
-    });
-  } else if (yellowness > 25) {
-    problems.push({
-      type: "Slight Discoloration",
-      severity: "mild",
-      description:
-        "Slight yellowish tint detected, which may be due to natural skin tone variation, lighting conditions, or dietary factors (high carotene intake).",
-      confidence: 0.6,
-    });
-  }
-
-  // Combined analysis
-  if (redness > 40 && yellowness > 30) {
-    problems.push({
-      type: "Mixed Skin Discoloration",
-      severity: "moderate",
-      description:
-        "Both redness and yellowness detected, suggesting possible complex skin condition, medication side effects, or multiple underlying issues requiring professional evaluation.",
-      confidence: 0.7,
-    });
-  }
-
-  // If no significant problems detected
-  if (problems.length === 0) {
-    problems.push({
-      type: "Normal Skin Appearance",
-      severity: "mild",
-      description:
-        "Skin color appears within normal ranges. No significant discoloration or inflammation detected. Continue with regular skincare routine.",
-      confidence: 0.9,
-    });
-  }
-
-  return problems;
-}
-
-/**
- * Generate treatment recommendations based on detected problems
- */
-function generateTreatmentRecommendations(
-  problems: SkinProblem[]
-): Treatment[] {
-  const treatments: Treatment[] = [];
-  const problemTypes = problems.map((p) => p.type);
-
-  // Treatments for inflammation/redness
-  if (
-    problemTypes.some(
-      (type) => type.includes("Inflammation") || type.includes("Irritation")
-    )
-  ) {
-    treatments.push({
-      category: "Immediate Care",
-      recommendation:
-        "Apply cool compresses for 10-15 minutes several times daily to reduce inflammation. Avoid hot water and harsh skincare products.",
-      priority: "high",
-      timeframe: "Start immediately",
-    });
-
-    treatments.push({
-      category: "Skincare",
-      recommendation:
-        "Use gentle, fragrance-free moisturizers and cleansers. Consider products with aloe vera, chamomile, or niacinamide to soothe irritation.",
-      priority: "high",
-      timeframe: "Daily routine",
-    });
-
-    treatments.push({
-      category: "Lifestyle",
-      recommendation:
-        "Identify and avoid potential triggers (new skincare products, detergents, foods). Protect skin from sun exposure with SPF 30+ sunscreen.",
-      priority: "medium",
-      timeframe: "Ongoing",
-    });
-  }
-
-  // Treatments for severe conditions
-  if (
-    problemTypes.some(
-      (type) => type.includes("Severe") || type.includes("Jaundice")
-    )
-  ) {
-    treatments.push({
-      category: "Medical Consultation",
-      recommendation:
-        "Schedule an appointment with a dermatologist or healthcare provider within 24-48 hours for proper diagnosis and treatment plan.",
-      priority: "high",
-      timeframe: "Within 1-2 days",
-    });
-
-    treatments.push({
-      category: "Monitoring",
-      recommendation:
-        "Document symptoms with photos and notes. Monitor for changes in color, size, or associated symptoms like itching, pain, or fever.",
-      priority: "high",
-      timeframe: "Daily until seen by doctor",
-    });
-  }
-
-  // Treatments for jaundice specifically
-  if (problemTypes.some((type) => type.includes("Jaundice"))) {
-    treatments.push({
-      category: "Urgent Medical Care",
-      recommendation:
-        "Seek immediate medical attention. Jaundice can indicate serious liver or blood conditions requiring prompt treatment.",
-      priority: "high",
-      timeframe: "Immediately",
-    });
-
-    treatments.push({
-      category: "Preparation for Medical Visit",
-      recommendation:
-        "Prepare a list of all medications, supplements, and recent dietary changes. Note any associated symptoms like fatigue, abdominal pain, or dark urine.",
-      priority: "high",
-      timeframe: "Before medical appointment",
-    });
-  }
-
-  // General maintenance treatments
-  if (
-    problemTypes.some(
-      (type) => type.includes("Normal") || type.includes("Mild")
-    )
-  ) {
-    treatments.push({
-      category: "Prevention",
-      recommendation:
-        "Maintain a consistent skincare routine with gentle cleansing, moisturizing, and daily sun protection to prevent future skin issues.",
-      priority: "medium",
-      timeframe: "Daily routine",
-    });
-
-    treatments.push({
-      category: "Nutrition",
-      recommendation:
-        "Maintain a balanced diet rich in antioxidants (fruits, vegetables) and stay hydrated. Consider omega-3 supplements for skin health.",
-      priority: "low",
-      timeframe: "Ongoing lifestyle",
-    });
-  }
-
-  // Always include general advice
-  treatments.push({
-    category: "General Health",
-    recommendation:
-      "Regular health check-ups can help detect underlying conditions early. Keep a skin diary to track changes over time.",
-    priority: "low",
-    timeframe: "Schedule annually",
-  });
-
-  return treatments;
-}
-
-/**
- * Generate skin tone analysis based on color percentages
- */
-function generateSkinToneAnalysis(redness: number, yellowness: number): string {
-  if (redness > 60) {
-    return "High redness detected - may indicate inflammation, irritation, or recent sun exposure";
-  } else if (yellowness > 50) {
-    return "Elevated yellowness detected - may indicate jaundice or liver-related issues, consult healthcare provider";
-  } else if (redness < 20 && yellowness < 20) {
-    return "Low color saturation detected - may indicate pale complexion or lighting conditions";
-  } else {
-    return "Normal skin tone detected - color levels appear within typical ranges";
-  }
-}
-
-/**
- * Generate a mock base64 image (placeholder)
- * In production, this would be an actual annotated image
- */
-function generateMockAnnotatedImage(): string {
-  // This is a minimal 1x1 pixel transparent PNG in base64
-  // In production, you'd use a proper image processing library to create
-  // an annotated version of the original image with bounding boxes
-  return "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
-}
-
-/**
- * Alternative: Client-side face analysis instructions
- * Since face analysis works best with browser APIs, you might want to
- * move this functionality to the client side where you have access to:
- * - Canvas API for image manipulation
- * - WebGL for GPU acceleration
- * - MediaDevices API for camera access
- * - Better performance for real-time analysis
- */
-export const CLIENT_SIDE_INSTRUCTIONS = {
-  recommendation:
-    "For better face analysis, consider moving this to client-side",
-  benefits: [
-    "Access to Canvas API for image processing",
-    "Better performance with GPU acceleration",
-    "Real-time analysis capabilities",
-    "No server load for image processing",
-  ],
-  implementation: "Use the face-analysis.ts file in a client component",
-};

@@ -2,6 +2,29 @@
 
 import { Node, Edge, MarkerType } from '@xyflow/react'
 import { DiagramWrapper } from './DiagramWrapper'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faHome,
+  faChartBar,
+  faFlask,
+  faRobot,
+  faBolt,
+  faPlug,
+  faBrain,
+  faLock,
+  faDatabase,
+  faCloud,
+  faKey,
+} from '@fortawesome/free-solid-svg-icons'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+
+// Helper component for node labels with Font Awesome icons
+const NodeLabel = ({ icon, text, color }: { icon: IconDefinition; text: string; color: string }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <FontAwesomeIcon icon={icon} style={{ width: '14px', height: '14px', color }} />
+    <span>{text}</span>
+  </div>
+)
 
 const nodeDefaults = {
   style: {
@@ -47,25 +70,25 @@ const nodes: Node[] = [
   {
     id: 'landing',
     position: { x: 70, y: 45 },
-    data: { label: '🏠 Landing Page' },
+    data: { label: <NodeLabel icon={faHome} text="Landing Page" color="var(--color-primary)" /> },
     style: serviceStyle,
   },
   {
     id: 'dashboard',
     position: { x: 230, y: 45 },
-    data: { label: '📊 Dashboard' },
+    data: { label: <NodeLabel icon={faChartBar} text="Dashboard" color="var(--color-primary)" /> },
     style: serviceStyle,
   },
   {
     id: 'analysis',
     position: { x: 390, y: 45 },
-    data: { label: '🔬 Analysis Pages' },
+    data: { label: <NodeLabel icon={faFlask} text="Analysis Pages" color="var(--color-primary)" /> },
     style: serviceStyle,
   },
   {
     id: 'chatbot',
     position: { x: 580, y: 45 },
-    data: { label: '🤖 Chatbot' },
+    data: { label: <NodeLabel icon={faRobot} text="Chatbot" color="var(--color-primary)" /> },
     style: serviceStyle,
   },
 
@@ -80,13 +103,13 @@ const nodes: Node[] = [
   {
     id: 'server-actions',
     position: { x: 170, y: 205 },
-    data: { label: '⚡ Server Actions' },
+    data: { label: <NodeLabel icon={faBolt} text="Server Actions" color="#065f46" /> },
     style: { ...serviceStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'api-routes',
     position: { x: 470, y: 205 },
-    data: { label: '🔌 API Routes' },
+    data: { label: <NodeLabel icon={faPlug} text="API Routes" color="#065f46" /> },
     style: { ...serviceStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
 
@@ -101,19 +124,19 @@ const nodes: Node[] = [
   {
     id: 'gemini-service',
     position: { x: 100, y: 365 },
-    data: { label: '🧠 Gemini AI' },
+    data: { label: <NodeLabel icon={faBrain} text="Gemini AI" color="#5b21b6" /> },
     style: { ...serviceStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'clerk-service',
     position: { x: 300, y: 365 },
-    data: { label: '🔐 Clerk Auth' },
+    data: { label: <NodeLabel icon={faLock} text="Clerk Auth" color="#5b21b6" /> },
     style: { ...serviceStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'prisma-service',
     position: { x: 500, y: 365 },
-    data: { label: '🗄️ Prisma ORM' },
+    data: { label: <NodeLabel icon={faDatabase} text="Prisma ORM" color="#5b21b6" /> },
     style: { ...serviceStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
 
@@ -128,19 +151,19 @@ const nodes: Node[] = [
   {
     id: 'google-api',
     position: { x: 100, y: 525 },
-    data: { label: '☁️ Google Gemini' },
+    data: { label: <NodeLabel icon={faCloud} text="Google Gemini" color="#92400e" /> },
     style: externalStyle,
   },
   {
     id: 'clerk-platform',
     position: { x: 300, y: 525 },
-    data: { label: '🔑 Clerk Platform' },
+    data: { label: <NodeLabel icon={faKey} text="Clerk Platform" color="#92400e" /> },
     style: externalStyle,
   },
   {
     id: 'supabase',
     position: { x: 500, y: 525 },
-    data: { label: '🐘 Supabase PG' },
+    data: { label: <NodeLabel icon={faDatabase} text="Supabase PG" color="#92400e" /> },
     style: externalStyle,
   },
 ]

@@ -2,6 +2,45 @@
 
 import { Node, Edge, MarkerType } from "@xyflow/react";
 import { DiagramWrapper } from "./DiagramWrapper";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faFile,
+  faPlug,
+  faFolder,
+  faDatabase,
+  faLock,
+  faCloud,
+} from "@fortawesome/free-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
+// Helper component for node labels with Font Awesome icons (multiline support)
+const NodeLabel = ({
+  icon,
+  text,
+  color,
+  multiline = false,
+}: {
+  icon: IconDefinition;
+  text: string;
+  color: string;
+  multiline?: boolean;
+}) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: multiline ? "column" : "row",
+      alignItems: "center",
+      gap: multiline ? "4px" : "8px",
+      textAlign: multiline ? "center" : "left",
+    }}
+  >
+    <FontAwesomeIcon
+      icon={icon}
+      style={{ width: "14px", height: "14px", color }}
+    />
+    <span style={{ whiteSpace: multiline ? "pre-wrap" : "normal" }}>{text}</span>
+  </div>
+);
 
 const nodeDefaults = {
   style: {
@@ -49,7 +88,11 @@ const nodes: Node[] = [
   {
     id: "pages-ssr",
     position: { x: 70, y: 100 },
-    data: { label: "📄 Pages\n(SSR)" },
+    data: {
+      label: (
+        <NodeLabel icon={faFile} text={"Pages\n(SSR)"} color="#1e40af" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#dbeafe",
@@ -63,7 +106,11 @@ const nodes: Node[] = [
   {
     id: "api-routes",
     position: { x: 220, y: 100 },
-    data: { label: "🔌 API\nRoutes" },
+    data: {
+      label: (
+        <NodeLabel icon={faPlug} text={"API\nRoutes"} color="#1e40af" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#dbeafe",
@@ -77,7 +124,11 @@ const nodes: Node[] = [
   {
     id: "static-assets",
     position: { x: 370, y: 100 },
-    data: { label: "📁 Static\nAssets" },
+    data: {
+      label: (
+        <NodeLabel icon={faFolder} text={"Static\nAssets"} color="#1e40af" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#dbeafe",
@@ -93,7 +144,11 @@ const nodes: Node[] = [
   {
     id: "supabase",
     position: { x: 20, y: 280 },
-    data: { label: "🐘 Supabase\nPostgreSQL" },
+    data: {
+      label: (
+        <NodeLabel icon={faDatabase} text={"Supabase\nPostgreSQL"} color="#065f46" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#d1fae5",
@@ -107,7 +162,11 @@ const nodes: Node[] = [
   {
     id: "clerk",
     position: { x: 200, y: 280 },
-    data: { label: "🔐 Clerk\nAuthentication" },
+    data: {
+      label: (
+        <NodeLabel icon={faLock} text={"Clerk\nAuthentication"} color="#5b21b6" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#ede9fe",
@@ -121,7 +180,11 @@ const nodes: Node[] = [
   {
     id: "google-cloud",
     position: { x: 390, y: 280 },
-    data: { label: "☁️ Google Cloud\nGemini API" },
+    data: {
+      label: (
+        <NodeLabel icon={faCloud} text={"Google Cloud\nGemini API"} color="#92400e" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#fef3c7",

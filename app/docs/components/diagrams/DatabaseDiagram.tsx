@@ -14,17 +14,17 @@ import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
 
 // Helper component for node labels with Font Awesome icons
 const NodeLabel = ({ icon, text, color }: { icon: IconDefinition; text: string; color: string }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
     <FontAwesomeIcon icon={icon} style={{ width: '14px', height: '14px', color }} />
     <span>{text}</span>
   </div>
 )
 
-const nodeStyle = {
+// Shared styles
+const baseNodeStyle = {
   borderRadius: '8px',
-  fontSize: '11px',
+  fontSize: '12px',
   fontWeight: 500,
-  padding: '10px 14px',
   fontFamily: 'var(--font-heading), Poppins, sans-serif',
 }
 
@@ -34,86 +34,154 @@ const layerStyle = {
   borderRadius: '12px',
 }
 
-// Database Architecture Diagram nodes
+// Database Architecture Diagram - Clean vertical flow
 const archNodes: Node[] = [
-  // Application Layer
+  // APPLICATION LAYER
   {
     id: 'app-layer',
-    position: { x: 50, y: 0 },
+    position: { x: 100, y: 0 },
     data: { label: 'APPLICATION' },
-    style: { ...layerStyle, width: 520, height: 120, background: 'rgba(59, 130, 246, 0.05)' },
+    style: {
+      ...layerStyle,
+      width: 400,
+      height: 100,
+      background: 'rgba(59, 130, 246, 0.05)',
+    },
   },
   {
-    id: 'prisma-client',
-    position: { x: 130, y: 50 },
-    data: { label: <NodeLabel icon={faDatabase} text="Prisma Client (Type-safe queries)" color="#1e40af" /> },
-    style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
+    id: 'prisma',
+    position: { x: 200, y: 35 },
+    data: { label: <NodeLabel icon={faDatabase} text="Prisma Client" color="#1e40af" /> },
+    style: {
+      ...baseNodeStyle,
+      background: '#dbeafe',
+      border: '2px solid #3b82f6',
+      color: '#1e40af',
+      padding: '12px 24px',
+      width: 180,
+      textAlign: 'center',
+    },
   },
 
-  // Supabase Pooler Layer
+  // SUPABASE POOLER LAYER
   {
     id: 'pooler-layer',
-    position: { x: 50, y: 170 },
+    position: { x: 100, y: 140 },
     data: { label: 'SUPABASE POOLER' },
-    style: { ...layerStyle, width: 520, height: 120, background: 'rgba(16, 185, 129, 0.05)' },
+    style: {
+      ...layerStyle,
+      width: 400,
+      height: 100,
+      background: 'rgba(16, 185, 129, 0.05)',
+    },
   },
   {
     id: 'pgbouncer',
-    position: { x: 110, y: 220 },
-    data: { label: <NodeLabel icon={faRotate} text="PgBouncer (Connection Pooling)" color="#065f46" /> },
-    style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
+    position: { x: 200, y: 175 },
+    data: { label: <NodeLabel icon={faRotate} text="PgBouncer" color="#065f46" /> },
+    style: {
+      ...baseNodeStyle,
+      background: '#d1fae5',
+      border: '2px solid #10b981',
+      color: '#065f46',
+      padding: '12px 24px',
+      width: 180,
+      textAlign: 'center',
+    },
   },
 
-  // PostgreSQL Layer
+  // POSTGRESQL LAYER
   {
     id: 'postgres-layer',
-    position: { x: 50, y: 340 },
+    position: { x: 100, y: 280 },
     data: { label: 'POSTGRESQL' },
-    style: { ...layerStyle, width: 520, height: 120, background: 'rgba(139, 92, 246, 0.05)' },
+    style: {
+      ...layerStyle,
+      width: 400,
+      height: 110,
+      background: 'rgba(139, 92, 246, 0.05)',
+    },
   },
   {
-    id: 'users-table',
-    position: { x: 90, y: 390 },
+    id: 'users',
+    position: { x: 120, y: 320 },
     data: { label: <NodeLabel icon={faUser} text="Users" color="#5b21b6" /> },
-    style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
+    style: {
+      ...baseNodeStyle,
+      background: '#ede9fe',
+      border: '2px solid #8b5cf6',
+      color: '#5b21b6',
+      padding: '10px 16px',
+      width: 110,
+      textAlign: 'center',
+    },
   },
   {
-    id: 'analyses-table',
-    position: { x: 240, y: 390 },
+    id: 'analyses',
+    position: { x: 245, y: 320 },
     data: { label: <NodeLabel icon={faFlask} text="Analyses" color="#5b21b6" /> },
-    style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
+    style: {
+      ...baseNodeStyle,
+      background: '#ede9fe',
+      border: '2px solid #8b5cf6',
+      color: '#5b21b6',
+      padding: '10px 16px',
+      width: 110,
+      textAlign: 'center',
+    },
   },
   {
-    id: 'future-tables',
-    position: { x: 400, y: 390 },
-    data: { label: <NodeLabel icon={faCube} text="Future..." color="#7c3aed" /> },
-    style: { ...nodeStyle, background: '#f3e8ff', border: '1px dashed #8b5cf6', color: '#7c3aed' },
+    id: 'future',
+    position: { x: 370, y: 320 },
+    data: { label: <NodeLabel icon={faCube} text="Future..." color="#5b21b6" /> },
+    style: {
+      ...baseNodeStyle,
+      background: '#ede9fe',
+      border: '2px solid #8b5cf6',
+      color: '#5b21b6',
+      padding: '10px 16px',
+      width: 110,
+      textAlign: 'center',
+    },
   },
 ]
 
 const archEdges: Edge[] = [
+  // Prisma to PgBouncer
   {
-    id: 'app-to-pooler',
-    source: 'prisma-client',
+    id: 'e1',
+    source: 'prisma',
     target: 'pgbouncer',
     type: 'smoothstep',
     animated: true,
     style: { stroke: '#3b82f6', strokeWidth: 2 },
     markerEnd: { type: MarkerType.ArrowClosed, color: '#3b82f6' },
   },
+  // PgBouncer to Users
   {
-    id: 'pooler-to-users',
+    id: 'e2',
     source: 'pgbouncer',
-    target: 'users-table',
+    target: 'users',
     type: 'smoothstep',
     animated: true,
     style: { stroke: '#10b981', strokeWidth: 2 },
     markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' },
   },
+  // PgBouncer to Analyses
   {
-    id: 'pooler-to-analyses',
+    id: 'e3',
     source: 'pgbouncer',
-    target: 'analyses-table',
+    target: 'analyses',
+    type: 'smoothstep',
+    animated: true,
+    style: { stroke: '#10b981', strokeWidth: 2 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' },
+  },
+  // PgBouncer to Future
+  {
+    id: 'e4',
+    source: 'pgbouncer',
+    target: 'future',
     type: 'smoothstep',
     animated: true,
     style: { stroke: '#10b981', strokeWidth: 2 },
@@ -121,7 +189,7 @@ const archEdges: Edge[] = [
   },
 ]
 
-// Entity Relationship Diagram
+// Entity Relationship Diagram styles
 const tableStyle = {
   borderRadius: '8px',
   fontSize: '11px',
@@ -329,7 +397,7 @@ export function DatabaseArchitectureDiagram() {
       nodes={archNodes}
       edges={archEdges}
       title="Database Architecture"
-      height="580px"
+      height="480px"
     />
   )
 }

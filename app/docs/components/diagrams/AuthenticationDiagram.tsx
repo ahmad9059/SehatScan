@@ -2,6 +2,45 @@
 
 import { Node, Edge, MarkerType } from "@xyflow/react";
 import { DiagramWrapper } from "./DiagramWrapper";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faKey,
+  faUserPlus,
+  faGlobe,
+  faLock,
+  faBolt,
+  faDatabase,
+} from "@fortawesome/free-solid-svg-icons";
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
+// Helper component for node labels with Font Awesome icons (multiline support)
+const NodeLabel = ({
+  icon,
+  text,
+  color,
+  multiline = false,
+}: {
+  icon: IconDefinition;
+  text: string;
+  color: string;
+  multiline?: boolean;
+}) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: multiline ? "column" : "row",
+      alignItems: "center",
+      gap: multiline ? "4px" : "8px",
+      textAlign: multiline ? "center" : "left",
+    }}
+  >
+    <FontAwesomeIcon
+      icon={icon}
+      style={{ width: "14px", height: "14px", color }}
+    />
+    <span style={{ whiteSpace: multiline ? "pre-wrap" : "normal" }}>{text}</span>
+  </div>
+);
 
 const nodeDefaults = {
   style: {
@@ -52,7 +91,11 @@ const nodes: Node[] = [
   {
     id: "sign-in",
     position: { x: 50, y: 145 },
-    data: { label: "🔑 Sign In\nForm" },
+    data: {
+      label: (
+        <NodeLabel icon={faKey} text={"Sign In\nForm"} color="#5b21b6" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#ede9fe",
@@ -66,7 +109,11 @@ const nodes: Node[] = [
   {
     id: "sign-up",
     position: { x: 180, y: 145 },
-    data: { label: "📝 Sign Up\nForm" },
+    data: {
+      label: (
+        <NodeLabel icon={faUserPlus} text={"Sign Up\nForm"} color="#5b21b6" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#ede9fe",
@@ -80,7 +127,11 @@ const nodes: Node[] = [
   {
     id: "oauth",
     position: { x: 310, y: 145 },
-    data: { label: "🌐 OAuth\n(Google)" },
+    data: {
+      label: (
+        <NodeLabel icon={faGlobe} text={"OAuth\n(Google)"} color="#5b21b6" multiline />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#ede9fe",
@@ -94,7 +145,15 @@ const nodes: Node[] = [
   {
     id: "session-mgmt",
     position: { x: 100, y: 220 },
-    data: { label: "🔐 Session Management (JWT Tokens, Cookies, Refresh)" },
+    data: {
+      label: (
+        <NodeLabel
+          icon={faLock}
+          text="Session Management (JWT Tokens, Cookies, Refresh)"
+          color="#5b21b6"
+        />
+      ),
+    },
     style: {
       ...nodeDefaults.style,
       background: "#ddd6fe",
@@ -123,7 +182,14 @@ const nodes: Node[] = [
     id: "middleware",
     position: { x: 80, y: 380 },
     data: {
-      label: "⚡ Clerk Session Middleware\n(Validates tokens, extracts user)",
+      label: (
+        <NodeLabel
+          icon={faBolt}
+          text={"Clerk Session Middleware\n(Validates tokens, extracts user)"}
+          color="#065f46"
+          multiline
+        />
+      ),
     },
     style: {
       ...nodeDefaults.style,
@@ -140,7 +206,14 @@ const nodes: Node[] = [
     id: "db-sync",
     position: { x: 80, y: 450 },
     data: {
-      label: "🗄️ Database Sync Layer\n(Ensures user exists in PostgreSQL)",
+      label: (
+        <NodeLabel
+          icon={faDatabase}
+          text={"Database Sync Layer\n(Ensures user exists in PostgreSQL)"}
+          color="#065f46"
+          multiline
+        />
+      ),
     },
     style: {
       ...nodeDefaults.style,

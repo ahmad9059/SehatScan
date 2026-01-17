@@ -2,6 +2,33 @@
 
 import { Node, Edge, MarkerType } from '@xyflow/react'
 import { DiagramWrapper } from './DiagramWrapper'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  faUpload,
+  faCircleCheck,
+  faBrain,
+  faGear,
+  faFloppyDisk,
+  faChartBar,
+  faUser,
+  faLock,
+  faRotate,
+  faIdCard,
+  faRocket,
+  faComment,
+  faClockRotateLeft,
+  faWrench,
+  faFileLines,
+} from '@fortawesome/free-solid-svg-icons'
+import type { IconDefinition } from '@fortawesome/fontawesome-svg-core'
+
+// Helper component for node labels with Font Awesome icons
+const NodeLabel = ({ icon, text, color }: { icon: IconDefinition; text: string; color: string }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <FontAwesomeIcon icon={icon} style={{ width: '14px', height: '14px', color }} />
+    <span>{text}</span>
+  </div>
+)
 
 const nodeStyle = {
   borderRadius: '8px',
@@ -16,37 +43,37 @@ const reportNodes: Node[] = [
   {
     id: 'upload',
     position: { x: 0, y: 100 },
-    data: { label: '📤 User Uploads File' },
+    data: { label: <NodeLabel icon={faUpload} text="User Uploads File" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'validate',
     position: { x: 160, y: 100 },
-    data: { label: '✅ Validate File' },
+    data: { label: <NodeLabel icon={faCircleCheck} text="Validate File" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'gemini',
     position: { x: 320, y: 100 },
-    data: { label: '🧠 Gemini Vision' },
+    data: { label: <NodeLabel icon={faBrain} text="Gemini Vision" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'process',
     position: { x: 480, y: 100 },
-    data: { label: '⚙️ Process Results' },
+    data: { label: <NodeLabel icon={faGear} text="Process Results" color="#92400e" /> },
     style: { ...nodeStyle, background: '#fef3c7', border: '1px solid #f59e0b', color: '#92400e' },
   },
   {
     id: 'save',
     position: { x: 640, y: 100 },
-    data: { label: '💾 Save to DB' },
+    data: { label: <NodeLabel icon={faFloppyDisk} text="Save to DB" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'display',
     position: { x: 800, y: 100 },
-    data: { label: '📊 Display Results' },
+    data: { label: <NodeLabel icon={faChartBar} text="Display Results" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
 ]
@@ -64,37 +91,37 @@ const authNodes: Node[] = [
   {
     id: 'login',
     position: { x: 0, y: 100 },
-    data: { label: '👤 User Login' },
+    data: { label: <NodeLabel icon={faUser} text="User Login" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'clerk-auth',
     position: { x: 160, y: 100 },
-    data: { label: '🔐 Clerk Auth UI' },
+    data: { label: <NodeLabel icon={faLock} text="Clerk Auth UI" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'validate-session',
     position: { x: 320, y: 100 },
-    data: { label: '✅ Validate Session' },
+    data: { label: <NodeLabel icon={faCircleCheck} text="Validate Session" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'sync-db',
     position: { x: 480, y: 100 },
-    data: { label: '🔄 Sync to Database' },
+    data: { label: <NodeLabel icon={faRotate} text="Sync to Database" color="#92400e" /> },
     style: { ...nodeStyle, background: '#fef3c7', border: '1px solid #f59e0b', color: '#92400e' },
   },
   {
     id: 'create-session',
     position: { x: 640, y: 100 },
-    data: { label: '🎫 Create Session' },
+    data: { label: <NodeLabel icon={faIdCard} text="Create Session" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'access',
     position: { x: 800, y: 100 },
-    data: { label: '🚀 Access Dashboard' },
+    data: { label: <NodeLabel icon={faRocket} text="Access Dashboard" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
 ]
@@ -112,37 +139,37 @@ const chatbotNodes: Node[] = [
   {
     id: 'user-msg',
     position: { x: 0, y: 100 },
-    data: { label: '💬 User Message' },
+    data: { label: <NodeLabel icon={faComment} text="User Message" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
   {
     id: 'fetch-profile',
     position: { x: 170, y: 60 },
-    data: { label: '👤 Fetch Profile' },
+    data: { label: <NodeLabel icon={faUser} text="Fetch Profile" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'fetch-history',
     position: { x: 170, y: 140 },
-    data: { label: '📜 Fetch History' },
+    data: { label: <NodeLabel icon={faClockRotateLeft} text="Fetch History" color="#065f46" /> },
     style: { ...nodeStyle, background: '#d1fae5', border: '1px solid #10b981', color: '#065f46' },
   },
   {
     id: 'build-context',
     position: { x: 360, y: 100 },
-    data: { label: '🔧 Build Context' },
+    data: { label: <NodeLabel icon={faWrench} text="Build Context" color="#92400e" /> },
     style: { ...nodeStyle, background: '#fef3c7', border: '1px solid #f59e0b', color: '#92400e' },
   },
   {
     id: 'gemini-chat',
     position: { x: 530, y: 100 },
-    data: { label: '🧠 Gemini AI' },
+    data: { label: <NodeLabel icon={faBrain} text="Gemini AI" color="#5b21b6" /> },
     style: { ...nodeStyle, background: '#ede9fe', border: '1px solid #8b5cf6', color: '#5b21b6' },
   },
   {
     id: 'response',
     position: { x: 700, y: 100 },
-    data: { label: '📝 Display Response' },
+    data: { label: <NodeLabel icon={faFileLines} text="Display Response" color="#1e40af" /> },
     style: { ...nodeStyle, background: '#dbeafe', border: '1px solid #3b82f6', color: '#1e40af' },
   },
 ]

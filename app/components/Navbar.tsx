@@ -73,6 +73,12 @@ export default function Navbar() {
             Integrations
           </Link>
           <Link
+            href="/docs"
+            className="text-sm/6 font-semibold hover:text-[var(--color-primary)]"
+          >
+            Docs
+          </Link>
+          <Link
             href="#about"
             className="text-sm/6 font-semibold hover:text-[var(--color-primary)]"
           >
@@ -166,6 +172,13 @@ export default function Navbar() {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Integrations
+                  </Link>
+                  <Link
+                    href="/docs"
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[var(--color-foreground)] hover:bg-gray-50 dark:hover:bg-white/5"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Docs
                   </Link>
                   <Link
                     href="#about"

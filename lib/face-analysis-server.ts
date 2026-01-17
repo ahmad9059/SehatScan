@@ -18,6 +18,7 @@ export interface Treatment {
   recommendation: string;
   priority: "low" | "medium" | "high";
   timeframe: string;
+  for_condition?: string; // Which detected condition this treatment addresses
 }
 
 export interface FaceBoundingBox {
@@ -80,6 +81,7 @@ interface GeminiAnalysisResult {
     recommendation: string;
     priority: "low" | "medium" | "high";
     timeframe: string;
+    for_condition?: string;
   }>;
 }
 
@@ -100,7 +102,7 @@ async function analyzeWithGemini(
     model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
   });
 
-  const prompt = `You are a dermatology AI assistant analyzing a facial image for skin health indicators. Analyze this image carefully and provide accurate detection of any skin conditions visible.
+  const prompt = `You are an expert dermatology AI assistant analyzing a facial image for skin health indicators. Analyze this image carefully and provide accurate detection of any skin conditions visible.
 
 IMPORTANT: Analyze the ACTUAL image provided. Do not make up conditions that are not visible. Be accurate and honest about what you can see.
 
@@ -122,11 +124,11 @@ Analyze the image and return a JSON response with this exact structure:
   },
   "detected_conditions": [
     {
-      "condition": "Name of skin condition (e.g., Acne, Rosacea, Dry Skin, Dark Circles, Hyperpigmentation, Wrinkles, Eczema, Psoriasis, Moles, Sunspots, etc.)",
+      "condition": "Name of skin condition (e.g., Acne, Rosacea, Dry Skin, Dark Circles, Hyperpigmentation, Wrinkles, Eczema, Psoriasis, Moles, Sunspots, Oily Skin, Blackheads, Whiteheads, Fine Lines, Age Spots, Melasma, etc.)",
       "severity": "mild/moderate/severe",
       "confidence": number (0-1, your confidence in this detection),
-      "description": "Detailed description of what you observe",
-      "location": "Where on the face (e.g., forehead, cheeks, nose, chin, under eyes, T-zone, jawline)",
+      "description": "Detailed description of what you observe including visual characteristics",
+      "location": "Where on the face (e.g., forehead, cheeks, nose, chin, under eyes, T-zone, jawline, temples, nasolabial folds)",
       "area_bounds": {
         "x_percent": number (0-100),
         "y_percent": number (0-100),
@@ -137,22 +139,64 @@ Analyze the image and return a JSON response with this exact structure:
   ],
   "recommended_treatments": [
     {
-      "category": "Category (e.g., Skincare, Lifestyle, Medical Consultation, Immediate Care)",
-      "recommendation": "Specific actionable recommendation",
+      "category": "Category",
+      "recommendation": "Detailed specific recommendation",
       "priority": "low/medium/high",
-      "timeframe": "When to implement (e.g., Daily, Immediately, Within 1 week)"
+      "timeframe": "When to implement",
+      "for_condition": "Which detected condition this treatment addresses"
     }
   ]
 }
 
-Guidelines:
+TREATMENT RECOMMENDATION GUIDELINES - VERY IMPORTANT:
+For each detected condition, provide SPECIFIC, EVIDENCE-BASED treatments. Here are examples:
+
+FOR ACNE:
+- Skincare: "Use a gentle cleanser with salicylic acid (2%) morning and night. Apply benzoyl peroxide (2.5-5%) spot treatment on active breakouts."
+- Products: "Look for non-comedogenic moisturizers. Consider products with niacinamide to reduce inflammation and oil production."
+- Lifestyle: "Avoid touching your face. Change pillowcases weekly. Reduce dairy and high-glycemic foods."
+- Medical: "For persistent acne, consult a dermatologist about retinoids (tretinoin) or oral medications."
+
+FOR ROSACEA:
+- Skincare: "Use fragrance-free, gentle cleansers. Apply azelaic acid (15-20%) to reduce redness."
+- Triggers: "Avoid hot drinks, spicy foods, alcohol, and extreme temperatures that can trigger flare-ups."
+- Medical: "Consider prescription metronidazole gel or ivermectin cream. Laser therapy may help persistent redness."
+
+FOR DRY SKIN:
+- Skincare: "Apply hyaluronic acid serum on damp skin, followed by a ceramide-rich moisturizer. Use a humidifier."
+- Products: "Look for moisturizers with glycerin, squalane, and shea butter. Avoid alcohol-based toners."
+- Lifestyle: "Take lukewarm (not hot) showers. Drink adequate water. Use gentle, fragrance-free products."
+
+FOR DARK CIRCLES:
+- Skincare: "Apply eye cream with vitamin C, retinol, or caffeine. Use cold compresses to reduce puffiness."
+- Lifestyle: "Ensure 7-9 hours of quality sleep. Elevate head while sleeping. Reduce salt intake."
+- Medical: "Persistent dark circles may benefit from dermal fillers or laser treatment. Consult a dermatologist."
+
+FOR HYPERPIGMENTATION:
+- Skincare: "Use vitamin C serum (10-20%) in the morning. Apply products with niacinamide, arbutin, or kojic acid."
+- Sun Protection: "Apply SPF 30+ sunscreen daily and reapply every 2 hours. Sun exposure worsens dark spots."
+- Medical: "Consider chemical peels, microdermabrasion, or prescription hydroquinone for stubborn spots."
+
+FOR WRINKLES/FINE LINES:
+- Skincare: "Start with retinol (0.25-0.5%) at night, gradually increasing strength. Use peptide serums."
+- Hydration: "Apply hyaluronic acid and moisturizer to plump skin. Consider facial oils at night."
+- Medical: "Botox, dermal fillers, or microneedling can address deeper wrinkles. Consult a dermatologist."
+
+FOR OILY SKIN:
+- Skincare: "Use oil-free, gel-based cleanser. Apply niacinamide serum to regulate sebum production."
+- Products: "Use lightweight, non-comedogenic moisturizers. Clay masks 1-2x weekly to absorb excess oil."
+- Lifestyle: "Blot excess oil with blotting papers rather than washing frequently, which can increase oil production."
+
+GENERAL GUIDELINES:
 - If no face is detected, set face_detected to false and return minimal data
 - Only report conditions you can actually see in the image - do NOT fabricate conditions
 - Be specific about locations and provide accurate bounding boxes for problem areas
 - Provide realistic confidence scores based on image clarity and visibility
-- If skin appears healthy, say so - don't invent problems
+- If skin appears healthy, say so - provide maintenance recommendations instead
 - Consider lighting conditions when assessing colors
-- Provide practical, actionable treatment recommendations
+- Each treatment MUST be specific and actionable with product recommendations or specific ingredients
+- Include at least 3-5 treatments for each detected condition
+- Treatments should cover: immediate care, daily routine, products/ingredients, lifestyle changes, and when to see a doctor
 
 Return ONLY valid JSON, no additional text or markdown.`;
 
@@ -261,6 +305,7 @@ export async function analyzeFaceImageServer(
       recommendation: treatment.recommendation,
       priority: treatment.priority,
       timeframe: treatment.timeframe,
+      for_condition: treatment.for_condition,
     }));
 
     // If no problems detected, add a healthy skin message

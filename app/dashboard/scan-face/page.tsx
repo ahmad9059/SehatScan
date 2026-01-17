@@ -71,6 +71,7 @@ interface FaceAnalysisResult {
     recommendation: string;
     priority: "low" | "medium" | "high";
     timeframe: string;
+    for_condition?: string;
   }>;
   annotated_image: string;
 }
@@ -663,29 +664,46 @@ function ScanFacePageContent() {
                     </div>
 
                     {result.treatments && result.treatments.length > 0 ? (
-                      <div className="space-y-3">
-                        {result.treatments.map((treatment, idx) => (
-                          <div
-                            key={`${treatment.category}-${idx}`}
-                            className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 rounded-xl"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
-                                <p className="text-sm font-semibold text-[var(--color-heading)]">
-                                  {treatment.category}
-                                </p>
+                      <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                        {result.treatments.map((treatment, idx) => {
+                          const priorityColors = {
+                            high: "bg-[var(--color-danger)]/10 text-[var(--color-danger)] border-[var(--color-danger)]",
+                            medium: "bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]",
+                            low: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]",
+                          };
+                          return (
+                            <div
+                              key={`${treatment.category}-${idx}`}
+                              className="border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-4 rounded-xl"
+                            >
+                              <div className="flex items-center justify-between flex-wrap gap-2">
+                                <div className="flex items-center gap-2">
+                                  <HeartIcon className="h-5 w-5 text-[var(--color-primary)]" />
+                                  <p className="text-sm font-semibold text-[var(--color-heading)]">
+                                    {treatment.category}
+                                  </p>
+                                </div>
+                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${priorityColors[treatment.priority]}`}>
+                                  {treatment.priority.charAt(0).toUpperCase() + treatment.priority.slice(1)} Priority
+                                </span>
                               </div>
-                              <span className={pill}>{treatment.priority}</span>
+                              {treatment.for_condition && (
+                                <p className="mt-1.5 text-xs text-[var(--color-primary)] font-medium">
+                                  For: {treatment.for_condition}
+                                </p>
+                              )}
+                              <p className={`${mutedText} mt-2 text-sm leading-relaxed`}>
+                                {treatment.recommendation}
+                              </p>
+                              <div className="mt-3 flex items-center gap-2 text-xs">
+                                <span className="text-[var(--color-muted)]">Timeline:</span>
+                                <span className="font-medium text-[var(--color-foreground)]">
+                                  {treatment.timeframe}
+                                </span>
+                              </div>
                             </div>
-                            <p className={`${mutedText} mt-2 text-sm`}>
-                              {treatment.recommendation}
-                            </p>
-                            <p className={`${subheading} mt-2 text-xs`}>
-                              Timeline: {treatment.timeframe}
-                            </p>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className={`${mutedText} text-sm`}>

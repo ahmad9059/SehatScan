@@ -55,7 +55,7 @@ function getAnalysisIcon(type: string) {
 
 function getAnalysisTypeLabel(
   type: string,
-  t: (key: string) => string
+  t: (key: string) => string,
 ): string {
   switch (type) {
     case "report":
@@ -93,10 +93,10 @@ function getAnalysisPreview(analysis: any): string {
     // Show problems detected if available
     if (analysis.problemsDetected && analysis.problemsDetected.length > 0) {
       const severeProblem = analysis.problemsDetected.find(
-        (p: any) => p.severity === "severe"
+        (p: any) => p.severity === "severe",
       );
       const moderateProblem = analysis.problemsDetected.find(
-        (p: any) => p.severity === "moderate"
+        (p: any) => p.severity === "moderate",
       );
       const mainProblem =
         severeProblem || moderateProblem || analysis.problemsDetected[0];
@@ -182,11 +182,11 @@ export default function DashboardClient({
   const recentAnalysesLimited = recentAnalyses.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 animate-fade-in-up">
+    <div className="min-h-screen bg-[var(--color-bg)] px-4 py-10 sm:px-6 lg:px-8 dashboard-content">
       <div className="mx-auto max-w-7xl">
         {/* Error Alert */}
         {hasError && (
-          <div className="mb-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 animate-fade-in">
+          <div className="mb-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
             <div className="flex items-center">
               <ExclamationCircleIcon className="h-5 w-5 text-red-500 shrink-0" />
               <div className="ml-3">

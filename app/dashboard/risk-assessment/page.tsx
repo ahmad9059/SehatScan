@@ -86,6 +86,7 @@ function RiskAssessmentPageContent() {
   const { user } = useUser();
   const router = useRouter();
   const reportRef = useRef<HTMLDivElement>(null);
+  const sourceMenuRef = useRef<HTMLDivElement>(null);
   const [reportAnalyses, setReportAnalyses] = useState<Analysis[]>([]);
   const [faceAnalyses, setFaceAnalyses] = useState<Analysis[]>([]);
   const [selectedReport, setSelectedReport] = useState<string>("");
@@ -159,6 +160,25 @@ function RiskAssessmentPageContent() {
     loadAnalyses();
   }, [user]);
 
+  // Close source menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        sourceMenuRef.current &&
+        !sourceMenuRef.current.contains(event.target as Node)
+      ) {
+        setSourceMenuOpen(false);
+      }
+    }
+
+    if (sourceMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [sourceMenuOpen]);
+
   // No auto-selection; user may optionally pick from dropdowns
 
   const handleSymptomChange = (symptom: string, checked: boolean) => {
@@ -204,7 +224,7 @@ function RiskAssessmentPageContent() {
             id: data.analysisId,
             type: "report",
             createdAt: new Date(),
-            structuredData: data.structuredData,
+            structuredData: data.data?.structured_data || data.structuredData,
           };
           setReportAnalyses((prev) => [newAnalysis, ...prev]);
           setSelectedReport(data.analysisId);
@@ -259,7 +279,7 @@ function RiskAssessmentPageContent() {
             id: data.analysisId,
             type: "face",
             createdAt: new Date(),
-            visualMetrics: data.visualMetrics,
+            visualMetrics: data.data?.visual_metrics || data.visualMetrics,
           };
           setFaceAnalyses((prev) => [newAnalysis, ...prev]);
           setSelectedFace(data.analysisId);
@@ -390,7 +410,8 @@ function RiskAssessmentPageContent() {
         useCORS: true,
         logging: false,
         background: "#ffffff",
-      });
+        scale: 2, // Higher quality
+      } as any);
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
@@ -401,11 +422,14 @@ function RiskAssessmentPageContent() {
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-      const imgY = 10;
+      const margin = 10;
+      const headerHeight = 35; // Space for title and date
+      const footerHeight = 20; // Space for disclaimer
+      const availableHeight = pdfHeight - headerHeight - footerHeight;
+
+      // Calculate scaled dimensions for the content
+      const contentWidth = pdfWidth - margin * 2;
+      const scaledHeight = (canvas.height * contentWidth) / canvas.width;
 
       // Add title
       pdf.setFontSize(18);
@@ -430,23 +454,78 @@ function RiskAssessmentPageContent() {
         { align: "center" }
       );
 
-      // Calculate scaled dimensions for the content
-      const contentWidth = pdfWidth - 20;
-      const contentHeight = (imgHeight * contentWidth) / imgWidth;
+      // Handle multi-page content
+      if (scaledHeight <= availableHeight) {
+        // Single page - content fits
+        pdf.addImage(imgData, "PNG", margin, headerHeight, contentWidth, scaledHeight);
 
-      // Add the report content
-      pdf.addImage(imgData, "PNG", 10, 30, contentWidth, contentHeight);
+        // Add disclaimer at the bottom
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(
+          "Disclaimer: This assessment is AI-generated for informational purposes only. Consult a healthcare provider for medical advice.",
+          pdfWidth / 2,
+          pdfHeight - 10,
+          { align: "center", maxWidth: pdfWidth - 20 }
+        );
+      } else {
+        // Multi-page - content needs to be split
+        const pageContentHeight = availableHeight;
+        const totalPages = Math.ceil(scaledHeight / pageContentHeight);
 
-      // Add disclaimer at the bottom
-      const disclaimerY = Math.min(30 + contentHeight + 10, pdfHeight - 20);
-      pdf.setFontSize(8);
-      pdf.setTextColor(150, 150, 150);
-      pdf.text(
-        "Disclaimer: This assessment is AI-generated for informational purposes only. Consult a healthcare provider for medical advice.",
-        pdfWidth / 2,
-        disclaimerY,
-        { align: "center", maxWidth: pdfWidth - 20 }
-      );
+        for (let page = 0; page < totalPages; page++) {
+          if (page > 0) {
+            pdf.addPage();
+            // Add page number header for subsequent pages
+            pdf.setFontSize(10);
+            pdf.setTextColor(100, 100, 100);
+            pdf.text(`Health Risk Assessment - Page ${page + 1} of ${totalPages}`, pdfWidth / 2, 15, {
+              align: "center",
+            });
+          }
+
+          // Calculate the source and destination coordinates for this page slice
+          const sourceY = page * (canvas.height * pageContentHeight / scaledHeight);
+          const sourceHeight = Math.min(
+            canvas.height * pageContentHeight / scaledHeight,
+            canvas.height - sourceY
+          );
+
+          // Create a temporary canvas for this page slice
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = canvas.width;
+          tempCanvas.height = sourceHeight;
+          const ctx = tempCanvas.getContext("2d");
+
+          if (ctx) {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+            ctx.drawImage(
+              canvas,
+              0, sourceY, canvas.width, sourceHeight,
+              0, 0, canvas.width, sourceHeight
+            );
+
+            const pageImgData = tempCanvas.toDataURL("image/png");
+            const destHeight = (sourceHeight * contentWidth) / canvas.width;
+            const yPosition = page === 0 ? headerHeight : 20;
+
+            pdf.addImage(pageImgData, "PNG", margin, yPosition, contentWidth, destHeight);
+          }
+
+          // Add disclaimer on last page
+          if (page === totalPages - 1) {
+            pdf.setFontSize(8);
+            pdf.setTextColor(150, 150, 150);
+            pdf.text(
+              "Disclaimer: This assessment is AI-generated for informational purposes only. Consult a healthcare provider for medical advice.",
+              pdfWidth / 2,
+              pdfHeight - 10,
+              { align: "center", maxWidth: pdfWidth - 20 }
+            );
+          }
+        }
+      }
 
       pdf.save(
         `health-risk-assessment-${new Date().toISOString().split("T")[0]}.pdf`
@@ -501,7 +580,7 @@ function RiskAssessmentPageContent() {
               </div>
             </div>
             <div className="flex flex-col gap-3 sm:items-end">
-              <div className="relative">
+              <div className="relative" ref={sourceMenuRef}>
                 <button
                   type="button"
                   onClick={() => setSourceMenuOpen((prev) => !prev)}
@@ -644,6 +723,12 @@ function RiskAssessmentPageContent() {
                     {validationErrors.faceAnalysisId}
                   </p>
                 )}
+
+                {faceAnalyses.length === 0 && !isUploadingFace && (
+                  <p className="text-sm text-[var(--color-subtle)] italic">
+                    No face analyses yet. Upload a photo to get started.
+                  </p>
+                )}
               </div>
 
               {/* Report selection (right) */}
@@ -724,6 +809,12 @@ function RiskAssessmentPageContent() {
                 {validationErrors.reportAnalysisId && (
                   <p className="text-sm text-[var(--color-danger)]">
                     {validationErrors.reportAnalysisId}
+                  </p>
+                )}
+
+                {reportAnalyses.length === 0 && !isUploadingReport && (
+                  <p className="text-sm text-[var(--color-subtle)] italic">
+                    No report analyses yet. Upload a medical report to get started.
                   </p>
                 )}
               </div>

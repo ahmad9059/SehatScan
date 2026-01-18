@@ -637,7 +637,7 @@ Would you like me to guide you through uploading your first health report?`;
   }
 
   /**
-   * Mock risk assessment generation
+   * Mock risk assessment generation with comprehensive structure
    */
   async generateRiskAssessment(
     labData: any,
@@ -657,103 +657,216 @@ Would you like me to guide you through uploading your first health report?`;
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Generate a basic risk assessment based on available data
-    let assessment = "## Health Risk Assessment\n\n";
+    // Collect findings for assessment
+    const concerns: { level: string; description: string }[] = [];
+    const strengths: string[] = [];
+    const recommendations: string[] = [];
+
+    // Generate comprehensive assessment
+    let assessment = "# Health Risk Assessment Report\n\n";
+
+    // Executive Summary
+    assessment += "## Executive Summary\n\n";
+    assessment += `This health risk assessment is based on ${labData ? "laboratory results" : ""}${labData && visualMetrics ? " and " : ""}${visualMetrics ? "visual health analysis" : ""} for a ${userData.age || "unknown age"}-year-old ${userData.gender || "individual"}. `;
+    assessment += "The following sections detail our findings and provide personalized recommendations.\n\n";
+
+    // Key Findings
+    assessment += "## Key Findings\n\n";
 
     // Analyze lab data
-    if (labData.metrics && Array.isArray(labData.metrics)) {
-      assessment += "### Laboratory Results Analysis:\n";
+    if (labData) {
+      assessment += "### Lab Results Analysis\n\n";
 
-      labData.metrics.forEach((metric: any) => {
-        if (metric.name && metric.value) {
-          assessment += `- **${metric.name}**: ${metric.value}${
-            metric.unit ? ` ${metric.unit}` : ""
-          }\n`;
+      if (labData.metrics && Array.isArray(labData.metrics)) {
+        labData.metrics.forEach((metric: any) => {
+          if (metric.name && metric.value) {
+            assessment += `- **${metric.name}**: ${metric.value}${metric.unit ? ` ${metric.unit}` : ""}`;
 
-          // Add basic interpretation for common metrics
-          if (metric.name.toLowerCase().includes("hemoglobin")) {
-            const value = parseFloat(metric.value);
-            if (value < 12) {
-              assessment += "  - ⚠️ Below normal range - may indicate anemia\n";
-            } else if (value > 16) {
-              assessment +=
-                "  - ⚠️ Above normal range - may indicate dehydration or other conditions\n";
+            // Add basic interpretation for common metrics
+            if (metric.name.toLowerCase().includes("hemoglobin")) {
+              const value = parseFloat(metric.value);
+              if (value < 12) {
+                assessment += " - Below normal range\n";
+                concerns.push({ level: "moderate", description: "Low hemoglobin may indicate anemia" });
+              } else if (value > 16) {
+                assessment += " - Above normal range\n";
+                concerns.push({ level: "low", description: "Elevated hemoglobin - monitor hydration" });
+              } else {
+                assessment += " - Within normal range\n";
+                strengths.push("Healthy hemoglobin levels");
+              }
+            } else if (metric.name.toLowerCase().includes("cholesterol")) {
+              const value = parseFloat(metric.value);
+              if (value > 240) {
+                assessment += " - High risk level\n";
+                concerns.push({ level: "high", description: "Elevated cholesterol increases cardiovascular risk" });
+              } else if (value > 200) {
+                assessment += " - Borderline high\n";
+                concerns.push({ level: "moderate", description: "Cholesterol approaching concerning levels" });
+              } else {
+                assessment += " - Desirable level\n";
+                strengths.push("Healthy cholesterol levels");
+              }
+            } else if (metric.name.toLowerCase().includes("glucose") || metric.name.toLowerCase().includes("blood sugar")) {
+              const value = parseFloat(metric.value);
+              if (value > 126) {
+                assessment += " - Elevated (diabetes range)\n";
+                concerns.push({ level: "high", description: "Blood glucose indicates possible diabetes" });
+              } else if (value > 100) {
+                assessment += " - Prediabetic range\n";
+                concerns.push({ level: "moderate", description: "Blood glucose in prediabetic range" });
+              } else {
+                assessment += " - Normal range\n";
+                strengths.push("Healthy blood sugar levels");
+              }
             } else {
-              assessment += "  - ✅ Within normal range\n";
+              assessment += "\n";
             }
           }
-
-          if (metric.name.toLowerCase().includes("cholesterol")) {
-            const value = parseFloat(metric.value);
-            if (value > 200) {
-              assessment +=
-                "  - ⚠️ Elevated - consider dietary modifications\n";
-            } else {
-              assessment += "  - ✅ Within recommended range\n";
-            }
-          }
-        }
-      });
-      assessment += "\n";
+        });
+        assessment += "\n";
+      } else {
+        assessment += "Lab data provided but no structured metrics available for detailed analysis.\n\n";
+      }
     }
 
     // Analyze visual metrics
     if (visualMetrics) {
-      assessment += "### Visual Health Indicators:\n";
+      assessment += "### Visual/Skin Analysis\n\n";
 
       if (visualMetrics.redness_percentage !== undefined) {
-        assessment += `- **Facial Redness**: ${visualMetrics.redness_percentage}%\n`;
+        assessment += `- **Facial Redness Level**: ${visualMetrics.redness_percentage}%`;
         if (visualMetrics.redness_percentage > 60) {
-          assessment +=
-            "  - ⚠️ High redness detected - may indicate inflammation or irritation\n";
+          assessment += " - Elevated\n";
+          concerns.push({ level: "moderate", description: "High facial redness may indicate inflammation or skin irritation" });
+        } else if (visualMetrics.redness_percentage > 30) {
+          assessment += " - Mild elevation\n";
+          concerns.push({ level: "low", description: "Slight redness observed" });
         } else {
-          assessment += "  - ✅ Normal redness levels\n";
+          assessment += " - Normal\n";
+          strengths.push("Normal skin redness levels");
         }
       }
 
       if (visualMetrics.yellowness_percentage !== undefined) {
-        assessment += `- **Facial Yellowness**: ${visualMetrics.yellowness_percentage}%\n`;
+        assessment += `- **Facial Yellowness Level**: ${visualMetrics.yellowness_percentage}%`;
         if (visualMetrics.yellowness_percentage > 70) {
-          assessment +=
-            "  - ⚠️ High yellowness detected - may indicate jaundice, consult a healthcare provider\n";
+          assessment += " - Concerning\n";
+          concerns.push({ level: "high", description: "High yellowness may indicate jaundice - seek medical evaluation" });
+        } else if (visualMetrics.yellowness_percentage > 40) {
+          assessment += " - Mild elevation\n";
+          concerns.push({ level: "low", description: "Slight yellowish tint observed" });
         } else {
-          assessment += "  - ✅ Normal skin tone\n";
+          assessment += " - Normal\n";
+          strengths.push("Healthy skin tone");
         }
       }
       assessment += "\n";
     }
 
-    // User information
-    if (userData) {
-      assessment += "### Patient Information Considered:\n";
-      if (userData.age) {
-        assessment += `- **Age**: ${userData.age} years\n`;
-      }
-      if (userData.gender) {
-        assessment += `- **Gender**: ${userData.gender}\n`;
-      }
-      if (userData.symptoms && Array.isArray(userData.symptoms)) {
-        assessment += `- **Reported Symptoms**: ${userData.symptoms.join(
-          ", "
-        )}\n`;
-      }
-      assessment += "\n";
+    // Risk Assessment Section
+    assessment += "## Risk Assessment\n\n";
+
+    const highConcerns = concerns.filter(c => c.level === "high");
+    const moderateConcerns = concerns.filter(c => c.level === "moderate");
+    const lowConcerns = concerns.filter(c => c.level === "low");
+
+    assessment += "### Immediate Concerns (High Priority)\n\n";
+    if (highConcerns.length > 0) {
+      highConcerns.forEach(c => {
+        assessment += `- ${c.description}\n`;
+      });
+    } else {
+      assessment += "No immediate concerns identified.\n";
+    }
+    assessment += "\n";
+
+    assessment += "### Moderate Concerns (Monitor)\n\n";
+    if (moderateConcerns.length > 0) {
+      moderateConcerns.forEach(c => {
+        assessment += `- ${c.description}\n`;
+      });
+    } else {
+      assessment += "No moderate concerns identified.\n";
+    }
+    assessment += "\n";
+
+    assessment += "### Low-Level Observations\n\n";
+    if (lowConcerns.length > 0) {
+      lowConcerns.forEach(c => {
+        assessment += `- ${c.description}\n`;
+      });
+    } else {
+      assessment += "No minor observations to note.\n";
+    }
+    assessment += "\n";
+
+    // Personalized Recommendations
+    assessment += "## Personalized Recommendations\n\n";
+
+    assessment += "### Lifestyle Modifications\n\n";
+    assessment += "- Maintain a balanced diet rich in fruits, vegetables, and whole grains\n";
+    assessment += "- Engage in regular physical activity (at least 150 minutes of moderate exercise per week)\n";
+    assessment += "- Ensure adequate sleep (7-9 hours for adults)\n";
+    assessment += "- Manage stress through relaxation techniques, meditation, or hobbies\n";
+    if (userData.symptoms && userData.symptoms.length > 0) {
+      assessment += `- Monitor and track your reported symptoms: ${Array.isArray(userData.symptoms) ? userData.symptoms.join(", ") : userData.symptoms}\n`;
+    }
+    assessment += "\n";
+
+    assessment += "### Follow-up Actions\n\n";
+    if (highConcerns.length > 0) {
+      assessment += "- **Urgent**: Schedule an appointment with your healthcare provider within 1-2 weeks\n";
+    }
+    if (moderateConcerns.length > 0) {
+      assessment += "- Schedule a follow-up appointment to discuss concerning findings\n";
+    }
+    assessment += "- Consider repeating lab tests in 3-6 months to track trends\n";
+    assessment += "- Keep a health diary to track symptoms and lifestyle factors\n\n";
+
+    assessment += "### Preventive Measures\n\n";
+    if (userData.age && userData.age >= 40) {
+      assessment += "- Schedule regular health screenings appropriate for your age group\n";
+      assessment += "- Consider cardiovascular risk assessment\n";
+    }
+    if (userData.age && userData.age >= 50) {
+      assessment += "- Discuss cancer screening options with your healthcare provider\n";
+    }
+    assessment += "- Stay up-to-date with vaccinations\n";
+    assessment += "- Maintain regular dental and vision check-ups\n\n";
+
+    // Health Score Overview
+    assessment += "## Health Score Overview\n\n";
+
+    const riskLevel = highConcerns.length > 0 ? "Elevated" :
+                      moderateConcerns.length > 0 ? "Moderate" :
+                      lowConcerns.length > 0 ? "Low" : "Low";
+
+    assessment += `- **Overall Risk Level**: ${riskLevel}\n`;
+
+    assessment += "- **Areas of Strength**: ";
+    if (strengths.length > 0) {
+      assessment += strengths.slice(0, 3).join(", ") + "\n";
+    } else {
+      assessment += "Continue maintaining your current health practices\n";
     }
 
-    // General recommendations
-    assessment += "### Recommendations:\n";
-    assessment +=
-      "- 📋 **Follow-up**: Schedule a consultation with your healthcare provider to discuss these results\n";
-    assessment +=
-      "- 🏥 **Professional Review**: This analysis is for informational purposes only and should not replace professional medical advice\n";
-    assessment +=
-      "- 📊 **Monitoring**: Keep track of your health metrics over time for better health management\n";
-    assessment +=
-      "- 🥗 **Lifestyle**: Maintain a balanced diet, regular exercise, and adequate sleep\n\n";
+    assessment += "- **Areas for Improvement**: ";
+    const improvements = concerns.slice(0, 3).map(c => c.description.split(" - ")[0]);
+    if (improvements.length > 0) {
+      assessment += improvements.join(", ") + "\n";
+    } else {
+      assessment += "Focus on preventive health measures\n";
+    }
+    assessment += "\n";
 
-    assessment += "---\n";
-    assessment +=
-      "*Note: This assessment was generated using mock analysis due to API limitations. For accurate AI-powered analysis, please ensure your Gemini API key has sufficient quota.*";
+    // Disclaimer
+    assessment += "---\n\n";
+    assessment += "**Important Notes:**\n";
+    assessment += "- This assessment is AI-generated and for informational purposes only\n";
+    assessment += "- Always consult healthcare professionals for medical decisions\n";
+    assessment += "- Individual health needs may vary\n\n";
+    assessment += "*Note: This assessment was generated using mock analysis due to API limitations. For accurate AI-powered analysis, please ensure your Gemini API key has sufficient quota.*";
 
     return assessment;
   }

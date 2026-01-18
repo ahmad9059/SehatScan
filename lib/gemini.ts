@@ -179,44 +179,102 @@ IMPORTANT:
       throw new Error("User data is required");
     }
 
-    // Build dynamic prompt based on available data
+    // Build dynamic data sections based on available data
     let dataSection = "";
-    const focusPoints: string[] = [];
 
     if (labData) {
-      dataSection += `Lab Report Data: ${JSON.stringify(labData, null, 2)}\n`;
-      focusPoints.push("Any lab values outside normal ranges");
+      dataSection += `## Lab Report Data\n${JSON.stringify(labData, null, 2)}\n\n`;
     }
 
     if (visualMetrics) {
-      dataSection += `Facial Analysis: ${JSON.stringify(
-        visualMetrics,
-        null,
-        2
-      )}\n`;
-      focusPoints.push(
-        "Visual indicators (high redness or yellowness percentages)"
-      );
+      dataSection += `## Facial/Skin Analysis\n${JSON.stringify(visualMetrics, null, 2)}\n\n`;
     }
 
-    dataSection += `Patient Info: ${JSON.stringify(userData, null, 2)}`;
-    focusPoints.push("Potential health risks based on the available data");
-    focusPoints.push("Recommendations for follow-up or medical consultation");
+    dataSection += `## Patient Information\n${JSON.stringify(userData, null, 2)}`;
 
-    const prompt = `Based on the following patient data, provide a health risk assessment:
+    // Build comprehensive symptoms context
+    const symptomsContext = userData.symptoms && userData.symptoms.length > 0
+      ? `The patient reports experiencing: ${Array.isArray(userData.symptoms) ? userData.symptoms.join(", ") : userData.symptoms}`
+      : "No specific symptoms reported.";
+
+    const medicalHistoryContext = userData.medicalHistory
+      ? `Medical History: ${userData.medicalHistory}`
+      : "";
+
+    const medicationsContext = userData.currentMedications
+      ? `Current Medications: ${userData.currentMedications}`
+      : "";
+
+    const prompt = `You are an expert medical AI assistant providing a comprehensive health risk assessment. Analyze the following patient data carefully and generate a detailed, well-structured risk assessment report.
 
 ${dataSection}
 
-Provide a concise health risk assessment highlighting any concerning indicators.
-Focus on:
-${focusPoints.map((p, i) => `${i + 1}. ${p}`).join("\n")}
+${symptomsContext}
+${medicalHistoryContext}
+${medicationsContext}
 
-Keep the assessment professional, clear, and actionable.`;
+Generate a comprehensive health risk assessment in **Markdown format** with the following sections:
+
+# Health Risk Assessment Report
+
+## Executive Summary
+Provide a brief 2-3 sentence overview of the patient's overall health status based on all available data.
+
+## Key Findings
+${labData ? "### Lab Results Analysis\n- List any abnormal values with their implications\n- Note any values approaching concerning ranges\n- Highlight positive/normal findings as well" : ""}
+${visualMetrics ? "### Visual/Skin Analysis\n- Summarize skin health indicators\n- Note any concerning visual markers (redness, yellowness, etc.)\n- Assess overall skin condition" : ""}
+
+## Risk Assessment
+
+### Immediate Concerns (High Priority)
+List any findings that require prompt medical attention. If none, state "No immediate concerns identified."
+
+### Moderate Concerns (Monitor)
+List findings that should be monitored or addressed in the near term.
+
+### Low-Level Observations
+List minor findings or areas for general health optimization.
+
+## Personalized Recommendations
+
+### Lifestyle Modifications
+Provide specific, actionable recommendations based on findings (diet, exercise, sleep, stress management).
+
+### Follow-up Actions
+- Suggest any additional tests or screenings if warranted
+- Recommend appropriate medical consultations
+- Provide timeline for follow-up
+
+### Preventive Measures
+Age and gender-appropriate preventive health recommendations.
+
+## Health Score Overview
+Provide a simple health score interpretation:
+- **Overall Risk Level**: Low / Moderate / Elevated / High
+- **Areas of Strength**: List 2-3 positive health indicators
+- **Areas for Improvement**: List 2-3 actionable improvement areas
+
+---
+
+**Important Notes:**
+- This assessment is AI-generated and for informational purposes only
+- Always consult healthcare professionals for medical decisions
+- Individual health needs may vary
+
+GUIDELINES:
+- Be thorough but concise
+- Use clear, patient-friendly language
+- Avoid medical jargon where possible, or explain terms when necessary
+- Provide specific, actionable recommendations
+- Be honest about limitations when data is insufficient
+- Consider the patient's age (${userData.age || "unknown"}) and gender (${userData.gender || "unknown"}) in your assessment
+- If symptoms are reported, correlate them with any findings from lab/visual data`;
 
     try {
       const result = await this.model.generateContent(prompt, {
         generationConfig: {
-          temperature: 0.3, // Slightly higher temperature for natural text
+          temperature: 0.3, // Balanced temperature for accurate but natural text
+          maxOutputTokens: 4000, // Allow for comprehensive assessment
         },
       });
 

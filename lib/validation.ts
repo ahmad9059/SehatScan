@@ -217,8 +217,8 @@ export function validateAge(age: string | number): ValidationResult {
     return { isValid: false, errors };
   }
 
-  if (ageNum > 150) {
-    errors.age = "Please enter a valid age";
+  if (ageNum > 120) {
+    errors.age = "Age must be less than 120 years";
     return { isValid: false, errors };
   }
 

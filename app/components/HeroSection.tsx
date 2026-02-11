@@ -20,7 +20,7 @@ export default function HeroSection() {
         <div className="absolute right-[10%] top-[50%] h-[500px] w-[500px] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--hero-grid-accent),transparent_70%)] blur-3xl opacity-30" />
       </div>
 
-      <div className="mx-auto w-full max-w-7xl px-6 lg:px-8 pt-20">
+      <div className="mx-auto w-full max-w-[1400px] px-6 lg:px-8 pt-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left - Text Content */}
           <div className="animate-fade-in-up">
@@ -45,7 +45,7 @@ export default function HeroSection() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-[3.5rem] font-semibold tracking-tight leading-[1.1] text-[var(--color-heading)]">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] text-[var(--color-heading)]">
               Your Health,{" "}
               <span className="text-[var(--color-primary)]">
                 Decoded
@@ -54,7 +54,7 @@ export default function HeroSection() {
             </h1>
 
             {/* Subtitle */}
-            <p className="mt-6 text-base sm:text-lg text-[var(--color-subtle)] leading-relaxed max-w-lg">
+            <p className="mt-6 text-lg sm:text-xl text-[var(--color-subtle)] leading-relaxed max-w-xl">
               Transform medical reports and facial photos into actionable
               health insights. Scan, analyze, and understand your wellness
               with advanced computer vision.

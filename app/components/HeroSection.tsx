@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="relative isolate min-h-screen flex items-center overflow-hidden bg-[var(--color-bg)] text-[var(--color-foreground)]">
+    <section className="relative isolate h-screen flex flex-col justify-center overflow-hidden bg-[var(--color-bg)] text-[var(--color-foreground)]">
       {/* Background */}
       <div
         aria-hidden="true"
@@ -20,7 +20,7 @@ export default function HeroSection() {
         <div className="absolute right-[10%] top-[50%] h-[500px] w-[500px] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--hero-grid-accent),transparent_70%)] blur-3xl opacity-30" />
       </div>
 
-      <div className="mx-auto w-full max-w-7xl px-6 lg:px-8 py-32 sm:py-40 lg:py-32">
+      <div className="mx-auto w-full max-w-7xl px-6 lg:px-8 pt-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left - Text Content */}
           <div className="animate-fade-in-up">
@@ -258,14 +258,15 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="hidden lg:flex flex-col items-center mt-16 animate-fade-in" style={{ animationDelay: "0.8s" }}>
-          <span className="text-xs tracking-[0.2em] uppercase text-[var(--color-muted)] mb-3">
-            Scroll to Explore
-          </span>
-          <div className="w-5 h-9 rounded-full border-2 border-[var(--color-border)] flex justify-center pt-2">
-            <div className="w-1 h-2 rounded-full bg-[var(--color-primary)] animate-bounce-slow" />
-          </div>
+      </div>
+
+      {/* Scroll Indicator - pinned to bottom */}
+      <div className="hidden lg:flex flex-col items-center pb-8 animate-fade-in" style={{ animationDelay: "0.8s" }}>
+        <span className="text-xs tracking-[0.2em] uppercase text-[var(--color-muted)] mb-3">
+          Scroll to Explore
+        </span>
+        <div className="w-5 h-9 rounded-full border-2 border-[var(--color-border)] flex justify-center pt-2">
+          <div className="w-1 h-2 rounded-full bg-[var(--color-primary)] animate-bounce-slow" />
         </div>
       </div>
     </section>

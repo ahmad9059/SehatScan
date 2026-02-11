@@ -246,14 +246,15 @@ export default function HeroSection() {
                 </div>
               </div>
 
-              {/* Decorative ring behind illustration */}
+              {/* Blue glow behind illustration */}
               <div
                 aria-hidden="true"
-                className="absolute inset-0 -z-10 flex items-center justify-center"
-              >
-                <div className="w-[85%] h-[85%] rounded-full border border-[var(--color-border)] opacity-40" />
-                <div className="absolute w-[110%] h-[110%] rounded-full border border-dashed border-[var(--color-border)] opacity-20 animate-spin-slow" />
-              </div>
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] -z-10 rounded-full"
+                style={{ background: "radial-gradient(circle, rgba(3,123,252,0.2) 0%, rgba(3,123,252,0.08) 40%, transparent 65%)" }}
+              />
+              {/* Decorative rings */}
+              <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-[85%] -z-10 rounded-full border border-[var(--color-border)] opacity-40" />
+              <div aria-hidden="true" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] -z-10 rounded-full border border-dashed border-[var(--color-border)] opacity-20 animate-spin-slow" />
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { prisma } from "./db";
-import { deleteCache, CACHE_KEYS } from "./redis";
+import { deleteCache, deleteCachePattern, withCache, CACHE_KEYS, CACHE_TTL } from "./redis";
 
 export interface CreateAnalysisData {
   userId: string;
@@ -33,10 +33,11 @@ export async function saveAnalysis(data: CreateAnalysisData) {
       },
     });
 
-    // Invalidate user's cached stats and analyses so dashboard shows new data
+    // Invalidate user's cached stats, analyses, and paginated results
     await Promise.all([
       deleteCache(CACHE_KEYS.stats(data.userId)),
       deleteCache(CACHE_KEYS.analyses(data.userId)),
+      deleteCachePattern(`analyses_page:${data.userId}:*`),
     ]);
 
     return { success: true, analysis };
@@ -118,59 +119,67 @@ export async function getUserAnalysesPaginated(
     type?: "face" | "report" | "risk";
   } = {},
 ) {
-  try {
-    const { page = 1, limit = 10, type } = options;
-    const skip = (page - 1) * limit;
+  const { page = 1, limit = 10, type } = options;
+  const cacheKey = `analyses_page:${userId}:${type || "all"}:${page}:${limit}`;
 
-    const where: any = {
-      userId: userId,
-    };
+  return withCache(
+    cacheKey,
+    async () => {
+      try {
+        const skip = (page - 1) * limit;
 
-    if (type) {
-      where.type = type;
-    }
+        const where: any = {
+          userId: userId,
+        };
 
-    // Get total count for pagination
-    const total = await prisma.analysis.count({ where });
+        if (type) {
+          where.type = type;
+        }
 
-    // Get analyses with pagination
-    const analyses = await prisma.analysis.findMany({
-      where,
-      orderBy: {
-        createdAt: "desc",
-      },
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        type: true,
-        rawData: true,
-        structuredData: true,
-        visualMetrics: true,
-        riskAssessment: true,
-        problemsDetected: true,
-        treatments: true,
-        createdAt: true,
-      },
-    });
+        // Get total count and analyses in parallel
+        const [total, analyses] = await Promise.all([
+          prisma.analysis.count({ where }),
+          prisma.analysis.findMany({
+            where,
+            orderBy: {
+              createdAt: "desc",
+            },
+            skip,
+            take: limit,
+            select: {
+              id: true,
+              type: true,
+              rawData: true,
+              structuredData: true,
+              visualMetrics: true,
+              riskAssessment: true,
+              problemsDetected: true,
+              treatments: true,
+              createdAt: true,
+            },
+          }),
+        ]);
 
-    const totalPages = Math.ceil(total / limit);
+        const totalPages = Math.ceil(total / limit);
 
-    return {
-      analyses,
-      total,
-      page,
-      totalPages,
-    };
-  } catch (error) {
-    console.error("Error fetching paginated user analyses:", error);
-    return {
-      analyses: [],
-      total: 0,
-      page: 1,
-      totalPages: 1,
-    };
-  }
+        return {
+          analyses,
+          total,
+          page,
+          totalPages,
+        };
+      } catch (error) {
+        console.error("Error fetching paginated user analyses:", error);
+        return {
+          analyses: [],
+          total: 0,
+          page: 1,
+          totalPages: 1,
+        };
+      }
+    },
+    CACHE_TTL.ANALYSES,
+  );
 }
 
 /**

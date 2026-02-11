@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
   // Reduce serverless function size
   outputFileTracingIncludes: {},
 
-  // Headers for caching static assets
+  // Headers for caching static assets and bundles
   async headers() {
     return [
       {
@@ -45,6 +45,24 @@ const nextConfig: NextConfig = {
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/:all*(js|css)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, stale-while-revalidate=86400",
           },
         ],
       },

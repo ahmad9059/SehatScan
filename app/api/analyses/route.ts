@@ -43,7 +43,11 @@ export async function GET(request: NextRequest) {
         type: type as "face" | "report" | "risk" | undefined,
       });
 
-      return NextResponse.json(result);
+      return NextResponse.json(result, {
+        headers: {
+          "Cache-Control": "private, max-age=120, stale-while-revalidate=300",
+        },
+      });
     } catch (dbError) {
       console.error("Database error:", dbError);
       return NextResponse.json(

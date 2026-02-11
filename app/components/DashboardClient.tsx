@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import DashboardCharts from "@/app/components/DashboardCharts";
+import dynamic from "next/dynamic";
 import AnalysisDetailModal from "@/app/components/AnalysisDetailModal";
 import EmptyState from "@/app/components/EmptyState";
 import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
@@ -16,6 +16,40 @@ import {
   ExclamationCircleIcon,
   EyeIcon,
 } from "@heroicons/react/24/outline";
+
+// Lazy load heavy charts component (recharts is ~200KB)
+const DashboardCharts = dynamic(
+  () => import("@/app/components/DashboardCharts"),
+  {
+    loading: () => (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-pulse">
+        <div className="bg-[var(--color-card)] rounded-xl p-6 border border-[var(--color-border)]">
+          <div className="flex justify-between mb-6">
+            <div className="h-5 w-32 rounded bg-[var(--color-surface)]" />
+            <div className="h-5 w-36 rounded bg-[var(--color-surface)]" />
+          </div>
+          <div className="h-48 rounded bg-[var(--color-surface)]" />
+        </div>
+        <div className="bg-[var(--color-card)] rounded-xl p-6 border border-[var(--color-border)]">
+          <div className="flex justify-between mb-6">
+            <div className="h-5 w-40 rounded bg-[var(--color-surface)]" />
+            <div className="h-5 w-36 rounded bg-[var(--color-surface)]" />
+          </div>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-[var(--color-surface)]" />
+                <div className="flex-1 h-9 rounded-lg bg-[var(--color-surface)]" />
+                <div className="w-8 h-4 rounded bg-[var(--color-surface)]" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    ssr: false,
+  },
+);
 
 interface AnalysisStats {
   total: number;

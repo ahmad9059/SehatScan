@@ -47,10 +47,10 @@ if (redis) {
 
 // Cache TTL constants (in seconds)
 export const CACHE_TTL = {
-  USER: 60 * 60, // 1 hour for user data
-  STATS: 60 * 5, // 5 minutes for dashboard stats
-  ANALYSES: 60 * 2, // 2 minutes for recent analyses
-  SHORT: 60, // 1 minute for frequently changing data
+  USER: 60 * 60 * 2, // 2 hours for user data
+  STATS: 60 * 30, // 30 minutes for dashboard stats
+  ANALYSES: 60 * 15, // 15 minutes for recent analyses
+  SHORT: 60 * 5, // 5 minutes for frequently changing data
 };
 
 // Cache key prefixes

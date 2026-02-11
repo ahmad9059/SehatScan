@@ -146,8 +146,8 @@ export default function HeroSection() {
               <img
                 src="/hero-section.svg"
                 alt="SehatScan AI Health Analysis"
-                className="w-full h-auto animate-fade-in drop-shadow-lg"
-                style={{ animationDelay: "0.2s" }}
+                className="w-full h-auto animate-float drop-shadow-lg"
+                style={{ animationDuration: "5s" }}
               />
 
               {/* Floating Card - Top Left: Report Accuracy */}

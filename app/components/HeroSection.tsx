@@ -20,8 +20,8 @@ export default function HeroSection() {
         <div className="absolute right-[10%] top-[50%] h-[500px] w-[500px] -translate-y-1/2 rounded-full bg-[radial-gradient(circle,var(--hero-grid-accent),transparent_70%)] blur-3xl opacity-30" />
       </div>
 
-      <div className="mx-auto w-full max-w-[1400px] px-6 lg:px-8 pt-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <div className="mx-auto w-full max-w-[1700px] px-6 lg:px-16 pt-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr] gap-12 lg:gap-20 items-center">
           {/* Left - Text Content */}
           <div className="animate-fade-in-up">
             {/* Badge */}
@@ -46,10 +46,10 @@ export default function HeroSection() {
 
             {/* Headline */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] text-[var(--color-heading)]">
-              Your Health,{" "}
-              <span className="text-[var(--color-primary)]">
-                Decoded
-              </span>{" "}
+              Your Health,
+              <br />
+              <span className="text-[var(--color-primary)]">Decoded</span>
+              <br />
               with AI Precision
             </h1>
 

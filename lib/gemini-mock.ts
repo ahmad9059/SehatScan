@@ -263,8 +263,8 @@ export class MockGeminiAnalyzer {
       lowerPrompt.includes("facial health analyses (") &&
       !lowerPrompt.includes("facial health analyses (0");
     const hasRiskData =
-      lowerPrompt.includes("risk assessments (") &&
-      !lowerPrompt.includes("risk assessments (0");
+      lowerPrompt.includes("health checks (") &&
+      !lowerPrompt.includes("health checks (0");
     const hasAnyData = hasReportData || hasFaceData || hasRiskData;
 
     // Extract user name if available
@@ -292,7 +292,7 @@ SehatScan is an AI-powered health analysis platform that helps you understand yo
 **Key Features:**
 📋 **Report Analysis** - Upload lab reports, and I'll extract and explain your health metrics
 📸 **Facial Health Analysis** - AI-powered visual health assessment from photos
-⚖️ **Risk Assessment** - Comprehensive health risk evaluation combining multiple data sources
+⚖️ **Health Check** - Dermatology-focused evaluation combining multiple data sources
 💬 **AI Health Assistant** - That's me! I provide personalized insights based on your data
 📊 **Health Tracking** - Monitor your health trends over time
 
@@ -430,9 +430,9 @@ Ready to try it?`;
     ) {
       if (hasRiskData) {
         const riskSection = prompt.match(
-          /Risk Assessment \d+[\s\S]*?(?=\n\n📊|$)/i
+          /Health Check \d+[\s\S]*?(?=\n\n📊|$)/i
         );
-        response = `${greeting}Here's a summary of your health risk assessment:\n\n`;
+        response = `${greeting}Here's a summary of your latest health check:\n\n`;
 
         if (riskSection) {
           response += riskSection[0] + "\n\n";
@@ -446,12 +446,12 @@ Ready to try it?`;
 
 Would you like me to explain any risk factor in detail?`;
       } else {
-        response = `${greeting}You haven't generated a risk assessment yet.
+        response = `${greeting}You haven't generated a health check yet.
 
-**To get a comprehensive risk assessment:**
+**To run a health check:**
 1. First, upload at least one health report
 2. Optionally, complete a facial health scan
-3. Go to **Risk Assessment** in the dashboard
+3. Go to **Health Check** in the dashboard
 4. Get a combined analysis of all your health data
 
 Would you like to start by uploading a health report?`;
@@ -604,7 +604,7 @@ ${
     : "○ No medical reports yet"
 }
 ${hasFaceData ? "✓ You have facial health analyses" : "○ No facial scans yet"}
-${hasRiskData ? "✓ You have risk assessments" : "○ No risk assessments yet"}
+${hasRiskData ? "✓ You have health checks" : "○ No health checks yet"}
 
 **💬 Try asking me about:**
 - Your latest health report results
@@ -621,7 +621,7 @@ I notice you haven't uploaded any health data yet. To give you personalized insi
 **🚀 Get Started:**
 1. **Scan Report** - Upload a blood test or lab report
 2. **Scan Face** - Take a photo for visual health analysis
-3. **Risk Assessment** - Get a comprehensive health evaluation
+3. **Health Check** - Get a dermatologist-focused evaluation
 
 **💡 Once you have data, I can:**
 - Explain your test results in simple terms
@@ -637,7 +637,7 @@ Would you like me to guide you through uploading your first health report?`;
   }
 
   /**
-   * Mock risk assessment generation with comprehensive structure
+   * Mock dermatology health check generation
    */
   async generateRiskAssessment(
     labData: any,
@@ -657,216 +657,264 @@ Would you like me to guide you through uploading your first health report?`;
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    // Collect findings for assessment
-    const concerns: { level: string; description: string }[] = [];
+    const concerns: { level: "high" | "moderate" | "low"; description: string }[] = [];
     const strengths: string[] = [];
-    const recommendations: string[] = [];
+    const reportedSymptoms = Array.isArray(userData.symptoms)
+      ? userData.symptoms
+      : userData.symptoms
+        ? [String(userData.symptoms)]
+        : [];
 
-    // Generate comprehensive assessment
-    let assessment = "# Health Risk Assessment Report\n\n";
-
-    // Executive Summary
+    let assessment = "# Dermatology Health Check Report\n\n";
     assessment += "## Executive Summary\n\n";
-    assessment += `This health risk assessment is based on ${labData ? "laboratory results" : ""}${labData && visualMetrics ? " and " : ""}${visualMetrics ? "visual health analysis" : ""} for a ${userData.age || "unknown age"}-year-old ${userData.gender || "individual"}. `;
-    assessment += "The following sections detail our findings and provide personalized recommendations.\n\n";
+    assessment += `This dermatologist-focused assessment is based on ${visualMetrics ? "skin photo analysis" : ""}${visualMetrics && labData ? " and " : ""}${labData ? "report data" : ""} for a ${userData.age || "unknown age"}-year-old ${userData.gender || "individual"}. `;
+    assessment += "The findings below focus only on skin-related risk, with clear follow-up guidance.\n\n";
 
-    // Key Findings
-    assessment += "## Key Findings\n\n";
+    assessment += "## Key Dermatology Findings\n\n";
 
-    // Analyze lab data
-    if (labData) {
-      assessment += "### Lab Results Analysis\n\n";
-
-      if (labData.metrics && Array.isArray(labData.metrics)) {
-        labData.metrics.forEach((metric: any) => {
-          if (metric.name && metric.value) {
-            assessment += `- **${metric.name}**: ${metric.value}${metric.unit ? ` ${metric.unit}` : ""}`;
-
-            // Add basic interpretation for common metrics
-            if (metric.name.toLowerCase().includes("hemoglobin")) {
-              const value = parseFloat(metric.value);
-              if (value < 12) {
-                assessment += " - Below normal range\n";
-                concerns.push({ level: "moderate", description: "Low hemoglobin may indicate anemia" });
-              } else if (value > 16) {
-                assessment += " - Above normal range\n";
-                concerns.push({ level: "low", description: "Elevated hemoglobin - monitor hydration" });
-              } else {
-                assessment += " - Within normal range\n";
-                strengths.push("Healthy hemoglobin levels");
-              }
-            } else if (metric.name.toLowerCase().includes("cholesterol")) {
-              const value = parseFloat(metric.value);
-              if (value > 240) {
-                assessment += " - High risk level\n";
-                concerns.push({ level: "high", description: "Elevated cholesterol increases cardiovascular risk" });
-              } else if (value > 200) {
-                assessment += " - Borderline high\n";
-                concerns.push({ level: "moderate", description: "Cholesterol approaching concerning levels" });
-              } else {
-                assessment += " - Desirable level\n";
-                strengths.push("Healthy cholesterol levels");
-              }
-            } else if (metric.name.toLowerCase().includes("glucose") || metric.name.toLowerCase().includes("blood sugar")) {
-              const value = parseFloat(metric.value);
-              if (value > 126) {
-                assessment += " - Elevated (diabetes range)\n";
-                concerns.push({ level: "high", description: "Blood glucose indicates possible diabetes" });
-              } else if (value > 100) {
-                assessment += " - Prediabetic range\n";
-                concerns.push({ level: "moderate", description: "Blood glucose in prediabetic range" });
-              } else {
-                assessment += " - Normal range\n";
-                strengths.push("Healthy blood sugar levels");
-              }
-            } else {
-              assessment += "\n";
-            }
-          }
-        });
-        assessment += "\n";
-      } else {
-        assessment += "Lab data provided but no structured metrics available for detailed analysis.\n\n";
-      }
-    }
-
-    // Analyze visual metrics
     if (visualMetrics) {
-      assessment += "### Visual/Skin Analysis\n\n";
+      assessment += "### Skin Photo Analysis\n\n";
 
       if (visualMetrics.redness_percentage !== undefined) {
-        assessment += `- **Facial Redness Level**: ${visualMetrics.redness_percentage}%`;
-        if (visualMetrics.redness_percentage > 60) {
+        assessment += `- **Facial Redness**: ${visualMetrics.redness_percentage}%`;
+        if (visualMetrics.redness_percentage >= 65) {
           assessment += " - Elevated\n";
-          concerns.push({ level: "moderate", description: "High facial redness may indicate inflammation or skin irritation" });
-        } else if (visualMetrics.redness_percentage > 30) {
+          concerns.push({
+            level: "moderate",
+            description:
+              "Pronounced facial redness may indicate active irritation or inflammatory skin activity.",
+          });
+        } else if (visualMetrics.redness_percentage >= 35) {
           assessment += " - Mild elevation\n";
-          concerns.push({ level: "low", description: "Slight redness observed" });
+          concerns.push({
+            level: "low",
+            description:
+              "Mild redness is present and may reflect sensitivity or temporary irritation.",
+          });
         } else {
-          assessment += " - Normal\n";
-          strengths.push("Normal skin redness levels");
+          assessment += " - Within expected range\n";
+          strengths.push("Redness level is within a low-risk range");
         }
       }
 
       if (visualMetrics.yellowness_percentage !== undefined) {
-        assessment += `- **Facial Yellowness Level**: ${visualMetrics.yellowness_percentage}%`;
-        if (visualMetrics.yellowness_percentage > 70) {
+        assessment += `- **Facial Yellowness**: ${visualMetrics.yellowness_percentage}%`;
+        if (visualMetrics.yellowness_percentage >= 70) {
           assessment += " - Concerning\n";
-          concerns.push({ level: "high", description: "High yellowness may indicate jaundice - seek medical evaluation" });
-        } else if (visualMetrics.yellowness_percentage > 40) {
+          concerns.push({
+            level: "high",
+            description:
+              "Marked yellowness should be reviewed urgently by a clinician to rule out jaundice-related causes.",
+          });
+        } else if (visualMetrics.yellowness_percentage >= 40) {
           assessment += " - Mild elevation\n";
-          concerns.push({ level: "low", description: "Slight yellowish tint observed" });
+          concerns.push({
+            level: "low",
+            description:
+              "Mild yellow undertone is present; confirm under consistent lighting and monitor trend.",
+          });
         } else {
-          assessment += " - Normal\n";
-          strengths.push("Healthy skin tone");
+          assessment += " - Within expected range\n";
+          strengths.push("Skin tone balance appears stable");
         }
+      }
+
+      assessment += "\n";
+    }
+
+    if (labData) {
+      assessment += "### Dermatology-Relevant Report Findings\n\n";
+      const reportMetrics = Array.isArray(labData.metrics) ? labData.metrics : [];
+      let matchedDermMetric = false;
+
+      for (const metric of reportMetrics) {
+        const name = String(metric?.name || "").trim();
+        if (!name) {
+          continue;
+        }
+
+        const lowerName = name.toLowerCase();
+        const valueText = String(metric?.value || "").trim();
+        const unit = metric?.unit ? ` ${metric.unit}` : "";
+        const numericValue = Number.parseFloat(valueText.replace(/,/g, ""));
+        const hasNumeric = Number.isFinite(numericValue);
+
+        if (
+          lowerName.includes("crp") ||
+          lowerName.includes("esr") ||
+          lowerName.includes("ige") ||
+          lowerName.includes("eosin")
+        ) {
+          matchedDermMetric = true;
+          assessment += `- **${name}**: ${valueText}${unit} (inflammation/allergy marker potentially relevant to skin)\n`;
+          if (hasNumeric && numericValue > 0) {
+            concerns.push({
+              level: "low",
+              description:
+                `${name} may support inflammatory or allergic skin activity when correlated with symptoms.`,
+            });
+          }
+          continue;
+        }
+
+        if (lowerName.includes("bilirubin")) {
+          matchedDermMetric = true;
+          assessment += `- **${name}**: ${valueText}${unit} (color-change marker relevant to yellowing concerns)\n`;
+          if (hasNumeric && numericValue > 1.2) {
+            concerns.push({
+              level: "high",
+              description:
+                "Elevated bilirubin with visible yellowness warrants prompt clinical evaluation.",
+            });
+          }
+          continue;
+        }
+
+        if (
+          lowerName.includes("hba1c") ||
+          lowerName.includes("glucose") ||
+          lowerName.includes("vitamin d") ||
+          lowerName.includes("ferritin") ||
+          lowerName.includes("zinc") ||
+          lowerName.includes("thyroid") ||
+          lowerName.includes("tsh")
+        ) {
+          matchedDermMetric = true;
+          assessment += `- **${name}**: ${valueText}${unit} (may influence skin healing, barrier, or flare tendency)\n`;
+        }
+      }
+
+      if (!matchedDermMetric) {
+        assessment +=
+          "- No clearly dermatology-relevant report markers were identified from the provided report data.\n";
       }
       assessment += "\n";
     }
 
-    // Risk Assessment Section
-    assessment += "## Risk Assessment\n\n";
+    if (reportedSymptoms.length > 0) {
+      assessment += `- **Reported skin symptoms**: ${reportedSymptoms.join(", ")}\n\n`;
+      if (
+        reportedSymptoms.some((s) =>
+          /itch|rash|burn|stinging|redness|peel/i.test(s)
+        )
+      ) {
+        concerns.push({
+          level: "moderate",
+          description:
+            "Reported active skin symptoms suggest ongoing irritation that should be clinically reviewed if persistent.",
+        });
+      }
+    }
 
-    const highConcerns = concerns.filter(c => c.level === "high");
-    const moderateConcerns = concerns.filter(c => c.level === "moderate");
-    const lowConcerns = concerns.filter(c => c.level === "low");
+    assessment += "## Dermatology Risk Stratification\n\n";
+
+    const highConcerns = concerns.filter((c) => c.level === "high");
+    const moderateConcerns = concerns.filter((c) => c.level === "moderate");
+    const lowConcerns = concerns.filter((c) => c.level === "low");
 
     assessment += "### Immediate Concerns (High Priority)\n\n";
     if (highConcerns.length > 0) {
-      highConcerns.forEach(c => {
-        assessment += `- ${c.description}\n`;
-      });
+      for (const concern of highConcerns) {
+        assessment += `- ${concern.description}\n`;
+      }
     } else {
-      assessment += "No immediate concerns identified.\n";
+      assessment += "No immediate dermatology concerns identified.\n";
     }
     assessment += "\n";
 
     assessment += "### Moderate Concerns (Monitor)\n\n";
     if (moderateConcerns.length > 0) {
-      moderateConcerns.forEach(c => {
-        assessment += `- ${c.description}\n`;
-      });
+      for (const concern of moderateConcerns) {
+        assessment += `- ${concern.description}\n`;
+      }
     } else {
-      assessment += "No moderate concerns identified.\n";
+      assessment += "No moderate dermatology concerns identified.\n";
     }
     assessment += "\n";
 
     assessment += "### Low-Level Observations\n\n";
     if (lowConcerns.length > 0) {
-      lowConcerns.forEach(c => {
-        assessment += `- ${c.description}\n`;
-      });
+      for (const concern of lowConcerns) {
+        assessment += `- ${concern.description}\n`;
+      }
     } else {
-      assessment += "No minor observations to note.\n";
+      assessment += "No minor dermatology observations to note.\n";
     }
     assessment += "\n";
 
-    // Personalized Recommendations
-    assessment += "## Personalized Recommendations\n\n";
+    assessment += "## Personalized Dermatology Plan\n\n";
+    assessment += "### Daily Skin Care Actions\n\n";
+    assessment += "- Use a gentle, fragrance-free cleanser and moisturizer twice daily\n";
+    assessment += "- Apply broad-spectrum SPF 30+ every morning and reapply when outdoors\n";
+    assessment += "- Avoid harsh exfoliants or frequent product switching during active irritation\n";
+    if (reportedSymptoms.length > 0) {
+      assessment += `- Track symptom triggers and flare patterns: ${reportedSymptoms.join(", ")}\n`;
+    }
+    assessment += "\n";
 
-    assessment += "### Lifestyle Modifications\n\n";
-    assessment += "- Maintain a balanced diet rich in fruits, vegetables, and whole grains\n";
-    assessment += "- Engage in regular physical activity (at least 150 minutes of moderate exercise per week)\n";
-    assessment += "- Ensure adequate sleep (7-9 hours for adults)\n";
-    assessment += "- Manage stress through relaxation techniques, meditation, or hobbies\n";
-    if (userData.symptoms && userData.symptoms.length > 0) {
-      assessment += `- Monitor and track your reported symptoms: ${Array.isArray(userData.symptoms) ? userData.symptoms.join(", ") : userData.symptoms}\n`;
+    assessment += "### Targeted Treatment Considerations\n\n";
+    if (reportedSymptoms.some((s) => /acne|oily|breakout/i.test(s))) {
+      assessment += "- Consider acne-focused actives (e.g., salicylic acid, adapalene) with gradual introduction\n";
+    }
+    if (reportedSymptoms.some((s) => /dry|flaky|itch|peel/i.test(s))) {
+      assessment += "- Prioritize barrier repair with ceramides, petrolatum, and reduced irritant exposure\n";
+    }
+    if (reportedSymptoms.some((s) => /redness|burn|stinging|rash/i.test(s))) {
+      assessment += "- Use anti-inflammatory, low-irritation products and pause known triggers until symptoms settle\n";
+    }
+    if (reportedSymptoms.length === 0) {
+      assessment += "- No specific symptom-targeted treatment needed; continue maintenance skin care\n";
     }
     assessment += "\n";
 
     assessment += "### Follow-up Actions\n\n";
     if (highConcerns.length > 0) {
-      assessment += "- **Urgent**: Schedule an appointment with your healthcare provider within 1-2 weeks\n";
+      assessment += "- **Urgent**: Arrange prompt clinical review (same week) for high-priority skin findings\n";
+    } else if (moderateConcerns.length > 0) {
+      assessment += "- Book a routine dermatologist follow-up within 2-6 weeks\n";
+    } else {
+      assessment += "- Continue monitoring skin changes and review with dermatology if new symptoms appear\n";
     }
-    if (moderateConcerns.length > 0) {
-      assessment += "- Schedule a follow-up appointment to discuss concerning findings\n";
-    }
-    assessment += "- Consider repeating lab tests in 3-6 months to track trends\n";
-    assessment += "- Keep a health diary to track symptoms and lifestyle factors\n\n";
+    assessment += "- Bring photos and symptom timeline to improve clinical evaluation accuracy\n\n";
 
-    assessment += "### Preventive Measures\n\n";
-    if (userData.age && userData.age >= 40) {
-      assessment += "- Schedule regular health screenings appropriate for your age group\n";
-      assessment += "- Consider cardiovascular risk assessment\n";
-    }
-    if (userData.age && userData.age >= 50) {
-      assessment += "- Discuss cancer screening options with your healthcare provider\n";
-    }
-    assessment += "- Stay up-to-date with vaccinations\n";
-    assessment += "- Maintain regular dental and vision check-ups\n\n";
+    assessment += "### Preventive Skin Measures\n\n";
+    assessment += "- Maintain consistent sun protection and avoid prolonged UV exposure\n";
+    assessment += "- Patch-test new skincare products before full-face use\n";
+    assessment += "- Maintain sleep, hydration, and stress control to reduce flare frequency\n\n";
 
-    // Health Score Overview
-    assessment += "## Health Score Overview\n\n";
-
-    const riskLevel = highConcerns.length > 0 ? "Elevated" :
-                      moderateConcerns.length > 0 ? "Moderate" :
-                      lowConcerns.length > 0 ? "Low" : "Low";
+    assessment += "## Skin Risk Overview\n\n";
+    const riskLevel =
+      highConcerns.length > 0
+        ? "High"
+        : moderateConcerns.length > 0
+          ? "Moderate"
+          : lowConcerns.length > 0
+            ? "Low"
+            : "Low";
 
     assessment += `- **Overall Risk Level**: ${riskLevel}\n`;
-
     assessment += "- **Areas of Strength**: ";
     if (strengths.length > 0) {
       assessment += strengths.slice(0, 3).join(", ") + "\n";
     } else {
-      assessment += "Continue maintaining your current health practices\n";
+      assessment += "No major adverse skin indicators were detected from available data\n";
     }
 
+    const improvements = concerns.slice(0, 3).map((c) => c.description);
     assessment += "- **Areas for Improvement**: ";
-    const improvements = concerns.slice(0, 3).map(c => c.description.split(" - ")[0]);
     if (improvements.length > 0) {
       assessment += improvements.join(", ") + "\n";
     } else {
-      assessment += "Focus on preventive health measures\n";
+      assessment += "Continue current skin-maintenance practices\n";
     }
     assessment += "\n";
 
-    // Disclaimer
     assessment += "---\n\n";
     assessment += "**Important Notes:**\n";
     assessment += "- This assessment is AI-generated and for informational purposes only\n";
-    assessment += "- Always consult healthcare professionals for medical decisions\n";
-    assessment += "- Individual health needs may vary\n\n";
-    assessment += "*Note: This assessment was generated using mock analysis due to API limitations. For accurate AI-powered analysis, please ensure your Gemini API key has sufficient quota.*";
+    assessment += "- Always consult a qualified dermatologist for diagnosis and treatment\n";
+    assessment += "- Skin findings can vary with lighting, image quality, and timing\n\n";
+    assessment += "*Note: This assessment was generated using mock analysis due to API limitations. For accurate AI-powered analysis, ensure Gemini API quota is available.*";
 
     return assessment;
   }

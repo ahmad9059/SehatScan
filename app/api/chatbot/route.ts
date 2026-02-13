@@ -22,9 +22,9 @@ SehatScan is an AI-powered health analytics platform that helps users understand
    - Provides overall health score based on visual indicators
    - Non-invasive health monitoring method
 
-3. RISK ASSESSMENT:
+3. HEALTH CHECK:
    - Combines data from reports and facial analysis
-   - Generates comprehensive health risk profile
+   - Generates comprehensive dermatology-focused health check summary
    - Identifies potential health concerns early
    - Provides personalized recommendations
    - Helps prioritize areas for health improvement

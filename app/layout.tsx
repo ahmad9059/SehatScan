@@ -24,7 +24,7 @@ const notoNastaliqUrdu = Noto_Nastaliq_Urdu({
 });
 
 export const metadata: Metadata = {
-  title: "SehatScan - AI-Powered Health Risk Assessment",
+  title: "SehatScan - AI-Powered Health Check",
   description:
     "Transform your medical reports and photos into actionable health insights using advanced AI and computer vision technology.",
   icons: {

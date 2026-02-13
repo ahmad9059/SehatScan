@@ -102,7 +102,7 @@ const navigationItems: NavigationItem[] = [
   },
   {
     nameKey: "nav.riskAssessment",
-    href: "/dashboard/risk-assessment",
+    href: "/dashboard/health-check",
     icon: faTriangleExclamation,
   },
   {
@@ -561,6 +561,10 @@ export default function DashboardLayout({
       "/dashboard/scan-report": {
         title: t("nav.scanReport"),
         subtitle: t("page.scanReportSubtitle"),
+      },
+      "/dashboard/health-check": {
+        title: t("nav.riskAssessment"),
+        subtitle: t("page.riskAssessmentSubtitle"),
       },
       "/dashboard/risk-assessment": {
         title: t("nav.riskAssessment"),

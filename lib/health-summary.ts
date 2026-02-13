@@ -86,7 +86,7 @@ function buildSummary(
     lines.push("SUGGESTION: Encourage the user to:");
     lines.push("- Upload a blood test or lab report in 'Scan Report'");
     lines.push("- Take a facial health analysis in 'Scan Face'");
-    lines.push("- Generate a comprehensive Risk Assessment");
+    lines.push("- Generate a comprehensive Health Check");
     return lines.join("\n");
   }
 
@@ -204,7 +204,7 @@ function buildSummary(
     lines.push(parts.join(" | "));
   }
 
-  // Latest risk assessment
+  // Latest health check
   if (risks.length > 0) {
     const latestRisk = risks[0];
     const riskDate = formatDate(latestRisk.createdAt);

@@ -354,7 +354,7 @@ export default function DashboardClient({
             </div>
           </div>
 
-          {/* Risk Assessments Card */}
+          {/* Health Checks Card */}
           <div
             className="group relative bg-[var(--color-card)] rounded-xl p-6 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
             style={{ animationDelay: "0.3s" }}
@@ -528,10 +528,10 @@ export default function DashboardClient({
             </Link>
 
             <Link
-              href="/dashboard/risk-assessment"
+              href="/dashboard/health-check"
               className="group relative bg-[var(--color-card)] rounded-xl p-4 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-strong)] transition-all duration-300 hover:-translate-y-1 animate-fade-in border border-[var(--color-border)] overflow-hidden cursor-pointer"
               style={{ animationDelay: "0.2s" }}
-              aria-label="Generate comprehensive risk assessment"
+              aria-label="Generate dermatology health check"
             >
               <div className="relative z-10 text-center">
                 <div className="p-3 bg-[var(--color-primary-soft)] rounded-xl group-hover:scale-105 transition-transform duration-300 mx-auto w-fit mb-3">

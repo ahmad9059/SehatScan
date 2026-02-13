@@ -36,10 +36,10 @@ const searchData: SearchResult[] = [
   },
   {
     id: "4",
-    title: "Risk Assessment",
-    description: "Comprehensive health risk evaluation",
+    title: "Health Check",
+    description: "Dermatology-focused health check",
     type: "page",
-    href: "/dashboard/risk-assessment",
+    href: "/dashboard/health-check",
   },
   {
     id: "5",

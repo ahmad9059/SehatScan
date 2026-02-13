@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      console.log("Starting risk assessment...");
+      console.log("Starting health check...");
       let analyzer;
 
       try {
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Risk assessment error:", error);
     return NextResponse.json(
-      { error: "Internal server error occurred during risk assessment" },
+      { error: "Internal server error occurred during health check" },
       { status: 500 }
     );
   }

@@ -1,6 +1,6 @@
 /**
  * Gemini AI integration for health data analysis
- * Handles OCR text structuring and risk assessment generation
+ * Handles OCR text structuring and health check generation
  */
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -162,7 +162,7 @@ IMPORTANT:
   }
 
   /**
-   * Generates health risk assessment based on combined data
+   * Generates dermatology-focused health check based on combined data
    */
   async generateRiskAssessment(
     labData: any,
@@ -192,10 +192,11 @@ IMPORTANT:
 
     dataSection += `## Patient Information\n${JSON.stringify(userData, null, 2)}`;
 
-    // Build comprehensive symptoms context
-    const symptomsContext = userData.symptoms && userData.symptoms.length > 0
-      ? `The patient reports experiencing: ${Array.isArray(userData.symptoms) ? userData.symptoms.join(", ") : userData.symptoms}`
-      : "No specific symptoms reported.";
+    // Build skin-specific symptoms context
+    const symptomsContext =
+      userData.symptoms && userData.symptoms.length > 0
+        ? `The patient reports the following skin-related symptoms: ${Array.isArray(userData.symptoms) ? userData.symptoms.join(", ") : userData.symptoms}`
+        : "No specific skin symptoms reported.";
 
     const medicalHistoryContext = userData.medicalHistory
       ? `Medical History: ${userData.medicalHistory}`
@@ -205,7 +206,7 @@ IMPORTANT:
       ? `Current Medications: ${userData.currentMedications}`
       : "";
 
-    const prompt = `You are an expert medical AI assistant providing a comprehensive health risk assessment. Analyze the following patient data carefully and generate a detailed, well-structured risk assessment report.
+    const prompt = `You are an expert dermatology AI assistant providing a dermatologist-focused skin health check. Analyze the following data and generate a detailed dermatology report.
 
 ${dataSection}
 
@@ -213,62 +214,65 @@ ${symptomsContext}
 ${medicalHistoryContext}
 ${medicationsContext}
 
-Generate a comprehensive health risk assessment in **Markdown format** with the following sections:
+Generate a comprehensive dermatology health check in **Markdown format** with the following sections:
 
-# Health Risk Assessment Report
+# Dermatology Health Check Report
 
 ## Executive Summary
-Provide a brief 2-3 sentence overview of the patient's overall health status based on all available data.
+Provide a brief 2-3 sentence overview of the patient's current skin risk profile.
 
-## Key Findings
-${labData ? "### Lab Results Analysis\n- List any abnormal values with their implications\n- Note any values approaching concerning ranges\n- Highlight positive/normal findings as well" : ""}
-${visualMetrics ? "### Visual/Skin Analysis\n- Summarize skin health indicators\n- Note any concerning visual markers (redness, yellowness, etc.)\n- Assess overall skin condition" : ""}
+## Key Dermatology Findings
+${labData ? "### Dermatology-Relevant Report Findings\n- Include only report findings that are relevant to skin, hair, or nails\n- Ignore non-dermatology findings unless they directly affect skin interpretation\n- If no dermatology-relevant findings are present, explicitly state that" : ""}
+${visualMetrics ? "### Skin Photo Analysis\n- Summarize skin indicators from visual metrics\n- Note concerning markers (e.g., redness, yellowness, irritation patterns)\n- Assess overall skin condition confidence and limitations" : ""}
 
-## Risk Assessment
+## Dermatology Risk Stratification
 
 ### Immediate Concerns (High Priority)
-List any findings that require prompt medical attention. If none, state "No immediate concerns identified."
+List skin findings that require prompt dermatologist evaluation. If none, state "No immediate dermatology concerns identified."
 
 ### Moderate Concerns (Monitor)
-List findings that should be monitored or addressed in the near term.
+List skin findings that should be monitored or addressed soon.
 
 ### Low-Level Observations
-List minor findings or areas for general health optimization.
+List minor skin observations and maintenance opportunities.
 
-## Personalized Recommendations
+## Personalized Dermatology Plan
 
-### Lifestyle Modifications
-Provide specific, actionable recommendations based on findings (diet, exercise, sleep, stress management).
+### Daily Skin Care Actions
+Provide specific, actionable skin-care steps (cleanser, moisturizer, SPF, barrier support, trigger avoidance).
+
+### Targeted Treatment Considerations
+Recommend evidence-based topical/oral ingredient categories when appropriate, with cautionary notes.
 
 ### Follow-up Actions
-- Suggest any additional tests or screenings if warranted
-- Recommend appropriate medical consultations
+- Recommend when to consult a dermatologist (urgent vs routine)
+- Suggest dermatology-relevant follow-up tests only when justified by available data
 - Provide timeline for follow-up
 
-### Preventive Measures
-Age and gender-appropriate preventive health recommendations.
+### Preventive Skin Measures
+Provide prevention tips focused on skin health, irritation control, and long-term skin barrier maintenance.
 
-## Health Score Overview
-Provide a simple health score interpretation:
+## Skin Risk Overview
+Provide a simple skin risk interpretation:
 - **Overall Risk Level**: Low / Moderate / Elevated / High
-- **Areas of Strength**: List 2-3 positive health indicators
-- **Areas for Improvement**: List 2-3 actionable improvement areas
+- **Areas of Strength**: List 2-3 positive skin indicators
+- **Areas for Improvement**: List 2-3 actionable skin-focused improvement areas
 
 ---
 
 **Important Notes:**
 - This assessment is AI-generated and for informational purposes only
-- Always consult healthcare professionals for medical decisions
-- Individual health needs may vary
+- Always consult a qualified dermatologist for diagnosis and treatment decisions
+- Individual skin needs may vary
 
 GUIDELINES:
-- Be thorough but concise
+- Keep the scope strictly dermatology-related (skin/hair/nails)
+- Do not provide broad non-dermatology health risk conclusions
+- Be explicit when data is insufficient for a dermatology conclusion
 - Use clear, patient-friendly language
-- Avoid medical jargon where possible, or explain terms when necessary
 - Provide specific, actionable recommendations
-- Be honest about limitations when data is insufficient
-- Consider the patient's age (${userData.age || "unknown"}) and gender (${userData.gender || "unknown"}) in your assessment
-- If symptoms are reported, correlate them with any findings from lab/visual data`;
+- Consider the patient's age (${userData.age || "unknown"}) and gender (${userData.gender || "unknown"}) only when relevant to skin risk
+- If symptoms are reported, correlate them with visual/report findings in dermatology context`;
 
     try {
       const result = await this.model.generateContent(prompt, {
@@ -282,7 +286,7 @@ GUIDELINES:
       const assessment = response.text().trim();
 
       if (!assessment) {
-        throw new Error("Empty risk assessment received");
+        throw new Error("Empty health check received");
       }
 
       return assessment;
@@ -290,7 +294,7 @@ GUIDELINES:
       if (error instanceof Error) {
         throw new Error(`Gemini API error: ${error.message}`);
       }
-      throw new Error("Unknown error occurred during risk assessment");
+      throw new Error("Unknown error occurred during health check");
     }
   }
 

@@ -39,7 +39,7 @@ const translations = {
     // Page Subtitles
     "page.scanFaceSubtitle": "Analyze your face for health insights",
     "page.scanReportSubtitle": "Upload and analyze medical reports",
-    "page.riskAssessmentSubtitle": "Evaluate your health risks",
+    "page.riskAssessmentSubtitle": "Run a dermatologist-focused health check",
     "page.chatbotSubtitle": "Get AI-powered health advice",
     "page.historySubtitle": "View your past analyses",
     "page.profileSubtitle": "Manage your account settings",
@@ -81,7 +81,7 @@ const translations = {
     "actions.scanFace": "Scan Face",
     "actions.scanFaceDesc": "AI-powered facial analysis",
     "actions.riskAssessment": "Health Check",
-    "actions.riskAssessmentDesc": "Quick health evaluation",
+    "actions.riskAssessmentDesc": "Dermatology-focused health summary",
     "actions.viewHistory": "View History",
     "actions.viewHistoryDesc": "See all your analyses",
 
@@ -151,7 +151,7 @@ const translations = {
     // Recent Analyses
     "recent.reportAnalysis": "Report Analysis",
     "recent.faceAnalysis": "Face Analysis",
-    "recent.riskAssessment": "Risk Assessment",
+    "recent.riskAssessment": "Health Check",
     "recent.analysis": "Analysis",
     "recent.analysisCompleted": "Analysis completed",
 
@@ -191,7 +191,7 @@ const translations = {
     // Page Subtitles
     "page.scanFaceSubtitle": "صحت کی بصیرت کے لیے اپنے چہرے کا تجزیہ کریں",
     "page.scanReportSubtitle": "طبی رپورٹس اپ لوڈ اور تجزیہ کریں",
-    "page.riskAssessmentSubtitle": "اپنے صحت کے خطرات کا جائزہ لیں",
+    "page.riskAssessmentSubtitle": "ڈرماٹولوجی پر مبنی صحت کی جانچ کریں",
     "page.chatbotSubtitle": "AI سے صحت کے مشورے حاصل کریں",
     "page.historySubtitle": "اپنے پچھلے تجزیے دیکھیں",
     "page.profileSubtitle": "اپنے اکاؤنٹ کی ترتیبات کا انتظام کریں",
@@ -232,7 +232,7 @@ const translations = {
     "actions.scanFace": "چہرہ اسکین",
     "actions.scanFaceDesc": "AI سے چہرے کا تجزیہ",
     "actions.riskAssessment": "صحت کی جانچ",
-    "actions.riskAssessmentDesc": "فوری صحت کا جائزہ",
+    "actions.riskAssessmentDesc": "ڈرماٹولوجی پر مبنی صحت کا خلاصہ",
     "actions.viewHistory": "تاریخ دیکھیں",
     "actions.viewHistoryDesc": "اپنے تمام تجزیے دیکھیں",
 
@@ -301,7 +301,7 @@ const translations = {
     // Recent Analyses
     "recent.reportAnalysis": "رپورٹ کا تجزیہ",
     "recent.faceAnalysis": "چہرے کا تجزیہ",
-    "recent.riskAssessment": "خطرے کا جائزہ",
+    "recent.riskAssessment": "صحت کی جانچ",
     "recent.analysis": "تجزیہ",
     "recent.analysisCompleted": "تجزیہ مکمل",
 

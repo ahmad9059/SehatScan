@@ -41,7 +41,7 @@ function getAnalysisTypeLabel(type: string): string {
     case "face":
       return "Face Analysis";
     case "risk":
-      return "Risk Assessment";
+      return "Health Check";
     default:
       return "Analysis";
   }

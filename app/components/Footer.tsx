@@ -51,7 +51,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-[var(--color-subtle)] mb-8 max-w-sm leading-relaxed">
-              AI-powered health risk assessment platform combining advanced
+              AI-powered health check platform combining advanced
               image processing and machine learning to transform healthcare data
               into actionable insights.
             </p>

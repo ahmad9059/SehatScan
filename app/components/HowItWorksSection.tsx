@@ -46,7 +46,7 @@ export default function HowItWorksSection() {
       number: "03",
       title: "Get Insights",
       description:
-        "Receive comprehensive health insights and risk assessments instantly in an easy-to-understand format.",
+        "Receive comprehensive health insights and health checks instantly in an easy-to-understand format.",
       icon: (
         <svg
           className="w-8 h-8"

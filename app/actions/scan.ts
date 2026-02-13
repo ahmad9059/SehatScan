@@ -590,7 +590,7 @@ export async function generateRiskAssessment(
       user_data: userFormData,
     };
 
-    // Call frontend API risk assessment endpoint with timeout
+    // Call frontend API health check endpoint with timeout
     let response;
     try {
       const controller = new AbortController();
@@ -645,7 +645,7 @@ export async function generateRiskAssessment(
         if (response.status === 400) {
           errorType = "validation";
           errorMessage =
-            "Invalid data provided for risk assessment. Please check your selected analyses.";
+            "Invalid data provided for health check. Please check your selected analyses.";
         } else if (response.status === 429) {
           errorType = "rate_limit";
           errorMessage =
@@ -686,7 +686,7 @@ export async function generateRiskAssessment(
       return {
         success: false,
         error:
-          "Invalid response from risk assessment service. Please try again.",
+          "Invalid response from health check service. Please try again.",
         errorType: "service",
       };
     }
@@ -696,12 +696,12 @@ export async function generateRiskAssessment(
       logError("generateRiskAssessment - Invalid response structure", data);
       return {
         success: false,
-        error: "Invalid risk assessment results. Please try again.",
+        error: "Invalid health check results. Please try again.",
         errorType: "service",
       };
     }
 
-    // Save risk assessment to database
+    // Save health check to database
     let saveResult;
     try {
       saveResult = await saveAnalysis({
@@ -723,7 +723,7 @@ export async function generateRiskAssessment(
       return {
         success: true,
         data,
-        saveError: "Failed to save risk assessment to history",
+        saveError: "Failed to save health check to history",
         warning:
           "Risk assessment completed but couldn't be saved to your history",
       };
@@ -770,7 +770,7 @@ export async function generateRiskAssessment(
     return {
       success: false,
       error:
-        "An unexpected error occurred during risk assessment. Please try again.",
+        "An unexpected error occurred during health check. Please try again.",
       errorType: "unexpected",
     };
   }

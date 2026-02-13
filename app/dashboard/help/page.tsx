@@ -43,9 +43,9 @@ const faqs: FAQItem[] = [
   },
   {
     category: "Features",
-    question: "What is the Risk Assessment feature?",
+    question: "What is the Health Check feature?",
     answer:
-      "Risk Assessment combines your face analysis and medical report data with additional health information you provide (age, symptoms, medical history) to generate a comprehensive health risk profile using AI.",
+      "Health Check combines your face analysis and medical report data with additional information you provide (age, symptoms, medical history) to generate a dermatologist-focused health summary using AI.",
   },
   {
     category: "Features",
@@ -94,9 +94,9 @@ const quickLinks = [
   },
   {
     icon: ExclamationTriangleIcon,
-    title: "Risk Assessment",
-    description: "Understanding your health risk profile",
-    href: "/dashboard/risk-assessment",
+    title: "Health Check",
+    description: "Understanding your dermatology-focused health summary",
+    href: "/dashboard/health-check",
   },
   {
     icon: SparklesIcon,

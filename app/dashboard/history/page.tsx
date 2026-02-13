@@ -205,7 +205,7 @@ function HistoryPageContent() {
       case "report":
         return "Report Analysis";
       case "risk":
-        return "Risk Assessment";
+        return "Health Check";
       default:
         return "Analysis";
     }

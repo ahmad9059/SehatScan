@@ -60,6 +60,7 @@ export const CACHE_KEYS = {
   stats: (userId: string) => `stats:${userId}`,
   analyses: (userId: string) => `analyses:${userId}`,
   analysis: (analysisId: string) => `analysis:${analysisId}`,
+  healthSummary: (userId: string) => `chatbot_ctx:${userId}:health_summary`,
 };
 
 /**

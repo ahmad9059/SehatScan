@@ -306,7 +306,7 @@ GUIDELINES:
       const result = await this.model.generateContent(prompt, {
         generationConfig: {
           temperature: 0.4, // Balanced temperature for conversational responses
-          maxOutputTokens: 1000, // Reasonable response length
+          maxOutputTokens: 2048, // Allow longer health discussion responses
         },
       });
 
@@ -350,5 +350,52 @@ export async function generateHealthInsights(prompt: string): Promise<string> {
     const { createMockGeminiAnalyzer } = await import("./gemini-mock");
     const mockAnalyzer = createMockGeminiAnalyzer();
     return await mockAnalyzer.generateHealthInsights(prompt);
+  }
+}
+
+// --- Streaming chatbot support ---
+// Singleton model for chatbot streaming. Uses GEMINI_CHATBOT_MODEL if set,
+// otherwise falls back to the same GEMINI_MODEL used elsewhere.
+let _chatbotModel: ReturnType<GoogleGenerativeAI["getGenerativeModel"]> | null =
+  null;
+
+function getChatbotModel() {
+  if (_chatbotModel) return _chatbotModel;
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) {
+    throw new Error(
+      "Gemini API key is required. Set GEMINI_API_KEY environment variable.",
+    );
+  }
+  const genai = new GoogleGenerativeAI(key);
+  const modelName =
+    process.env.GEMINI_CHATBOT_MODEL ||
+    process.env.GEMINI_MODEL ||
+    "gemini-2.5-flash";
+  _chatbotModel = genai.getGenerativeModel({
+    model: modelName,
+    generationConfig: {
+      temperature: 0.4,
+      maxOutputTokens: 2048,
+    },
+  });
+  return _chatbotModel;
+}
+
+/**
+ * Stream health insights token-by-token for the chatbot.
+ * Uses a faster non-thinking model (gemini-2.0-flash) for low latency.
+ */
+export async function* streamHealthInsights(
+  prompt: string,
+): AsyncGenerator<string> {
+  if (!prompt?.trim()) {
+    throw new Error("Prompt cannot be empty");
+  }
+  const model = getChatbotModel();
+  const result = await model.generateContentStream(prompt);
+  for await (const chunk of result.stream) {
+    const text = chunk.text();
+    if (text) yield text;
   }
 }

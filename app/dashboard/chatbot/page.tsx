@@ -9,7 +9,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
   PaperAirplaneIcon,
-  UserIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { mutedText } from "@/app/components/dashboardStyles";
@@ -50,8 +49,6 @@ function ChatbotPageContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Remove the welcome message initialization - start with empty chat
-
   const handleSendMessage = async (overrideMessage?: string) => {
     const messageToSend = (overrideMessage ?? inputMessage).trim();
     if (!messageToSend || isLoading) return;
@@ -83,31 +80,62 @@ function ChatbotPageContent() {
         },
         body: JSON.stringify({
           message: messageToSend,
-          conversationHistory: messages.slice(-10),
+          conversationHistory: messages.slice(-6),
         }),
       });
 
       if (!response.ok) {
+        // Error responses come as JSON
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type") || "";
 
-      if (!data.success) {
-        throw new Error(data.error || "Failed to get response");
+      if (contentType.includes("text/plain") && response.body) {
+        // Streaming response — show text as it arrives
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          fullText += chunk;
+
+          const text = fullText;
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === loadingMessage.id
+                ? { ...msg, content: text, isLoading: false }
+                : msg,
+            ),
+          );
+        }
+
+        if (!fullText.trim()) {
+          throw new Error("Empty response from assistant");
+        }
+      } else {
+        // JSON fallback (for error responses that still return 200)
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.error || "Failed to get response");
+        }
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === loadingMessage.id
+              ? { ...msg, content: data.response, isLoading: false }
+              : msg,
+          ),
+        );
       }
-
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === loadingMessage.id
-            ? {
-                ...msg,
-                content: data.response,
-                isLoading: false,
-              }
-            : msg
-        )
-      );
     } catch (error) {
       console.error("Chatbot error:", error);
       setMessages((prev) =>
@@ -119,8 +147,8 @@ function ChatbotPageContent() {
                   "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
                 isLoading: false,
               }
-            : msg
-        )
+            : msg,
+        ),
       );
 
       showErrorToast("Failed to get response from AI assistant");
@@ -135,13 +163,6 @@ function ChatbotPageContent() {
       e.preventDefault();
       handleSendMessage();
     }
-  };
-
-  const formatTimestamp = (timestamp: Date) => {
-    return timestamp.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   return (
@@ -261,7 +282,7 @@ function ChatbotPageContent() {
                 >
                   {question}
                 </button>
-              )
+              ),
             )}
           </div>
         )}

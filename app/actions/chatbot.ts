@@ -1,7 +1,7 @@
 "use server";
 
 import { requireAuth } from "@/lib/clerk-session";
-import { getUserAnalyses } from "@/lib/analysis";
+import { getCompactHealthSummary } from "@/lib/health-summary";
 
 // Enhanced error logging utility
 function logError(context: string, error: unknown, additionalData?: any) {
@@ -31,26 +31,19 @@ export async function getChatbotContext() {
       };
     }
 
-    // Load user's analyses for context
     try {
-      const [reports, faces, risks] = await Promise.all([
-        getUserAnalyses(user.id!, "report", 10),
-        getUserAnalyses(user.id!, "face", 10),
-        getUserAnalyses(user.id!, "risk", 10),
-      ]);
-
-      const userAnalyses = [...reports, ...faces, ...risks];
+      const healthSummary = await getCompactHealthSummary(user.id!);
 
       return {
         success: true,
         data: {
-          userAnalyses,
+          healthSummary,
           userId: user.id,
           userName: user.name || user.email,
         },
       };
     } catch (error) {
-      logError("getChatbotContext - Failed to load analyses", error, {
+      logError("getChatbotContext - Failed to load health summary", error, {
         userId: user.id,
       });
       return {

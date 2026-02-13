@@ -270,6 +270,13 @@ export async function analyzeFace(formData: FormData) {
     }
 
     const data = analysisResult.value.data;
+    const visualMetrics = data.visual_metrics;
+    const problemsDetected = Array.isArray(data.problems_detected)
+      ? data.problems_detected
+      : undefined;
+    const treatments = Array.isArray(data.treatments)
+      ? data.treatments
+      : undefined;
 
     if (uploadResult.status === "fulfilled") {
       attachUploadedFaceImage(data, uploadResult.value);
@@ -286,9 +293,9 @@ export async function analyzeFace(formData: FormData) {
         userId: user.id!,
         type: "face",
         rawData: data,
-        visualMetrics: data.visual_metrics,
-        problemsDetected: data.problems_detected,
-        treatments: data.treatments,
+        visualMetrics,
+        problemsDetected,
+        treatments,
       });
     } catch (saveError) {
       logError("analyzeFace - Database save failed", saveError, {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/clerk-session";
 import { generateHealthInsights } from "@/lib/gemini";
 import { prisma } from "@/lib/db";
+import { withCache, CACHE_TTL } from "@/lib/redis";
 
 // SehatScan Knowledge Base - Project Information for RAG
 const SEHATSCAN_KNOWLEDGE_BASE = `
@@ -343,60 +344,65 @@ export async function POST(request: NextRequest) {
     let dbAnalyses: Analysis[] = [];
 
     try {
-      const dbUser = await prisma.user.findUnique({
-        where: { id: user.id },
-        include: {
-          analyses: {
-            orderBy: { createdAt: "desc" },
-            take: 20, // Get last 20 analyses for context
-          },
+      const cached = await withCache(
+        `chatbot_ctx:${user.id}:profile_analyses`,
+        async () => {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            include: {
+              analyses: {
+                orderBy: { createdAt: "desc" },
+                take: 10,
+                select: {
+                  id: true,
+                  type: true,
+                  createdAt: true,
+                  structuredData: true,
+                  visualMetrics: true,
+                  riskAssessment: true,
+                  problemsDetected: true,
+                  treatments: true,
+                },
+              },
+            },
+          });
+
+          if (!dbUser) return null;
+
+          return {
+            profile: {
+              name: dbUser.name,
+              email: dbUser.email,
+              memberSince: dbUser.createdAt.toLocaleDateString(),
+              totalAnalyses: dbUser.analyses.length,
+            },
+            analyses: dbUser.analyses.map((a) => ({
+              id: a.id,
+              type: a.type,
+              createdAt: a.createdAt,
+              structuredData: a.structuredData as Record<string, unknown> | undefined,
+              visualMetrics: a.visualMetrics as Record<string, unknown>[] | undefined,
+              riskAssessment: a.riskAssessment || undefined,
+              problemsDetected: a.problemsDetected as Record<string, unknown>[] | undefined,
+              treatments: a.treatments as Record<string, unknown>[] | undefined,
+            })),
+          };
         },
-      });
+        CACHE_TTL.SHORT, // 5 minutes
+      );
 
-      if (dbUser) {
-        userProfile = {
-          name: dbUser.name,
-          email: dbUser.email,
-          memberSince: dbUser.createdAt.toLocaleDateString(),
-          totalAnalyses: dbUser.analyses.length,
-        };
-
-        dbAnalyses = dbUser.analyses.map(
-          (a: {
-            id: string;
-            type: string;
-            createdAt: Date;
-            structuredData: unknown;
-            visualMetrics: unknown;
-            riskAssessment: string | null;
-            problemsDetected: unknown;
-            treatments: unknown;
-          }) => ({
-            id: a.id,
-            type: a.type,
-            createdAt: a.createdAt,
-            structuredData: a.structuredData as
-              | Record<string, unknown>
-              | undefined,
-            visualMetrics: a.visualMetrics as
-              | Record<string, unknown>[]
-              | undefined,
-            riskAssessment: a.riskAssessment || undefined,
-            problemsDetected: a.problemsDetected as
-              | Record<string, unknown>[]
-              | undefined,
-            treatments: a.treatments as Record<string, unknown>[] | undefined,
-          })
-        );
+      if (cached) {
+        userProfile = cached.profile;
+        dbAnalyses = cached.analyses;
       }
     } catch (dbError) {
       logError("Chatbot - Database fetch failed", dbError);
       // Continue with client-provided data if DB fails
     }
 
-    // Use DB analyses if available, otherwise fall back to client-provided
+    // Use DB analyses if available, otherwise fall back to client-provided (limited to 10)
     const analysesToUse =
-      dbAnalyses.length > 0 ? dbAnalyses : userAnalyses || [];
+      dbAnalyses.length > 0 ? dbAnalyses : (userAnalyses || []).slice(0, 10);
 
     // Prepare context for RAG
     const userContext = prepareUserContext(analysesToUse, userProfile);

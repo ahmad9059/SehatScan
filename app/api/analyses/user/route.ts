@@ -19,13 +19,19 @@ export async function GET(request: NextRequest) {
       typeParam === "face" || typeParam === "report" || typeParam === "risk"
         ? typeParam
         : undefined;
+    const limitParam = searchParams.get("limit");
+    const limit = limitParam ? Math.min(parseInt(limitParam, 10), 100) : undefined;
 
-    const analyses = await getUserAnalyses(userId, type);
+    const analyses = await getUserAnalyses(userId, type, limit);
 
-    return NextResponse.json({
-      success: true,
-      analyses,
-    });
+    return NextResponse.json(
+      { success: true, analyses },
+      {
+        headers: {
+          "Cache-Control": "private, max-age=120, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error) {
     console.error("Error fetching user analyses:", error);
     return NextResponse.json(

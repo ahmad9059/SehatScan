@@ -5,7 +5,6 @@ import { useUser } from "@clerk/nextjs";
 import { showErrorToast } from "@/lib/toast";
 import ErrorBoundary from "@/app/components/ErrorBoundary";
 import LoadingSpinner from "@/app/components/LoadingSpinner";
-import LogoSpinner from "@/app/components/LogoSpinner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -24,15 +23,6 @@ interface Message {
   isLoading?: boolean;
 }
 
-interface Analysis {
-  id: string;
-  type: string;
-  createdAt: Date | string;
-  structuredData?: Record<string, unknown> | null;
-  visualMetrics?: Array<Record<string, unknown>> | null;
-  riskAssessment?: string | null;
-}
-
 const assistantBubble = "max-w-3xl rounded-2xl p-4";
 const userBubble =
   "max-w-3xl rounded-2xl bg-[var(--color-surface)] text-[var(--color-foreground)] p-4";
@@ -43,8 +33,6 @@ function ChatbotPageContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [userAnalyses, setUserAnalyses] = useState<Analysis[]>([]);
-  const [loadingAnalyses, setLoadingAnalyses] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const avatarUrl =
@@ -57,34 +45,6 @@ function ChatbotPageContent() {
   const userInitial = user?.firstName
     ? user.firstName.charAt(0).toUpperCase()
     : user?.emailAddresses?.[0]?.emailAddress?.charAt(0).toUpperCase() || "U";
-
-  useEffect(() => {
-    const loadUserData = async () => {
-      if (!user?.id) {
-        setLoadingAnalyses(false);
-        return;
-      }
-
-      try {
-        setLoadingAnalyses(true);
-        // Fetch analyses via API route (server-side)
-        const response = await fetch("/api/analyses/user");
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success) {
-            setUserAnalyses(data.analyses as Analysis[]);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load user analyses:", error);
-        showErrorToast("Failed to load your health data");
-      } finally {
-        setLoadingAnalyses(false);
-      }
-    };
-
-    loadUserData();
-  }, [user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -123,7 +83,6 @@ function ChatbotPageContent() {
         },
         body: JSON.stringify({
           message: messageToSend,
-          userAnalyses,
           conversationHistory: messages.slice(-10),
         }),
       });
@@ -184,14 +143,6 @@ function ChatbotPageContent() {
       minute: "2-digit",
     });
   };
-
-  if (loadingAnalyses) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center pb-[10%]">
-        <LogoSpinner message={t("chatbot.preparingAssistant")} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-[calc(100dvh-80px)] bg-[var(--color-bg)] overflow-hidden">

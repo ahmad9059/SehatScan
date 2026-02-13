@@ -34,9 +34,9 @@ export async function getChatbotContext() {
     // Load user's analyses for context
     try {
       const [reports, faces, risks] = await Promise.all([
-        getUserAnalyses(user.id!, "report"),
-        getUserAnalyses(user.id!, "face"),
-        getUserAnalyses(user.id!, "risk"),
+        getUserAnalyses(user.id!, "report", 10),
+        getUserAnalyses(user.id!, "face", 10),
+        getUserAnalyses(user.id!, "risk", 10),
       ]);
 
       const userAnalyses = [...reports, ...faces, ...risks];

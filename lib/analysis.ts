@@ -38,6 +38,8 @@ export async function saveAnalysis(data: CreateAnalysisData) {
       deleteCache(CACHE_KEYS.stats(data.userId)),
       deleteCache(CACHE_KEYS.analyses(data.userId)),
       deleteCachePattern(`analyses_page:${data.userId}:*`),
+      deleteCachePattern(`analyses_list:${data.userId}:*`),
+      deleteCachePattern(`chatbot_ctx:${data.userId}:*`),
     ]);
 
     return { success: true, analysis };
@@ -81,28 +83,39 @@ export async function getAnalysisById(analysisId: string, userId: string) {
 export async function getUserAnalyses(
   userId: string,
   type?: "face" | "report" | "risk",
+  limit?: number,
 ) {
   if (!userId) return [];
   // Ensure this runs server-side only
   if (typeof window !== "undefined") {
     throw new Error("getUserAnalyses should not be called on the client");
   }
-  try {
-    const analyses = await prisma.analysis.findMany({
-      where: {
-        userId: userId,
-        ...(type && { type }),
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
 
-    return analyses;
-  } catch (error) {
-    console.error("Error fetching user analyses:", error);
-    return [];
-  }
+  const cacheKey = `analyses_list:${userId}:${type || "all"}:${limit || "all"}`;
+
+  return withCache(
+    cacheKey,
+    async () => {
+      try {
+        const analyses = await prisma.analysis.findMany({
+          where: {
+            userId: userId,
+            ...(type && { type }),
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          ...(limit && { take: limit }),
+        });
+
+        return analyses;
+      } catch (error) {
+        console.error("Error fetching user analyses:", error);
+        return [];
+      }
+    },
+    CACHE_TTL.ANALYSES,
+  );
 }
 
 /**
@@ -149,7 +162,6 @@ export async function getUserAnalysesPaginated(
             select: {
               id: true,
               type: true,
-              rawData: true,
               structuredData: true,
               visualMetrics: true,
               riskAssessment: true,

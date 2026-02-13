@@ -111,16 +111,33 @@ export async function deleteCache(key: string): Promise<void> {
 }
 
 /**
- * Delete multiple cache keys by pattern
+ * Delete multiple cache keys by pattern using non-blocking SCAN
+ * (redis.keys() is O(N) and blocks the server — SCAN is incremental)
  */
 export async function deleteCachePattern(pattern: string): Promise<void> {
   if (!redis) return;
 
   try {
-    const keys = await redis.keys(pattern);
-    if (keys.length > 0) {
-      await redis.del(...keys);
-    }
+    const stream = redis.scanStream({ match: pattern, count: 100 });
+    const pipeline = redis.pipeline();
+    let keyCount = 0;
+
+    await new Promise<void>((resolve, reject) => {
+      stream.on("data", (keys: string[]) => {
+        if (keys.length > 0) {
+          keys.forEach((key) => pipeline.del(key));
+          keyCount += keys.length;
+        }
+      });
+      stream.on("end", () => {
+        if (keyCount > 0) {
+          pipeline.exec().then(() => resolve()).catch(reject);
+        } else {
+          resolve();
+        }
+      });
+      stream.on("error", reject);
+    });
   } catch (error) {
     console.error("Redis pattern delete error:", error);
   }

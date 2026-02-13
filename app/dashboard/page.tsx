@@ -64,7 +64,6 @@ async function getDashboardData(userId: string) {
               createdAt: true,
               structuredData: true,
               riskAssessment: true,
-              rawData: true,
               visualMetrics: true,
               problemsDetected: true,
               treatments: true,

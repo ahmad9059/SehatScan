@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { requireAuth } from "@/lib/clerk-session";
+import { withCache, CACHE_KEYS, CACHE_TTL } from "@/lib/redis";
 
 interface UpdateProfileResult {
   success: boolean;
@@ -147,11 +148,16 @@ export async function getUserStats() {
       return { totalAnalyses: 0 };
     }
 
-    const totalAnalyses = await prisma.analysis.count({
-      where: { userId: user.id },
-    });
-
-    return { totalAnalyses };
+    return withCache(
+      CACHE_KEYS.stats(user.id),
+      async () => {
+        const totalAnalyses = await prisma.analysis.count({
+          where: { userId: user.id },
+        });
+        return { totalAnalyses };
+      },
+      CACHE_TTL.STATS, // 30 minutes
+    );
   } catch (error) {
     console.error("Error fetching user stats:", error);
     return { totalAnalyses: 0 };

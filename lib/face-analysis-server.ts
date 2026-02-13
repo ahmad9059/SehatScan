@@ -36,6 +36,10 @@ export interface FaceDetectionResult {
   problem_areas?: FaceBoundingBox[]; // Specific areas with detected problems
   image_width?: number;
   image_height?: number;
+  source_image_url?: string;
+  source_image_key?: string;
+  source_image_name?: string;
+  source_image_size?: number;
   visual_metrics: Array<{
     face_index: number;
     redness_percentage: number;
@@ -450,4 +454,3 @@ function getImageDimensions(buffer: Buffer): { width: number; height: number } {
   // Fallback dimensions if parsing fails
   return { width: 800, height: 600 };
 }
-

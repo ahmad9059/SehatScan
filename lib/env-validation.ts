@@ -14,6 +14,9 @@ interface EnvConfig {
   // Gemini AI
   GEMINI_API_KEY: string;
 
+  // Optional UploadThing (cloud storage for uploaded originals)
+  UPLOADTHING_TOKEN?: string;
+
   // Optional Supabase (if using Supabase auth)
   NEXT_PUBLIC_SUPABASE_URL?: string;
   NEXT_PUBLIC_SUPABASE_ANON_KEY?: string;
@@ -110,6 +113,17 @@ export function validateEnvironment(): ValidationResult {
     );
   }
 
+  const uploadThingToken = process.env.UPLOADTHING_TOKEN;
+  if (!uploadThingToken) {
+    warnings.push(
+      "UPLOADTHING_TOKEN is not set. Face scan originals will not be archived in UploadThing."
+    );
+  } else if (uploadThingToken.length < 16) {
+    warnings.push(
+      "UPLOADTHING_TOKEN appears too short. Please verify your token."
+    );
+  }
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -148,6 +162,7 @@ export function getEnvConfig(): EnvConfig {
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY!,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY!,
+    UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   };
@@ -175,6 +190,9 @@ export function validateEnvironmentOnStartup(): void {
     );
     console.log(
       `   - Gemini API: ${config.GEMINI_API_KEY ? "✅ Set" : "❌ Missing"}`
+    );
+    console.log(
+      `   - UploadThing: ${config.UPLOADTHING_TOKEN ? "✅ Set" : "⚠️ Optional (not set)"}`
     );
     console.log(
       `   - Clerk Secret: ${config.CLERK_SECRET_KEY ? "✅ Set" : "❌ Missing"}`

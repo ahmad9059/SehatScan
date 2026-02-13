@@ -105,6 +105,18 @@ export default function AnalysisDetailModal({
     );
   }, [analysis]);
 
+  const sourceImageUrl = useMemo(() => {
+    if (analysis?.type !== "face") return null;
+    if (
+      analysis?.rawData &&
+      typeof analysis.rawData === "object" &&
+      typeof analysis.rawData.source_image_url === "string"
+    ) {
+      return analysis.rawData.source_image_url;
+    }
+    return null;
+  }, [analysis]);
+
   // Face-specific problems and treatments
   const hasFaceProblems =
     analysis?.type === "face" &&
@@ -272,6 +284,22 @@ export default function AnalysisDetailModal({
                       <div className="text-lg font-semibold text-[var(--color-heading)]">
                         {healthMetrics.length} values
                       </div>
+                    </div>
+                  )}
+
+                  {sourceImageUrl && (
+                    <div className={sectionBox}>
+                      <p className="text-xs text-[var(--color-subtle)]">
+                        Stored original image
+                      </p>
+                      <a
+                        href={sourceImageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-semibold text-[var(--color-primary)] hover:underline break-all"
+                      >
+                        Open UploadThing file
+                      </a>
                     </div>
                   )}
 

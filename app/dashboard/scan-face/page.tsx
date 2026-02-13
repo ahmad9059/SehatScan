@@ -53,6 +53,10 @@ interface FaceAnalysisResult {
   problem_areas?: FaceBoundingBox[];
   image_width?: number;
   image_height?: number;
+  source_image_url?: string;
+  source_image_key?: string;
+  source_image_name?: string;
+  source_image_size?: number;
   visual_metrics: Array<{
     redness_percentage: number;
     yellowness_percentage: number;
@@ -535,6 +539,16 @@ function ScanFacePageContent() {
                       ? "Detection success"
                       : "No face found"}
                   </span>
+                  {result.source_image_url && (
+                    <a
+                      href={result.source_image_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={chip}
+                    >
+                      Original stored in UploadThing
+                    </a>
+                  )}
                 </div>
               </div>
 

@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { requireAuth } from "@/lib/clerk-session";
 import { saveAnalysis } from "@/lib/analysis";
+import { uploadFaceImageCopy } from "@/lib/uploadthing-server";
 
 // Enhanced error logging utility
 function logError(context: string, error: unknown, additionalData?: any) {
@@ -63,6 +64,148 @@ async function resolveBaseUrl() {
   return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 }
 
+type AnalysisErrorType =
+  | "validation"
+  | "timeout"
+  | "network"
+  | "service"
+  | "rate_limit"
+  | "unexpected";
+
+type FaceProcessingResult =
+  | {
+      success: true;
+      data: Record<string, unknown>;
+    }
+  | {
+      success: false;
+      error: string;
+      errorType: AnalysisErrorType;
+    };
+
+async function processFaceAnalysis(
+  formData: FormData,
+  file: File
+): Promise<FaceProcessingResult> {
+  let response: Response;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const baseUrl = await resolveBaseUrl();
+    response = await fetch(`${baseUrl}/api/analyze/face`, {
+      method: "POST",
+      body: formData,
+      signal: controller.signal,
+    });
+  } catch (fetchError) {
+    if (fetchError instanceof Error && fetchError.name === "AbortError") {
+      logError("analyzeFace - Request timeout", fetchError);
+      return {
+        success: false,
+        error: "Request timed out. Please try again with a smaller image.",
+        errorType: "timeout",
+      };
+    }
+
+    logError("analyzeFace - Network error", fetchError, {
+      fileName: file.name,
+      fileSize: file.size,
+    });
+    return {
+      success: false,
+      error:
+        "Unable to connect to analysis service. Please check your connection and try again.",
+      errorType: "network",
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!response.ok) {
+    let errorMessage = `Analysis service error (${response.status})`;
+    let errorType: AnalysisErrorType = "service";
+
+    try {
+      const errorData = await response.json();
+      if (
+        errorData &&
+        typeof errorData === "object" &&
+        "detail" in errorData &&
+        typeof (errorData as { detail?: unknown }).detail === "string"
+      ) {
+        errorMessage = (errorData as { detail: string }).detail;
+      }
+
+      if (response.status === 400) {
+        errorType = "validation";
+      } else if (response.status === 429) {
+        errorType = "rate_limit";
+        errorMessage = "Service is busy. Please try again in a few moments.";
+      } else if (response.status >= 500) {
+        errorType = "service";
+        errorMessage =
+          "Analysis service is temporarily unavailable. Please try again later.";
+      }
+    } catch (parseError) {
+      logError("analyzeFace - Error parsing error response", parseError);
+    }
+
+    logError("analyzeFace - HTTP error", `${response.status}: ${errorMessage}`, {
+      fileName: file.name,
+    });
+    return {
+      success: false,
+      error: errorMessage,
+      errorType,
+    };
+  }
+
+  try {
+    const parsed = await response.json();
+    if (!parsed || typeof parsed !== "object") {
+      logError("analyzeFace - Invalid response structure", parsed);
+      return {
+        success: false,
+        error: "Invalid analysis results. Please try again.",
+        errorType: "service",
+      };
+    }
+
+    return {
+      success: true,
+      data: parsed as Record<string, unknown>,
+    };
+  } catch (parseError) {
+    logError("analyzeFace - Response parsing failed", parseError);
+    return {
+      success: false,
+      error: "Invalid response from analysis service. Please try again.",
+      errorType: "service",
+    };
+  }
+}
+
+function attachUploadedFaceImage(
+  data: Record<string, unknown>,
+  uploadedImage: Awaited<ReturnType<typeof uploadFaceImageCopy>>
+) {
+  if (!uploadedImage?.url) {
+    return;
+  }
+
+  data.source_image_url = uploadedImage.url;
+  if (uploadedImage.key) {
+    data.source_image_key = uploadedImage.key;
+  }
+  if (uploadedImage.name) {
+    data.source_image_name = uploadedImage.name;
+  }
+  if (typeof uploadedImage.size === "number") {
+    data.source_image_size = uploadedImage.size;
+  }
+}
+
 export async function analyzeFace(formData: FormData) {
   const startTime = Date.now();
 
@@ -102,101 +245,38 @@ export async function analyzeFace(formData: FormData) {
       };
     }
 
-    // Call frontend API with timeout
-    let response;
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    // Run image processing and source-image copy upload as separate async tasks.
+    const analysisTask = processFaceAnalysis(formData, file);
+    const uploadTask = uploadFaceImageCopy(file);
 
-      // Get the base URL for server-side requests
-      const baseUrl = await resolveBaseUrl();
+    const [analysisResult, uploadResult] = await Promise.allSettled([
+      analysisTask,
+      uploadTask,
+    ]);
 
-      response = await fetch(`${baseUrl}/api/analyze/face`, {
-        method: "POST",
-        body: formData,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-    } catch (fetchError) {
-      if (fetchError instanceof Error && fetchError.name === "AbortError") {
-        logError("analyzeFace - Request timeout", fetchError);
-        return {
-          success: false,
-          error: "Request timed out. Please try again with a smaller image.",
-          errorType: "timeout",
-        };
-      }
-
-      logError("analyzeFace - Network error", fetchError, {
+    if (analysisResult.status === "rejected") {
+      logError("analyzeFace - Analysis task crashed", analysisResult.reason, {
         fileName: file.name,
-        fileSize: file.size,
       });
       return {
         success: false,
-        error:
-          "Unable to connect to analysis service. Please check your connection and try again.",
-        errorType: "network",
+        error: "An unexpected error occurred. Please try again.",
+        errorType: "unexpected",
       };
     }
 
-    // Handle HTTP errors
-    if (!response.ok) {
-      let errorMessage = `Analysis service error (${response.status})`;
-      let errorType = "service";
-
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.detail || errorMessage;
-
-        // Categorize errors based on status code
-        if (response.status === 400) {
-          errorType = "validation";
-        } else if (response.status === 429) {
-          errorType = "rate_limit";
-          errorMessage = "Service is busy. Please try again in a few moments.";
-        } else if (response.status >= 500) {
-          errorType = "service";
-          errorMessage =
-            "Analysis service is temporarily unavailable. Please try again later.";
-        }
-      } catch (parseError) {
-        logError("analyzeFace - Error parsing error response", parseError);
-      }
-
-      logError(
-        "analyzeFace - HTTP error",
-        `${response.status}: ${errorMessage}`,
-        { fileName: file.name }
-      );
-      return {
-        success: false,
-        error: errorMessage,
-        errorType,
-      };
+    if (!analysisResult.value.success) {
+      return analysisResult.value;
     }
 
-    // Parse response
-    let data;
-    try {
-      data = await response.json();
-    } catch (parseError) {
-      logError("analyzeFace - Response parsing failed", parseError);
-      return {
-        success: false,
-        error: "Invalid response from analysis service. Please try again.",
-        errorType: "service",
-      };
-    }
+    const data = analysisResult.value.data;
 
-    // Validate response structure
-    if (!data || typeof data !== "object") {
-      logError("analyzeFace - Invalid response structure", data);
-      return {
-        success: false,
-        error: "Invalid analysis results. Please try again.",
-        errorType: "service",
-      };
+    if (uploadResult.status === "fulfilled") {
+      attachUploadedFaceImage(data, uploadResult.value);
+    } else {
+      logError("analyzeFace - Source image upload failed", uploadResult.reason, {
+        fileName: file.name,
+      });
     }
 
     // Save analysis to database

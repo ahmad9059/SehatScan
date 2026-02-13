@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { analyzeFace } from "../../actions/scan";
 import { validateFile } from "@/lib/validation";
@@ -114,6 +114,57 @@ function ScanFacePageContent() {
     naturalH: 0,
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const annotatedImageRef = useRef<HTMLImageElement>(null);
+
+  const syncAnnotatedDims = useCallback((img: HTMLImageElement | null) => {
+    if (!img) {
+      return;
+    }
+
+    setAnnotatedDims((prev) => {
+      const next = {
+        renderW: img.clientWidth,
+        renderH: img.clientHeight,
+        naturalW: img.naturalWidth,
+        naturalH: img.naturalHeight,
+      };
+
+      if (
+        prev.renderW === next.renderW &&
+        prev.renderH === next.renderH &&
+        prev.naturalW === next.naturalW &&
+        prev.naturalH === next.naturalH
+      ) {
+        return prev;
+      }
+
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!result?.annotated_image) {
+      return;
+    }
+
+    const handleResize = () => {
+      syncAnnotatedDims(annotatedImageRef.current);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    let observer: ResizeObserver | null = null;
+    if (annotatedImageRef.current && typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(handleResize);
+      observer.observe(annotatedImageRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer?.disconnect();
+    };
+  }, [result?.annotated_image, syncAnnotatedDims]);
 
   const handleFileSelect = (selectedFile: File) => {
     const validation = validateFile(selectedFile, {
@@ -131,6 +182,7 @@ function ScanFacePageContent() {
     setFile(selectedFile);
     setError(null);
     setResult(null);
+    setAnnotatedDims({ renderW: 0, renderH: 0, naturalW: 0, naturalH: 0 });
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -176,6 +228,7 @@ function ScanFacePageContent() {
     setImagePreview(null);
     setError(null);
     setResult(null);
+    setAnnotatedDims({ renderW: 0, renderH: 0, naturalW: 0, naturalH: 0 });
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -724,169 +777,168 @@ function ScanFacePageContent() {
                         )}
                       </div>
                     </div>
-                    <div className="relative overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-lg">
-                      <img
-                        src={
-                          result.annotated_image.startsWith("data:")
-                            ? result.annotated_image
-                            : `data:image/png;base64,${result.annotated_image}`
-                        }
-                        alt="Annotated analysis"
-                        className="w-full max-h-[70vh] object-contain bg-[var(--color-surface)]"
-                        onLoad={(e) => {
-                          const img = e.currentTarget;
-                          setAnnotatedDims({
-                            renderW: img.clientWidth,
-                            renderH: img.clientHeight,
-                            naturalW: img.naturalWidth,
-                            naturalH: img.naturalHeight,
-                          });
-                        }}
-                      />
+                    <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-lg">
+                      <div className="flex justify-center bg-[var(--color-surface)]">
+                        <div className="relative">
+                          <img
+                            ref={annotatedImageRef}
+                            src={
+                              result.annotated_image.startsWith("data:")
+                                ? result.annotated_image
+                                : `data:image/png;base64,${result.annotated_image}`
+                            }
+                            alt="Annotated analysis"
+                            className="block h-auto max-h-[70vh] w-auto max-w-full bg-[var(--color-surface)]"
+                            onLoad={(e) => {
+                              syncAnnotatedDims(e.currentTarget);
+                            }}
+                          />
 
-                      {/* Face bounding boxes */}
-                      {result.faces && result.faces.length > 0 && (
-                        <div className="pointer-events-none absolute inset-0">
-                          {result.faces.map((face, idx) => {
-                            const imgW =
-                              result.image_width ||
-                              annotatedDims.naturalW ||
-                              annotatedDims.renderW ||
-                              1;
-                            const imgH =
-                              result.image_height ||
-                              annotatedDims.naturalH ||
-                              annotatedDims.renderH ||
-                              1;
-                            const scaleX = annotatedDims.renderW
-                              ? annotatedDims.renderW / imgW
-                              : 1;
-                            const scaleY = annotatedDims.renderH
-                              ? annotatedDims.renderH / imgH
-                              : 1;
+                          {/* Face bounding boxes */}
+                          {result.faces && result.faces.length > 0 && (
+                            <div className="pointer-events-none absolute inset-0">
+                              {result.faces.map((face, idx) => {
+                                const imgW =
+                                  result.image_width ||
+                                  annotatedDims.naturalW ||
+                                  annotatedDims.renderW ||
+                                  1;
+                                const imgH =
+                                  result.image_height ||
+                                  annotatedDims.naturalH ||
+                                  annotatedDims.renderH ||
+                                  1;
+                                const scaleX = annotatedDims.renderW
+                                  ? annotatedDims.renderW / imgW
+                                  : 1;
+                                const scaleY = annotatedDims.renderH
+                                  ? annotatedDims.renderH / imgH
+                                  : 1;
 
-                            const rawWidth =
-                              face.width ?? face.w ?? Math.round(imgW * 0.45);
-                            const rawHeight =
-                              face.height ?? face.h ?? Math.round(imgH * 0.5);
-                            const rawX =
-                              face.x ??
-                              Math.max(0, Math.round((imgW - rawWidth) / 2));
-                            const rawY =
-                              face.y ??
-                              Math.max(0, Math.round((imgH - rawHeight) / 2.5));
+                                const rawWidth =
+                                  face.width ?? face.w ?? Math.round(imgW * 0.45);
+                                const rawHeight =
+                                  face.height ?? face.h ?? Math.round(imgH * 0.5);
+                                const rawX =
+                                  face.x ??
+                                  Math.max(0, Math.round((imgW - rawWidth) / 2));
+                                const rawY =
+                                  face.y ??
+                                  Math.max(0, Math.round((imgH - rawHeight) / 2.5));
 
-                            const boxStyle: CSSProperties = {
-                              left: rawX * scaleX,
-                              top: rawY * scaleY,
-                              width: rawWidth * scaleX,
-                              height: rawHeight * scaleY,
-                              border: "2px solid var(--color-primary)",
-                              boxShadow: "0 0 0 1px rgba(0,0,0,0.1)",
-                              borderRadius: "12px",
-                              position: "absolute",
-                              background:
-                                "linear-gradient(135deg, rgba(76,110,245,0.08), rgba(76,110,245,0.02))",
-                            };
+                                const boxStyle: CSSProperties = {
+                                  left: rawX * scaleX,
+                                  top: rawY * scaleY,
+                                  width: rawWidth * scaleX,
+                                  height: rawHeight * scaleY,
+                                  border: "2px solid var(--color-primary)",
+                                  boxShadow: "0 0 0 1px rgba(0,0,0,0.1)",
+                                  borderRadius: "12px",
+                                  position: "absolute",
+                                  background:
+                                    "linear-gradient(135deg, rgba(76,110,245,0.08), rgba(76,110,245,0.02))",
+                                };
 
-                            return (
-                              <div
-                                key={`face-${face.x}-${face.y}-${idx}`}
-                                style={boxStyle}
-                                className="flex items-start"
-                              >
-                                <span className="m-2 rounded-md bg-[var(--color-card)] px-2 py-1 text-[10px] font-semibold text-[var(--color-primary)] shadow-sm">
-                                  {face.label || `Face ${idx + 1}`}
-                                </span>
-                              </div>
-                            );
-                          })}
+                                return (
+                                  <div
+                                    key={`face-${face.x}-${face.y}-${idx}`}
+                                    style={boxStyle}
+                                    className="flex items-start"
+                                  >
+                                    <span className="m-2 rounded-md bg-[var(--color-card)] px-2 py-1 text-[10px] font-semibold text-[var(--color-primary)] shadow-sm">
+                                      {face.label || `Face ${idx + 1}`}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {/* Problem area annotations */}
+                          {result.problem_areas && result.problem_areas.length > 0 && (
+                            <div className="pointer-events-none absolute inset-0">
+                              {result.problem_areas.map((area, idx) => {
+                                const imgW =
+                                  result.image_width ||
+                                  annotatedDims.naturalW ||
+                                  annotatedDims.renderW ||
+                                  1;
+                                const imgH =
+                                  result.image_height ||
+                                  annotatedDims.naturalH ||
+                                  annotatedDims.renderH ||
+                                  1;
+                                const scaleX = annotatedDims.renderW
+                                  ? annotatedDims.renderW / imgW
+                                  : 1;
+                                const scaleY = annotatedDims.renderH
+                                  ? annotatedDims.renderH / imgH
+                                  : 1;
+
+                                const rawWidth = area.width ?? area.w ?? 50;
+                                const rawHeight = area.height ?? area.h ?? 50;
+                                const rawX = area.x ?? 0;
+                                const rawY = area.y ?? 0;
+
+                                // Get severity color based on corresponding problem
+                                const problem = result.problems_detected?.find(
+                                  (p) => p.type === area.label
+                                );
+                                const severity = problem?.severity || "mild";
+                                const severityColors = {
+                                  mild: {
+                                    border: "var(--color-success)",
+                                    bg: "rgba(16, 185, 129, 0.15)",
+                                    text: "var(--color-success)",
+                                  },
+                                  moderate: {
+                                    border: "var(--color-warning)",
+                                    bg: "rgba(245, 158, 11, 0.15)",
+                                    text: "var(--color-warning)",
+                                  },
+                                  severe: {
+                                    border: "var(--color-danger)",
+                                    bg: "rgba(239, 68, 68, 0.15)",
+                                    text: "var(--color-danger)",
+                                  },
+                                };
+                                const colors = severityColors[severity];
+
+                                const boxStyle: CSSProperties = {
+                                  left: rawX * scaleX,
+                                  top: rawY * scaleY,
+                                  width: rawWidth * scaleX,
+                                  height: rawHeight * scaleY,
+                                  border: `2px solid ${colors.border}`,
+                                  boxShadow: `0 0 8px ${colors.bg}`,
+                                  borderRadius: "8px",
+                                  position: "absolute",
+                                  background: colors.bg,
+                                };
+
+                                return (
+                                  <div
+                                    key={`problem-${area.x}-${area.y}-${idx}`}
+                                    style={boxStyle}
+                                    className="flex items-end justify-center"
+                                  >
+                                    <span
+                                      className="mb-[-20px] rounded-md px-2 py-1 text-[9px] font-semibold shadow-sm whitespace-nowrap"
+                                      style={{
+                                        backgroundColor: "var(--color-card)",
+                                        color: colors.text,
+                                        border: `1px solid ${colors.border}`,
+                                      }}
+                                    >
+                                      {area.label || `Area ${idx + 1}`}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
                         </div>
-                      )}
-
-                      {/* Problem area annotations */}
-                      {result.problem_areas && result.problem_areas.length > 0 && (
-                        <div className="pointer-events-none absolute inset-0">
-                          {result.problem_areas.map((area, idx) => {
-                            const imgW =
-                              result.image_width ||
-                              annotatedDims.naturalW ||
-                              annotatedDims.renderW ||
-                              1;
-                            const imgH =
-                              result.image_height ||
-                              annotatedDims.naturalH ||
-                              annotatedDims.renderH ||
-                              1;
-                            const scaleX = annotatedDims.renderW
-                              ? annotatedDims.renderW / imgW
-                              : 1;
-                            const scaleY = annotatedDims.renderH
-                              ? annotatedDims.renderH / imgH
-                              : 1;
-
-                            const rawWidth = area.width ?? area.w ?? 50;
-                            const rawHeight = area.height ?? area.h ?? 50;
-                            const rawX = area.x ?? 0;
-                            const rawY = area.y ?? 0;
-
-                            // Get severity color based on corresponding problem
-                            const problem = result.problems_detected?.find(
-                              (p) => p.type === area.label
-                            );
-                            const severity = problem?.severity || "mild";
-                            const severityColors = {
-                              mild: {
-                                border: "var(--color-success)",
-                                bg: "rgba(16, 185, 129, 0.15)",
-                                text: "var(--color-success)",
-                              },
-                              moderate: {
-                                border: "var(--color-warning)",
-                                bg: "rgba(245, 158, 11, 0.15)",
-                                text: "var(--color-warning)",
-                              },
-                              severe: {
-                                border: "var(--color-danger)",
-                                bg: "rgba(239, 68, 68, 0.15)",
-                                text: "var(--color-danger)",
-                              },
-                            };
-                            const colors = severityColors[severity];
-
-                            const boxStyle: CSSProperties = {
-                              left: rawX * scaleX,
-                              top: rawY * scaleY,
-                              width: rawWidth * scaleX,
-                              height: rawHeight * scaleY,
-                              border: `2px solid ${colors.border}`,
-                              boxShadow: `0 0 8px ${colors.bg}`,
-                              borderRadius: "8px",
-                              position: "absolute",
-                              background: colors.bg,
-                            };
-
-                            return (
-                              <div
-                                key={`problem-${area.x}-${area.y}-${idx}`}
-                                style={boxStyle}
-                                className="flex items-end justify-center"
-                              >
-                                <span
-                                  className="mb-[-20px] rounded-md px-2 py-1 text-[9px] font-semibold shadow-sm whitespace-nowrap"
-                                  style={{
-                                    backgroundColor: "var(--color-card)",
-                                    color: colors.text,
-                                    border: `1px solid ${colors.border}`,
-                                  }}
-                                >
-                                  {area.label || `Area ${idx + 1}`}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                      </div>
                     </div>
 
                     {/* Legend for problem areas */}

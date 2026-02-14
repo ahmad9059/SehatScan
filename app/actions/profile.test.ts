@@ -42,6 +42,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       const updatedUser = {
         id: "user-123",
@@ -87,6 +88,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
 
@@ -104,6 +106,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
 
@@ -123,6 +126,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       const mockUserWithPassword = {
         id: "user-123",
@@ -175,6 +179,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
 
@@ -194,6 +199,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
 
@@ -215,6 +221,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       const mockUserWithPassword = {
         id: "user-123",
@@ -245,6 +252,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
       vi.mocked(prisma.analysis.count).mockResolvedValue(5);
@@ -270,6 +278,7 @@ describe("Profile Actions", () => {
         id: "user-123",
         name: "John Doe",
         email: "john@example.com",
+        createdAt: new Date().toISOString(),
       };
       vi.mocked(getCurrentUser).mockResolvedValue(mockUser);
       vi.mocked(prisma.analysis.count).mockRejectedValue(

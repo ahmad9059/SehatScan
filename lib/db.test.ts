@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fc from "fast-check";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 // Create a test Prisma client
 const prisma = new PrismaClient();
@@ -29,7 +29,10 @@ describe("Database Property-Based Tests", () => {
         async (userData) => {
           // Create user
           const createdUser = await prisma.user.create({
-            data: userData,
+            data: {
+              ...userData,
+              password: "test-password",
+            },
           });
 
           // Query by email
@@ -79,6 +82,7 @@ describe("Database Property-Based Tests", () => {
             data: {
               email: testData.userEmail,
               name: testData.userName,
+              password: "test-password",
             },
           });
 
@@ -87,9 +91,15 @@ describe("Database Property-Based Tests", () => {
             data: {
               userId: user.id,
               type: testData.analysisType,
-              rawData: testData.rawData,
-              structuredData: testData.structuredData,
-              visualMetrics: testData.visualMetrics,
+              rawData: (testData.rawData ?? {}) as Prisma.InputJsonValue,
+              structuredData:
+                testData.structuredData === null
+                  ? undefined
+                  : (testData.structuredData as Prisma.InputJsonValue),
+              visualMetrics:
+                testData.visualMetrics === null
+                  ? undefined
+                  : (testData.visualMetrics as Prisma.InputJsonValue),
               riskAssessment: testData.riskAssessment,
             },
           });
@@ -131,10 +141,10 @@ describe("Database Property-Based Tests", () => {
         async (testData) => {
           // Create two users
           const user1 = await prisma.user.create({
-            data: { email: testData.user1Email },
+            data: { email: testData.user1Email, password: "test-password" },
           });
           const user2 = await prisma.user.create({
-            data: { email: testData.user2Email },
+            data: { email: testData.user2Email, password: "test-password" },
           });
 
           // Create analyses for user1

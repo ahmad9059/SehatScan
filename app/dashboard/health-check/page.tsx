@@ -454,12 +454,14 @@ function RiskAssessmentPageContent() {
 
     setIsGeneratingPdf(true);
     try {
-      const canvas = await html2canvas(reportRef.current, {
+      const canvasOptions = {
         useCORS: true,
         logging: false,
-        backgroundColor: "#ffffff",
+        background: "#ffffff",
         scale: 2, // Higher quality
-      });
+      } as unknown as Parameters<typeof html2canvas>[1];
+
+      const canvas = await html2canvas(reportRef.current, canvasOptions);
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({

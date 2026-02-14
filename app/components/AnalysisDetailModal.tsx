@@ -344,7 +344,9 @@ export default function AnalysisDetailModal({
                                     ))}
                                   </Pie>
                                   <Tooltip
-                                    formatter={(value: number) => `${value}%`}
+                                    formatter={(value: number | string | undefined) =>
+                                      `${value ?? 0}%`
+                                    }
                                     contentStyle={{
                                       background: "var(--color-card)",
                                       border: "1px solid var(--color-border)",
@@ -383,7 +385,9 @@ export default function AnalysisDetailModal({
                                     ))}
                                   </Pie>
                                   <Tooltip
-                                    formatter={(value: number) => `${value}%`}
+                                    formatter={(value: number | string | undefined) =>
+                                      `${value ?? 0}%`
+                                    }
                                     contentStyle={{
                                       background: "var(--color-card)",
                                       border: "1px solid var(--color-border)",
@@ -426,9 +430,11 @@ export default function AnalysisDetailModal({
                                 }}
                               />
                               <Tooltip
-                                formatter={(value: number, _name, props: any) =>
-                                  `${value} ${props.payload.unit || ""}`
-                                }
+                                formatter={(
+                                  value: number | string | undefined,
+                                  _name,
+                                  props: { payload?: { unit?: string } }
+                                ) => `${value ?? ""} ${props?.payload?.unit || ""}`}
                                 contentStyle={{
                                   background: "var(--color-card)",
                                   border: "1px solid var(--color-border)",

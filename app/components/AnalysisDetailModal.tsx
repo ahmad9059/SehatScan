@@ -59,6 +59,31 @@ function formatDate(dateString: string) {
 
 const metricColors = ["#2563EB", "#F97316", "#10B981", "#8B5CF6", "#EC4899"];
 
+function normalizeTooltipValue(value: unknown): string | number {
+  if (Array.isArray(value)) {
+    return value[0] ?? 0;
+  }
+  if (value === undefined || value === null) {
+    return 0;
+  }
+  return value as string | number;
+}
+
+function getTooltipUnit(payload: unknown): string {
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "payload" in payload &&
+    payload.payload &&
+    typeof payload.payload === "object" &&
+    "unit" in payload.payload &&
+    typeof payload.payload.unit === "string"
+  ) {
+    return payload.payload.unit;
+  }
+  return "";
+}
+
 export default function AnalysisDetailModal({
   analysis,
   onClose,
@@ -344,8 +369,8 @@ export default function AnalysisDetailModal({
                                     ))}
                                   </Pie>
                                   <Tooltip
-                                    formatter={(value: number | string | undefined) =>
-                                      `${value ?? 0}%`
+                                    formatter={(value) =>
+                                      `${normalizeTooltipValue(value)}%`
                                     }
                                     contentStyle={{
                                       background: "var(--color-card)",
@@ -385,8 +410,8 @@ export default function AnalysisDetailModal({
                                     ))}
                                   </Pie>
                                   <Tooltip
-                                    formatter={(value: number | string | undefined) =>
-                                      `${value ?? 0}%`
+                                    formatter={(value) =>
+                                      `${normalizeTooltipValue(value)}%`
                                     }
                                     contentStyle={{
                                       background: "var(--color-card)",
@@ -430,11 +455,9 @@ export default function AnalysisDetailModal({
                                 }}
                               />
                               <Tooltip
-                                formatter={(
-                                  value: number | string | undefined,
-                                  _name,
-                                  props: { payload?: { unit?: string } }
-                                ) => `${value ?? ""} ${props?.payload?.unit || ""}`}
+                                formatter={(value, _name, payload) =>
+                                  `${normalizeTooltipValue(value)} ${getTooltipUnit(payload)}`.trim()
+                                }
                                 contentStyle={{
                                   background: "var(--color-card)",
                                   border: "1px solid var(--color-border)",

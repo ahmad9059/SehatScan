@@ -35,6 +35,7 @@ import {
   sectionTitle,
   subheading,
 } from "@/app/components/dashboardStyles";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 
 interface FaceBoundingBox {
   x: number;
@@ -80,31 +81,37 @@ interface FaceAnalysisResult {
   annotated_image: string;
 }
 
-const photoTips = [
-  "Face the camera with even lighting and no strong shadows.",
-  "Remove glasses or accessories covering the face.",
-  "Use a neutral expression for accurate health cues.",
-];
-
-const severityStyles = {
-  mild: {
-    text: "text-[var(--color-success)]",
-    border: "border-[var(--color-success)]",
-    label: "Mild",
-  },
-  moderate: {
-    text: "text-[var(--color-warning)]",
-    border: "border-[var(--color-warning)]",
-    label: "Moderate",
-  },
-  severe: {
-    text: "text-[var(--color-danger)]",
-    border: "border-[var(--color-danger)]",
-    label: "Severe",
-  },
-};
-
 function ScanFacePageContent() {
+  const { language } = useSimpleLanguage();
+  const isUrdu = language === "ur";
+  const photoTips = isUrdu
+    ? [
+        "چہرہ کیمرے کے سامنے رکھیں، روشنی یکساں ہو اور سخت سائے نہ ہوں۔",
+        "عینک یا چہرہ ڈھانپنے والی اشیاء ہٹا دیں۔",
+        "درست نتائج کے لیے نارمل تاثر رکھیں۔",
+      ]
+    : [
+        "Face the camera with even lighting and no strong shadows.",
+        "Remove glasses or accessories covering the face.",
+        "Use a neutral expression for accurate health cues.",
+      ];
+  const severityStyles = {
+    mild: {
+      text: "text-[var(--color-success)]",
+      border: "border-[var(--color-success)]",
+      label: isUrdu ? "ہلکا" : "Mild",
+    },
+    moderate: {
+      text: "text-[var(--color-warning)]",
+      border: "border-[var(--color-warning)]",
+      label: isUrdu ? "درمیانہ" : "Moderate",
+    },
+    severe: {
+      text: "text-[var(--color-danger)]",
+      border: "border-[var(--color-danger)]",
+      label: isUrdu ? "شدید" : "Severe",
+    },
+  } as const;
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -193,11 +200,15 @@ function ScanFacePageContent() {
       setImagePreview(e.target?.result as string);
     };
     reader.onerror = () => {
-      showErrorToast("Failed to read image file");
+      showErrorToast(
+        isUrdu ? "تصویری فائل پڑھنے میں ناکامی" : "Failed to read image file"
+      );
     };
     reader.readAsDataURL(selectedFile);
 
-    showSuccessToast("Image selected successfully");
+    showSuccessToast(
+      isUrdu ? "تصویر کامیابی سے منتخب ہو گئی" : "Image selected successfully"
+    );
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -250,7 +261,9 @@ function ScanFacePageContent() {
     e.preventDefault();
 
     if (!file) {
-      showErrorToast("Please select an image to upload");
+      showErrorToast(
+        isUrdu ? "براہ کرم اپ لوڈ کے لیے تصویر منتخب کریں" : "Please select an image to upload"
+      );
       return;
     }
 
@@ -278,12 +291,17 @@ function ScanFacePageContent() {
 
       const success = handleServerActionResponse(response, {
         successMessage:
-          "Face analysis completed successfully! You can view this in your history.",
+          isUrdu
+            ? "چہرے کا تجزیہ کامیابی سے مکمل ہو گیا! آپ اسے تاریخ میں دیکھ سکتے ہیں۔"
+            : "Face analysis completed successfully! You can view this in your history.",
         onSuccess: (data) => {
           setResult(data);
         },
         onError: (serverError) => {
-          setError(serverError.error || "Failed to analyze face");
+          setError(
+            serverError.error ||
+              (isUrdu ? "چہرے کا تجزیہ کرنے میں ناکامی" : "Failed to analyze face")
+          );
         },
       });
 
@@ -292,7 +310,9 @@ function ScanFacePageContent() {
       }
     } catch (err) {
       console.error("Face analysis error:", err);
-      const errorMessage = "An unexpected error occurred during face analysis";
+      const errorMessage = isUrdu
+        ? "چہرے کے تجزیے کے دوران غیر متوقع خرابی پیش آئی"
+        : "An unexpected error occurred during face analysis";
       setError(errorMessage);
       showErrorToast(errorMessage);
     } finally {
@@ -312,10 +332,13 @@ function ScanFacePageContent() {
                 <FaceSmileIcon className="h-7 w-7" />
               </div>
               <div>
-                <h1 className={heading}>Facial Health Analysis</h1>
+                <h1 className={heading}>
+                  {isUrdu ? "چہرے کی صحت کا تجزیہ" : "Facial Health Analysis"}
+                </h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Upload a clear portrait to detect visual health indicators in
-                  a full-width, continuous dashboard view.
+                  {isUrdu
+                    ? "ایک واضح تصویر اپ لوڈ کریں تاکہ مکمل ڈیش بورڈ ویو میں بصری صحت کے اشارے معلوم کیے جا سکیں۔"
+                    : "Upload a clear portrait to detect visual health indicators in a full-width, continuous dashboard view."}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className={pill}>JPG or PNG</span>
@@ -329,10 +352,10 @@ function ScanFacePageContent() {
                 type="button"
                 onClick={clearFile}
                 className={secondaryButton}
-                aria-label="Remove selected file"
+                aria-label={isUrdu ? "منتخب فائل ہٹائیں" : "Remove selected file"}
               >
                 <XMarkIcon className="h-4 w-4" />
-                Clear photo
+                {isUrdu ? "تصویر صاف کریں" : "Clear photo"}
               </button>
             )}
           </div>
@@ -356,7 +379,7 @@ function ScanFacePageContent() {
                   onChange={handleFileInputChange}
                   className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                   disabled={isLoading}
-                  aria-label="Upload face image"
+                  aria-label={isUrdu ? "چہرے کی تصویر اپ لوڈ کریں" : "Upload face image"}
                 />
 
                 <div className="space-y-4">
@@ -372,11 +395,18 @@ function ScanFacePageContent() {
 
                   <div className="space-y-2">
                     <h3 className="text-lg font-semibold text-[var(--color-heading)]">
-                      {isLoading ? "Processing photo..." : "Drop your photo"}
+                      {isLoading
+                        ? isUrdu
+                          ? "تصویر پروسیس ہو رہی ہے..."
+                          : "Processing photo..."
+                        : isUrdu
+                          ? "اپنی تصویر چھوڑیں"
+                          : "Drop your photo"}
                     </h3>
                     <p className={`${subheading} text-sm`}>
-                      Keep your face centered with neutral lighting for an
-                      accurate read.
+                      {isUrdu
+                        ? "درست نتائج کے لیے چہرہ مرکز میں رکھیں اور روشنی نارمل رکھیں۔"
+                        : "Keep your face centered with neutral lighting for an accurate read."}
                     </p>
                   </div>
 
@@ -401,7 +431,7 @@ function ScanFacePageContent() {
                           <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-xl">
                             <img
                               src={imagePreview}
-                              alt="Selected preview"
+                              alt={isUrdu ? "منتخب پیش منظر" : "Selected preview"}
                               className="h-56 w-full object-cover"
                             />
                           </div>
@@ -410,9 +440,15 @@ function ScanFacePageContent() {
                     </div>
                   ) : (
                     <div className="flex flex-wrap justify-center gap-2">
-                      <span className={chip}>Centered portrait</span>
-                      <span className={chip}>Natural light</span>
-                      <span className={chip}>No heavy filters</span>
+                      <span className={chip}>
+                        {isUrdu ? "مرکزی پورٹریٹ" : "Centered portrait"}
+                      </span>
+                      <span className={chip}>
+                        {isUrdu ? "قدرتی روشنی" : "Natural light"}
+                      </span>
+                      <span className={chip}>
+                        {isUrdu ? "بھاری فلٹرز نہ لگائیں" : "No heavy filters"}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -420,9 +456,9 @@ function ScanFacePageContent() {
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <span className={chip}>AI skin cues</span>
-                  <span className={chip}>Detection status</span>
-                  <span className={chip}>Saved to history</span>
+                  <span className={chip}>{isUrdu ? "AI جلد اشارے" : "AI skin cues"}</span>
+                  <span className={chip}>{isUrdu ? "شناخت کی حالت" : "Detection status"}</span>
+                  <span className={chip}>{isUrdu ? "تاریخ میں محفوظ" : "Saved to history"}</span>
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <button
@@ -430,25 +466,25 @@ function ScanFacePageContent() {
                     onClick={() => fileInputRef.current?.click()}
                     className={secondaryButton}
                     disabled={isLoading}
-                  >
-                    <SparklesIcon className="h-4 w-4" />
-                    Choose photo
-                  </button>
+                    >
+                      <SparklesIcon className="h-4 w-4" />
+                      {isUrdu ? "تصویر منتخب کریں" : "Choose photo"}
+                    </button>
                   <button
                     type="submit"
                     disabled={!file || isLoading}
                     className={primaryButton}
-                    aria-label="Analyze face"
+                    aria-label={isUrdu ? "چہرے کا تجزیہ کریں" : "Analyze face"}
                   >
                     {isLoading ? (
                       <>
                         <LoadingSpinner size="sm" color="white" />
-                        Analyzing...
+                        {isUrdu ? "تجزیہ جاری ہے..." : "Analyzing..."}
                       </>
                     ) : (
                       <>
                         <ChartBarIcon className="h-4 w-4" />
-                        Analyze face
+                        {isUrdu ? "چہرے کا تجزیہ کریں" : "Analyze face"}
                       </>
                     )}
                   </button>
@@ -462,10 +498,13 @@ function ScanFacePageContent() {
                   <HeartIcon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className={sectionTitle}>Capture guidance</h3>
+                  <h3 className={sectionTitle}>
+                    {isUrdu ? "تصویر لینے کی رہنمائی" : "Capture guidance"}
+                  </h3>
                   <p className={`${subheading} mt-1 text-sm`}>
-                    Quick reminders to keep the experience aligned with the open
-                    dashboard flow.
+                    {isUrdu
+                      ? "بہتر نتائج کے لیے فوری یاددہانیاں۔"
+                      : "Quick reminders to keep the experience aligned with the open dashboard flow."}
                   </p>
                 </div>
               </div>
@@ -484,7 +523,7 @@ function ScanFacePageContent() {
 
               <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
                 <h4 className="text-sm font-semibold text-[var(--color-foreground)]">
-                  Analysis includes
+                  {isUrdu ? "تجزیہ میں شامل" : "Analysis includes"}
                 </h4>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="flex items-center gap-3 border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 rounded-xl">
@@ -492,7 +531,7 @@ function ScanFacePageContent() {
                       <FaceSmileIcon className="h-5 w-5" />
                     </div>
                     <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      Detection & confidence
+                      {isUrdu ? "شناخت اور اعتماد" : "Detection & confidence"}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 rounded-xl">
@@ -500,7 +539,7 @@ function ScanFacePageContent() {
                       <ChartBarIcon className="h-5 w-5" />
                     </div>
                     <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      Visual health cues
+                      {isUrdu ? "بصری صحت اشارے" : "Visual health cues"}
                     </p>
                   </div>
                 </div>
@@ -516,17 +555,24 @@ function ScanFacePageContent() {
                     <CheckCircleIcon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className={sectionTitle}>Analysis complete</h2>
+                    <h2 className={sectionTitle}>
+                      {isUrdu ? "تجزیہ مکمل" : "Analysis complete"}
+                    </h2>
                     <p className={`${subheading} mt-1 text-sm`}>
-                      Your facial analysis is ready and saved to history within
-                      the continuous dashboard layout.
+                      {isUrdu
+                        ? "آپ کا چہرہ تجزیہ تیار ہے اور تاریخ میں محفوظ ہو چکا ہے۔"
+                        : "Your facial analysis is ready and saved to history within the continuous dashboard layout."}
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={pill}>
-                    {result.faces_count} face
-                    {result.faces_count === 1 ? "" : "s"} detected
+                    <span className={pill}>
+                    {result.faces_count}{" "}
+                    {isUrdu
+                      ? result.faces_count === 1
+                        ? "چہرہ شناخت ہوا"
+                        : "چہرے شناخت ہوئے"
+                      : `face${result.faces_count === 1 ? "" : "s"} detected`}
                   </span>
                   <span
                     className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
@@ -536,8 +582,12 @@ function ScanFacePageContent() {
                     }`}
                   >
                     {result.face_detected
-                      ? "Detection success"
-                      : "No face found"}
+                      ? isUrdu
+                        ? "شناخت کامیاب"
+                        : "Detection success"
+                      : isUrdu
+                        ? "کوئی چہرہ نہیں ملا"
+                        : "No face found"}
                   </span>
                   {result.source_image_url && (
                     <a
@@ -546,7 +596,7 @@ function ScanFacePageContent() {
                       rel="noopener noreferrer"
                       className={chip}
                     >
-                      Original stored in UploadThing
+                      {isUrdu ? "اصل تصویر UploadThing میں محفوظ ہے" : "Original stored in UploadThing"}
                     </a>
                   )}
                 </div>
@@ -556,14 +606,18 @@ function ScanFacePageContent() {
                 <div className="space-y-3">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <h3 className={sectionTitle}>Visual metrics</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "بصری میٹرکس" : "Visual metrics"}
+                      </h3>
                       <p className={`${subheading} text-sm`}>
-                        Key signals observed from your uploaded image
+                        {isUrdu
+                          ? "آپ کی اپ لوڈ کردہ تصویر سے حاصل اہم اشارے"
+                          : "Key signals observed from your uploaded image"}
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      <span className={chip}>Redness</span>
-                      <span className={chip}>Yellowness</span>
+                      <span className={chip}>{isUrdu ? "سرخی" : "Redness"}</span>
+                      <span className={chip}>{isUrdu ? "زردی" : "Yellowness"}</span>
                     </div>
                   </div>
 
@@ -574,7 +628,7 @@ function ScanFacePageContent() {
                         <div className="border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-xl">
                           <div className="flex items-center justify-between">
                             <h4 className="text-sm font-semibold text-[var(--color-heading)]">
-                              Overall Skin Health
+                              {isUrdu ? "جلد کی مجموعی صحت" : "Overall Skin Health"}
                             </h4>
                             <span
                               className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${
@@ -603,12 +657,12 @@ function ScanFacePageContent() {
                       <div className="grid gap-4 sm:grid-cols-2">
                         {[
                           {
-                            label: "Redness percentage",
+                            label: isUrdu ? "سرخی کی فیصد" : "Redness percentage",
                             value: visualMetrics.redness_percentage,
                             color: "bg-[var(--color-danger)]",
                           },
                           {
-                            label: "Yellowness percentage",
+                            label: isUrdu ? "زردی کی فیصد" : "Yellowness percentage",
                             value: visualMetrics.yellowness_percentage,
                             color:
                               visualMetrics.yellowness_percentage > 15
@@ -642,11 +696,12 @@ function ScanFacePageContent() {
                     <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-6 text-center rounded-xl">
                       <ExclamationCircleIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
                       <h4 className="mt-3 text-base font-semibold text-[var(--color-heading)]">
-                        No visual metrics found
+                        {isUrdu ? "بصری میٹرکس نہیں ملے" : "No visual metrics found"}
                       </h4>
                       <p className={`${subheading} mt-1 text-sm`}>
-                        Try another photo with brighter lighting and clearer
-                        focus.
+                        {isUrdu
+                          ? "زیادہ روشن روشنی اور بہتر فوکس والی دوسری تصویر آزمائیں۔"
+                          : "Try another photo with brighter lighting and clearer focus."}
                       </p>
                     </div>
                   )}
@@ -655,9 +710,11 @@ function ScanFacePageContent() {
                 <div className="grid gap-6 lg:grid-cols-2">
                   <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-5 rounded-xl">
                     <div className="flex items-center justify-between">
-                      <h3 className={sectionTitle}>Detected concerns</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "شناخت شدہ خدشات" : "Detected concerns"}
+                      </h3>
                       <span className={chip}>
-                        {result.problems_detected?.length || 0} items
+                        {result.problems_detected?.length || 0} {isUrdu ? "آئٹمز" : "items"}
                       </span>
                     </div>
 
@@ -691,7 +748,7 @@ function ScanFacePageContent() {
                               </div>
                               {problem.location && (
                                 <p className="mt-1 text-xs text-[var(--color-primary)] font-medium">
-                                  Location: {problem.location}
+                                  {isUrdu ? `مقام: ${problem.location}` : `Location: ${problem.location}`}
                                 </p>
                               )}
                               <p className={`${mutedText} mt-2 text-sm`}>
@@ -699,7 +756,9 @@ function ScanFacePageContent() {
                               </p>
                               {problem.confidence > 0 && (
                                 <div className="mt-2 flex items-center gap-2">
-                                  <span className="text-xs text-[var(--color-muted)]">Confidence:</span>
+                                  <span className="text-xs text-[var(--color-muted)]">
+                                    {isUrdu ? "اعتماد:" : "Confidence:"}
+                                  </span>
                                   <div className="flex-1 h-1.5 bg-[var(--color-surface)] rounded-full max-w-[100px]">
                                     <div
                                       className="h-1.5 bg-[var(--color-primary)] rounded-full"
@@ -717,16 +776,20 @@ function ScanFacePageContent() {
                       </div>
                     ) : (
                       <p className={`${mutedText} text-sm`}>
-                        No specific concerns detected for this photo.
+                        {isUrdu
+                          ? "اس تصویر کے لیے کوئی خاص خدشہ شناخت نہیں ہوا۔"
+                          : "No specific concerns detected for this photo."}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-5 rounded-xl">
                     <div className="flex items-center justify-between">
-                      <h3 className={sectionTitle}>Recommended actions</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "تجویز کردہ اقدامات" : "Recommended actions"}
+                      </h3>
                       <span className={chip}>
-                        {result.treatments?.length || 0} suggestions
+                        {result.treatments?.length || 0} {isUrdu ? "تجاویز" : "suggestions"}
                       </span>
                     </div>
 
@@ -751,19 +814,31 @@ function ScanFacePageContent() {
                                   </p>
                                 </div>
                                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${priorityColors[treatment.priority]}`}>
-                                  {treatment.priority.charAt(0).toUpperCase() + treatment.priority.slice(1)} Priority
+                                  {isUrdu
+                                    ? `ترجیح ${
+                                        treatment.priority === "high"
+                                          ? "زیادہ"
+                                          : treatment.priority === "medium"
+                                            ? "درمیانی"
+                                            : "کم"
+                                      }`
+                                    : `${treatment.priority.charAt(0).toUpperCase() + treatment.priority.slice(1)} Priority`}
                                 </span>
                               </div>
                               {treatment.for_condition && (
                                 <p className="mt-1.5 text-xs text-[var(--color-primary)] font-medium">
-                                  For: {treatment.for_condition}
+                                  {isUrdu
+                                    ? `کے لیے: ${treatment.for_condition}`
+                                    : `For: ${treatment.for_condition}`}
                                 </p>
                               )}
                               <p className={`${mutedText} mt-2 text-sm leading-relaxed`}>
                                 {treatment.recommendation}
                               </p>
                               <div className="mt-3 flex items-center gap-2 text-xs">
-                                <span className="text-[var(--color-muted)]">Timeline:</span>
+                                <span className="text-[var(--color-muted)]">
+                                  {isUrdu ? "ٹائم لائن:" : "Timeline:"}
+                                </span>
                                 <span className="font-medium text-[var(--color-foreground)]">
                                   {treatment.timeframe}
                                 </span>
@@ -774,7 +849,9 @@ function ScanFacePageContent() {
                       </div>
                     ) : (
                       <p className={`${mutedText} text-sm`}>
-                        Recommendations will appear here after analysis.
+                        {isUrdu
+                          ? "تجزیے کے بعد سفارشات یہاں ظاہر ہوں گی۔"
+                          : "Recommendations will appear here after analysis."}
                       </p>
                     )}
                   </div>
@@ -783,11 +860,16 @@ function ScanFacePageContent() {
                 {result.annotated_image && (
                   <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-5 py-5 rounded-xl">
                     <div className="flex items-center justify-between">
-                      <h3 className={sectionTitle}>Annotated image</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "تشریح شدہ تصویر" : "Annotated image"}
+                      </h3>
                       <div className="flex gap-2">
-                        <span className={chip}>AI overlay</span>
+                        <span className={chip}>{isUrdu ? "AI اوورلے" : "AI overlay"}</span>
                         {result.problem_areas && result.problem_areas.length > 0 && (
-                          <span className={chip}>{result.problem_areas.length} areas detected</span>
+                          <span className={chip}>
+                            {result.problem_areas.length}{" "}
+                            {isUrdu ? "علاقے شناخت ہوئے" : "areas detected"}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -801,7 +883,7 @@ function ScanFacePageContent() {
                                 ? result.annotated_image
                                 : `data:image/png;base64,${result.annotated_image}`
                             }
-                            alt="Annotated analysis"
+                            alt={isUrdu ? "تشریح شدہ تجزیہ" : "Annotated analysis"}
                             className="block h-auto max-h-[70vh] w-auto max-w-full bg-[var(--color-surface)]"
                             onLoad={(e) => {
                               syncAnnotatedDims(e.currentTarget);
@@ -958,18 +1040,26 @@ function ScanFacePageContent() {
                     {/* Legend for problem areas */}
                     {result.problem_areas && result.problem_areas.length > 0 && (
                       <div className="flex flex-wrap gap-3 pt-2">
-                        <span className="text-xs text-[var(--color-muted)]">Legend:</span>
+                        <span className="text-xs text-[var(--color-muted)]">
+                          {isUrdu ? "علامتیں:" : "Legend:"}
+                        </span>
                         <div className="flex items-center gap-1">
                           <div className="w-3 h-3 rounded border-2 border-[var(--color-success)] bg-[rgba(16,185,129,0.15)]" />
-                          <span className="text-xs text-[var(--color-muted)]">Mild</span>
+                          <span className="text-xs text-[var(--color-muted)]">
+                            {isUrdu ? "ہلکا" : "Mild"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <div className="w-3 h-3 rounded border-2 border-[var(--color-warning)] bg-[rgba(245,158,11,0.15)]" />
-                          <span className="text-xs text-[var(--color-muted)]">Moderate</span>
+                          <span className="text-xs text-[var(--color-muted)]">
+                            {isUrdu ? "درمیانہ" : "Moderate"}
+                          </span>
                         </div>
                         <div className="flex items-center gap-1">
                           <div className="w-3 h-3 rounded border-2 border-[var(--color-danger)] bg-[rgba(239,68,68,0.15)]" />
-                          <span className="text-xs text-[var(--color-muted)]">Severe</span>
+                          <span className="text-xs text-[var(--color-muted)]">
+                            {isUrdu ? "شدید" : "Severe"}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -987,7 +1077,7 @@ function ScanFacePageContent() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-[var(--color-heading)]">
-                    Analysis error
+                    {isUrdu ? "تجزیہ خرابی" : "Analysis error"}
                   </h3>
                   <p className={`${mutedText} mt-1 text-sm`}>{error}</p>
                 </div>

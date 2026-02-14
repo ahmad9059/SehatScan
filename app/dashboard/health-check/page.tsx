@@ -43,6 +43,7 @@ import {
   sectionTitle,
   subheading,
 } from "@/app/components/dashboardStyles";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 
 interface StructuredMetric {
   name?: string;
@@ -70,19 +71,32 @@ interface Analysis {
   rawData?: unknown;
 }
 
-const commonSymptoms = [
-  "Acne flare-ups",
-  "Persistent redness",
-  "Itching",
-  "Dry or flaky skin",
-  "Oily skin",
-  "Burning or stinging",
-  "Dark spots",
-  "Rash",
-  "Skin peeling",
-];
-
 function RiskAssessmentPageContent() {
+  const { language } = useSimpleLanguage();
+  const isUrdu = language === "ur";
+  const commonSymptoms = isUrdu
+    ? [
+        "مہاسوں میں اضافہ",
+        "مسلسل سرخی",
+        "خارش",
+        "خشک یا چھلکے دار جلد",
+        "چکنی جلد",
+        "جلن یا چبھن",
+        "سیاہ دھبے",
+        "خارش دانے",
+        "جلد اترنا",
+      ]
+    : [
+        "Acne flare-ups",
+        "Persistent redness",
+        "Itching",
+        "Dry or flaky skin",
+        "Oily skin",
+        "Burning or stinging",
+        "Dark spots",
+        "Rash",
+        "Skin peeling",
+      ];
   const { user } = useUser();
   const router = useRouter();
   const reportRef = useRef<HTMLDivElement>(null);
@@ -156,7 +170,9 @@ function RiskAssessmentPageContent() {
       } catch (error) {
         console.error("Failed to load analyses:", error);
         showErrorToast(
-          "Failed to load your past analyses. Please refresh the page."
+          isUrdu
+            ? "پچھلے تجزیے لوڈ کرنے میں ناکامی۔ براہ کرم صفحہ ریفریش کریں۔"
+            : "Failed to load your past analyses. Please refresh the page."
         );
       } finally {
         setLoadingAnalyses(false);
@@ -164,7 +180,7 @@ function RiskAssessmentPageContent() {
     };
 
     loadAnalyses();
-  }, [user]);
+  }, [isUrdu, user]);
 
   // Close source menu when clicking outside
   useEffect(() => {
@@ -198,7 +214,9 @@ function RiskAssessmentPageContent() {
 
   const handleReportUpload = async (file: File) => {
     if (!user?.id) {
-      showErrorToast("Please log in to upload files");
+      showErrorToast(
+        isUrdu ? "فائل اپ لوڈ کرنے کے لیے لاگ ان کریں" : "Please log in to upload files"
+      );
       return;
     }
 
@@ -224,7 +242,9 @@ function RiskAssessmentPageContent() {
       setReportUploadProgress(100);
 
       const success = handleServerActionResponse(result, {
-        successMessage: "Report uploaded and analyzed successfully!",
+        successMessage: isUrdu
+          ? "رپورٹ کامیابی سے اپ لوڈ اور تجزیہ ہو گئی!"
+          : "Report uploaded and analyzed successfully!",
         onSuccess: (data) => {
           const newAnalysis: Analysis = {
             id: data.analysisId,
@@ -243,7 +263,11 @@ function RiskAssessmentPageContent() {
       }
     } catch (error) {
       console.error("Report upload error:", error);
-      showErrorToast("Failed to upload and analyze report");
+      showErrorToast(
+        isUrdu
+          ? "رپورٹ اپ لوڈ اور تجزیہ کرنے میں ناکامی"
+          : "Failed to upload and analyze report"
+      );
       setReportFile(null);
     } finally {
       setIsUploadingReport(false);
@@ -253,7 +277,9 @@ function RiskAssessmentPageContent() {
 
   const handleFaceUpload = async (file: File) => {
     if (!user?.id) {
-      showErrorToast("Please log in to upload files");
+      showErrorToast(
+        isUrdu ? "فائل اپ لوڈ کرنے کے لیے لاگ ان کریں" : "Please log in to upload files"
+      );
       return;
     }
 
@@ -279,7 +305,9 @@ function RiskAssessmentPageContent() {
       setFaceUploadProgress(100);
 
       const success = handleServerActionResponse(result, {
-        successMessage: "Photo uploaded and analyzed successfully!",
+        successMessage: isUrdu
+          ? "تصویر کامیابی سے اپ لوڈ اور تجزیہ ہو گئی!"
+          : "Photo uploaded and analyzed successfully!",
         onSuccess: (data) => {
           const newAnalysis: Analysis = {
             id: data.analysisId,
@@ -298,7 +326,11 @@ function RiskAssessmentPageContent() {
       }
     } catch (error) {
       console.error("Face upload error:", error);
-      showErrorToast("Failed to upload and analyze photo");
+      showErrorToast(
+        isUrdu
+          ? "تصویر اپ لوڈ اور تجزیہ کرنے میں ناکامی"
+          : "Failed to upload and analyze photo"
+      );
       setFaceFile(null);
     } finally {
       setIsUploadingFace(false);
@@ -326,7 +358,7 @@ function RiskAssessmentPageContent() {
 
   const formatAnalysisDate = (date: Date | string) => {
     const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateObj.toLocaleDateString("en-US", {
+    return dateObj.toLocaleDateString(isUrdu ? "ur-PK" : "en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -338,14 +370,20 @@ function RiskAssessmentPageContent() {
   const getAnalysisPreview = (analysis: Analysis) => {
     if (analysis.type === "report" && analysis.structuredData?.metrics) {
       const metricCount = analysis.structuredData.metrics.length;
-      return `${metricCount} report metrics extracted`;
+      return isUrdu
+        ? `${metricCount} رپورٹ میٹرکس اخذ کیے گئے`
+        : `${metricCount} report metrics extracted`;
     } else if (analysis.type === "face" && analysis.visualMetrics) {
       const metrics = analysis.visualMetrics[0] || {};
-      return `Redness: ${metrics.redness_percentage || 0}%, Yellowness: ${
-        metrics.yellowness_percentage || 0
-      }%`;
+      return isUrdu
+        ? `سرخی: ${metrics.redness_percentage || 0}٪، زردی: ${
+            metrics.yellowness_percentage || 0
+          }٪`
+        : `Redness: ${metrics.redness_percentage || 0}%, Yellowness: ${
+            metrics.yellowness_percentage || 0
+          }%`;
     }
-    return "Analysis completed";
+    return isUrdu ? "تجزیہ مکمل" : "Analysis completed";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -385,7 +423,9 @@ function RiskAssessmentPageContent() {
 
       const success = handleServerActionResponse(result, {
         successMessage:
-          "Dermatology health check generated successfully! You can view this in your history.",
+          isUrdu
+            ? "جلدی صحت جانچ کامیابی سے تیار ہو گئی! آپ اسے تاریخ میں دیکھ سکتے ہیں۔"
+            : "Dermatology health check generated successfully! You can view this in your history.",
         onSuccess: (data) => {
           setRiskAssessment(data.risk_assessment);
           setAnalysisId(result.analysisId || "");
@@ -400,7 +440,9 @@ function RiskAssessmentPageContent() {
     } catch (error) {
       console.error("Risk assessment unexpected error:", error);
       showErrorToast(
-        "An unexpected error occurred during dermatology health check generation"
+        isUrdu
+          ? "جلدی صحت جانچ تیار کرتے وقت غیر متوقع خرابی پیش آئی"
+          : "An unexpected error occurred during dermatology health check generation"
       );
     } finally {
       setIsLoading(false);
@@ -415,9 +457,9 @@ function RiskAssessmentPageContent() {
       const canvas = await html2canvas(reportRef.current, {
         useCORS: true,
         logging: false,
-        background: "#ffffff",
+        backgroundColor: "#ffffff",
         scale: 2, // Higher quality
-      } as any);
+      });
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
@@ -538,7 +580,11 @@ function RiskAssessmentPageContent() {
       );
     } catch (error) {
       console.error("PDF generation error:", error);
-      showErrorToast("Failed to generate PDF. Please try again.");
+      showErrorToast(
+        isUrdu
+          ? "PDF بنانے میں ناکامی۔ براہ کرم دوبارہ کوشش کریں۔"
+          : "Failed to generate PDF. Please try again."
+      );
     } finally {
       setIsGeneratingPdf(false);
     }
@@ -557,7 +603,13 @@ function RiskAssessmentPageContent() {
   if (loadingAnalyses) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center pb-[10%]">
-        <LogoSpinner message="Loading your dermatology sources..." />
+        <LogoSpinner
+          message={
+            isUrdu
+              ? "آپ کے جلدی ذرائع لوڈ ہو رہے ہیں..."
+              : "Loading your dermatology sources..."
+          }
+        />
       </div>
     );
   }
@@ -572,16 +624,25 @@ function RiskAssessmentPageContent() {
                 <ExclamationTriangleIcon className="h-7 w-7" />
               </div>
               <div>
-                <h1 className={heading}>Dermatology Health Check</h1>
+                <h1 className={heading}>
+                  {isUrdu ? "جلدی صحت جانچ" : "Dermatology Health Check"}
+                </h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Generate a dermatologist-focused skin health check using skin
-                  photo analysis and optional report data.
+                  {isUrdu
+                    ? "جلدی تصویر کے تجزیے اور اختیاری رپورٹ ڈیٹا کے ساتھ جلد پر مرکوز صحت جانچ تیار کریں۔"
+                    : "Generate a dermatologist-focused skin health check using skin photo analysis and optional report data."}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className={pill}>Skin-focused output</span>
-                  <span className={pill}>Pick skin photo and/or report</span>
-                  <span className={pill}>Save to history</span>
-                  <span className={pill}>Dermatology recommendations</span>
+                  <span className={pill}>
+                    {isUrdu ? "جلد پر مرکوز نتیجہ" : "Skin-focused output"}
+                  </span>
+                  <span className={pill}>
+                    {isUrdu ? "جلدی تصویر اور/یا رپورٹ منتخب کریں" : "Pick skin photo and/or report"}
+                  </span>
+                  <span className={pill}>{isUrdu ? "تاریخ میں محفوظ" : "Save to history"}</span>
+                  <span className={pill}>
+                    {isUrdu ? "جلدی سفارشات" : "Dermatology recommendations"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -592,7 +653,7 @@ function RiskAssessmentPageContent() {
                   onClick={() => setSourceMenuOpen((prev) => !prev)}
                   className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-card)] px-3 py-2 text-sm font-semibold text-[var(--color-heading)] hover:border-[var(--color-primary)]"
                 >
-                  Sources
+                  {isUrdu ? "ذرائع" : "Sources"}
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                       includeFace && includeReport
@@ -601,12 +662,20 @@ function RiskAssessmentPageContent() {
                     }`}
                   >
                     {includeFace && includeReport
-                      ? "Skin photo + Report"
+                      ? isUrdu
+                        ? "جلدی تصویر + رپورٹ"
+                        : "Skin photo + Report"
                       : includeFace
-                      ? "Skin photo only"
+                      ? isUrdu
+                        ? "صرف جلدی تصویر"
+                        : "Skin photo only"
                       : includeReport
-                      ? "Report only"
-                      : "None selected"}
+                      ? isUrdu
+                        ? "صرف رپورٹ"
+                        : "Report only"
+                      : isUrdu
+                        ? "کوئی انتخاب نہیں"
+                        : "None selected"}
                   </span>
                 </button>
                 {sourceMenuOpen && (
@@ -620,7 +689,7 @@ function RiskAssessmentPageContent() {
                           onChange={(e) => setIncludeFace(e.target.checked)}
                         />
                         <span className="text-[var(--color-foreground)]">
-                          Use skin photo analysis
+                          {isUrdu ? "جلدی تصویر کا تجزیہ استعمال کریں" : "Use skin photo analysis"}
                         </span>
                       </label>
                       <label className="flex items-center gap-2">
@@ -631,12 +700,12 @@ function RiskAssessmentPageContent() {
                           onChange={(e) => setIncludeReport(e.target.checked)}
                         />
                         <span className="text-[var(--color-foreground)]">
-                          Use report analysis
+                          {isUrdu ? "رپورٹ تجزیہ استعمال کریں" : "Use report analysis"}
                         </span>
                       </label>
                       {!hasAtLeastOneSource && (
                         <p className="text-xs text-[var(--color-danger)]">
-                          Select at least one source
+                          {isUrdu ? "کم از کم ایک ذریعہ منتخب کریں" : "Select at least one source"}
                         </p>
                       )}
                     </div>
@@ -644,7 +713,9 @@ function RiskAssessmentPageContent() {
                 )}
               </div>
               {analysisId && (
-                <span className={chip}>Saved ID: {analysisId}</span>
+                <span className={chip}>
+                  {isUrdu ? "محفوظ آئی ڈی" : "Saved ID"}: {analysisId}
+                </span>
               )}
             </div>
           </div>
@@ -659,9 +730,13 @@ function RiskAssessmentPageContent() {
                       <PhotoIcon className="h-6 w-6" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className={sectionTitle}>Select skin photo analysis</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "جلدی تصویر تجزیہ منتخب کریں" : "Select skin photo analysis"}
+                      </h3>
                       <p className={`${subheading} text-sm`}>
-                        Choose from history or upload new photo. Optional.
+                        {isUrdu
+                          ? "تاریخ سے منتخب کریں یا نئی تصویر اپ لوڈ کریں۔ اختیاری۔"
+                          : "Choose from history or upload new photo. Optional."}
                       </p>
                     </div>
                   </div>
@@ -672,7 +747,7 @@ function RiskAssessmentPageContent() {
                     className={`${secondaryButton} self-start shrink-0 whitespace-nowrap`}
                   >
                     <CloudArrowUpIcon className="h-4 w-4" />
-                    Upload photo
+                    {isUrdu ? "تصویر اپ لوڈ کریں" : "Upload photo"}
                   </button>
                 </div>
 
@@ -681,19 +756,21 @@ function RiskAssessmentPageContent() {
                     <div className="flex items-center gap-2">
                       <LoadingSpinner size="sm" />
                       <p className="text-sm font-semibold text-[var(--color-heading)]">
-                        Uploading {faceFile?.name}
+                        {isUrdu ? "اپ لوڈ ہو رہا ہے" : "Uploading"} {faceFile?.name}
                       </p>
                     </div>
                     <ProgressBar
                       progress={faceUploadProgress}
-                      label="Analyzing photo"
+                      label={isUrdu ? "تصویر کا تجزیہ" : "Analyzing photo"}
                       size="sm"
                     />
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <label className="block text-sm font-semibold text-[var(--color-foreground)]">
-                      Skin photo analysis from history (optional)
+                      {isUrdu
+                        ? "تاریخ سے جلدی تصویر تجزیہ (اختیاری)"
+                        : "Skin photo analysis from history (optional)"}
                     </label>
                     <select
                       value={selectedFace}
@@ -710,14 +787,16 @@ function RiskAssessmentPageContent() {
                       className="w-full rounded-xl border px-4 py-3 text-[var(--color-foreground)] bg-[var(--color-card)] border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                     >
                       <option value="">
-                        Select skin photo analysis (optional)
+                        {isUrdu
+                          ? "جلدی تصویر تجزیہ منتخب کریں (اختیاری)"
+                          : "Select skin photo analysis (optional)"}
                       </option>
                       {faceAnalyses.map((analysis, index) => (
                         <option
                           key={analysis.id || `face-${index}`}
                           value={analysis.id}
                         >
-                          {`Face: ${getAnalysisPreview(
+                          {`${isUrdu ? "چہرہ" : "Face"}: ${getAnalysisPreview(
                             analysis
                           )} — ${formatAnalysisDate(analysis.createdAt)}`}
                         </option>
@@ -734,7 +813,9 @@ function RiskAssessmentPageContent() {
 
                 {faceAnalyses.length === 0 && !isUploadingFace && (
                   <p className="text-sm text-[var(--color-subtle)] italic">
-                    No skin photo analyses yet. Upload a photo to get started.
+                    {isUrdu
+                      ? "ابھی جلدی تصاویر کے تجزیے موجود نہیں۔ آغاز کے لیے تصویر اپ لوڈ کریں۔"
+                      : "No skin photo analyses yet. Upload a photo to get started."}
                   </p>
                 )}
               </div>
@@ -747,9 +828,13 @@ function RiskAssessmentPageContent() {
                       <DocumentTextIcon className="h-6 w-6" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className={sectionTitle}>Select report analysis</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "رپورٹ تجزیہ منتخب کریں" : "Select report analysis"}
+                      </h3>
                       <p className={`${subheading} text-sm`}>
-                        Choose from history or upload new report. Optional.
+                        {isUrdu
+                          ? "تاریخ سے منتخب کریں یا نئی رپورٹ اپ لوڈ کریں۔ اختیاری۔"
+                          : "Choose from history or upload new report. Optional."}
                       </p>
                     </div>
                   </div>
@@ -760,7 +845,7 @@ function RiskAssessmentPageContent() {
                     className={`${secondaryButton} self-start shrink-0 whitespace-nowrap`}
                   >
                     <CloudArrowUpIcon className="h-4 w-4" />
-                    Upload report
+                    {isUrdu ? "رپورٹ اپ لوڈ کریں" : "Upload report"}
                   </button>
                 </div>
 
@@ -769,19 +854,21 @@ function RiskAssessmentPageContent() {
                     <div className="flex items-center gap-2">
                       <LoadingSpinner size="sm" />
                       <p className="text-sm font-semibold text-[var(--color-heading)]">
-                        Uploading {reportFile?.name}
+                        {isUrdu ? "اپ لوڈ ہو رہا ہے" : "Uploading"} {reportFile?.name}
                       </p>
                     </div>
                     <ProgressBar
                       progress={reportUploadProgress}
-                      label="Analyzing report"
+                      label={isUrdu ? "رپورٹ کا تجزیہ" : "Analyzing report"}
                       size="sm"
                     />
                   </div>
                 ) : (
                   <div className="space-y-3">
                     <label className="block text-sm font-semibold text-[var(--color-foreground)]">
-                      Report analysis from history (optional)
+                      {isUrdu
+                        ? "تاریخ سے رپورٹ تجزیہ (اختیاری)"
+                        : "Report analysis from history (optional)"}
                     </label>
                     <select
                       value={selectedReport}
@@ -798,14 +885,16 @@ function RiskAssessmentPageContent() {
                       className="w-full rounded-xl border px-4 py-3 text-[var(--color-foreground)] bg-[var(--color-card)] border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                     >
                       <option value="">
-                        Select report analysis (optional)
+                        {isUrdu
+                          ? "رپورٹ تجزیہ منتخب کریں (اختیاری)"
+                          : "Select report analysis (optional)"}
                       </option>
                       {reportAnalyses.map((analysis, index) => (
                         <option
                           key={analysis.id || `report-${index}`}
                           value={analysis.id}
                         >
-                          {`Report: ${getAnalysisPreview(
+                          {`${isUrdu ? "رپورٹ" : "Report"}: ${getAnalysisPreview(
                             analysis
                           )} — ${formatAnalysisDate(analysis.createdAt)}`}
                         </option>
@@ -822,8 +911,9 @@ function RiskAssessmentPageContent() {
 
                 {reportAnalyses.length === 0 && !isUploadingReport && (
                   <p className="text-sm text-[var(--color-subtle)] italic">
-                    No report analyses yet. Upload a dermatology-relevant
-                    report to get started.
+                    {isUrdu
+                      ? "ابھی رپورٹ تجزیے موجود نہیں۔ آغاز کے لیے جلد سے متعلق رپورٹ اپ لوڈ کریں۔"
+                      : "No report analyses yet. Upload a dermatology-relevant report to get started."}
                   </p>
                 )}
               </div>
@@ -835,10 +925,13 @@ function RiskAssessmentPageContent() {
                   <HeartIcon className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className={sectionTitle}>Additional information</h3>
+                  <h3 className={sectionTitle}>
+                    {isUrdu ? "اضافی معلومات" : "Additional information"}
+                  </h3>
                   <p className={`${subheading} text-sm`}>
-                    Provide optional dermatology context to refine your
-                    assessment.
+                    {isUrdu
+                      ? "اپنی جانچ بہتر بنانے کے لیے اختیاری جلدی معلومات فراہم کریں۔"
+                      : "Provide optional dermatology context to refine your assessment."}
                   </p>
                 </div>
               </div>
@@ -846,7 +939,7 @@ function RiskAssessmentPageContent() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-[var(--color-foreground)]">
-                    Age *
+                    {isUrdu ? "عمر *" : "Age *"}
                   </label>
                   <input
                     type="number"
@@ -868,7 +961,7 @@ function RiskAssessmentPageContent() {
                     className={`w-full rounded-xl border px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] bg-[var(--color-card)] border-[var(--color-border)] ${
                       validationErrors.age ? "ring-[var(--color-danger)]" : ""
                     }`}
-                    placeholder="Enter your age"
+                    placeholder={isUrdu ? "اپنی عمر درج کریں" : "Enter your age"}
                     required
                   />
                   {validationErrors.age && (
@@ -880,7 +973,7 @@ function RiskAssessmentPageContent() {
 
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-[var(--color-foreground)]">
-                    Gender *
+                    {isUrdu ? "جنس *" : "Gender *"}
                   </label>
                   <select
                     value={userFormData.gender}
@@ -903,10 +996,10 @@ function RiskAssessmentPageContent() {
                     }`}
                     required
                   >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
+                    <option value="">{isUrdu ? "جنس منتخب کریں" : "Select gender"}</option>
+                    <option value="male">{isUrdu ? "مرد" : "Male"}</option>
+                    <option value="female">{isUrdu ? "خاتون" : "Female"}</option>
+                    <option value="other">{isUrdu ? "دیگر" : "Other"}</option>
                   </select>
                   {validationErrors.gender && (
                     <p className="mt-2 text-sm text-[var(--color-danger)]">
@@ -918,7 +1011,7 @@ function RiskAssessmentPageContent() {
 
               <div className="space-y-3">
                 <label className="block text-sm font-semibold text-[var(--color-foreground)]">
-                  Current skin symptoms (optional)
+                  {isUrdu ? "موجودہ جلدی علامات (اختیاری)" : "Current skin symptoms (optional)"}
                 </label>
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                   {commonSymptoms.map((symptom) => (
@@ -945,7 +1038,7 @@ function RiskAssessmentPageContent() {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-[var(--color-foreground)]">
-                    Dermatology history (optional)
+                    {isUrdu ? "جلدی طبی تاریخ (اختیاری)" : "Dermatology history (optional)"}
                   </label>
                   <textarea
                     value={userFormData.medicalHistory}
@@ -957,12 +1050,18 @@ function RiskAssessmentPageContent() {
                     }
                     rows={4}
                     className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-                    placeholder="Examples: eczema, psoriasis, rosacea, allergies, prior skin procedures."
+                    placeholder={
+                      isUrdu
+                        ? "مثالیں: ایگزیما، سوریاسس، روزیشیا، الرجی، سابقہ جلدی طریقہ کار۔"
+                        : "Examples: eczema, psoriasis, rosacea, allergies, prior skin procedures."
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-[var(--color-foreground)]">
-                    Current skin medications (optional)
+                    {isUrdu
+                      ? "موجودہ جلدی ادویات (اختیاری)"
+                      : "Current skin medications (optional)"}
                   </label>
                   <textarea
                     value={userFormData.currentMedications}
@@ -974,7 +1073,11 @@ function RiskAssessmentPageContent() {
                     }
                     rows={4}
                     className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-3 text-[var(--color-foreground)] placeholder:text-[var(--color-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-                    placeholder="Examples: tretinoin, benzoyl peroxide, topical steroids, oral isotretinoin."
+                    placeholder={
+                      isUrdu
+                        ? "مثالیں: tretinoin، benzoyl peroxide، topical steroids، oral isotretinoin۔"
+                        : "Examples: tretinoin, benzoyl peroxide, topical steroids, oral isotretinoin."
+                    }
                   />
                 </div>
               </div>
@@ -985,17 +1088,19 @@ function RiskAssessmentPageContent() {
                 type="submit"
                 disabled={!canSubmit}
                 className={primaryButton}
-                aria-label="Generate dermatology health check"
+                aria-label={
+                  isUrdu ? "جلدی صحت جانچ تیار کریں" : "Generate dermatology health check"
+                }
               >
                 {isLoading || isUploadingReport || isUploadingFace ? (
                   <>
                     <LoadingSpinner size="sm" color="white" />
-                    Processing...
+                    {isUrdu ? "پروسیسنگ..." : "Processing..."}
                   </>
                 ) : (
                   <>
                     <ExclamationTriangleIcon className="h-5 w-5" />
-                    Generate health check
+                    {isUrdu ? "صحت جانچ تیار کریں" : "Generate health check"}
                   </>
                 )}
               </button>
@@ -1010,10 +1115,13 @@ function RiskAssessmentPageContent() {
                     <ChartBarIcon className="h-6 w-6" />
                   </div>
                   <div>
-                    <h2 className={sectionTitle}>Dermatology health check</h2>
+                    <h2 className={sectionTitle}>
+                      {isUrdu ? "جلدی صحت جانچ" : "Dermatology health check"}
+                    </h2>
                     <p className={`${subheading} text-sm`}>
-                      Generated from your selected analyses and additional
-                      details.
+                      {isUrdu
+                        ? "آپ کے منتخب تجزیوں اور اضافی معلومات سے تیار شدہ۔"
+                        : "Generated from your selected analyses and additional details."}
                     </p>
                   </div>
                 </div>
@@ -1027,12 +1135,12 @@ function RiskAssessmentPageContent() {
                     {isGeneratingPdf ? (
                       <>
                         <LoadingSpinner size="sm" />
-                        Generating...
+                        {isUrdu ? "تیار ہو رہا ہے..." : "Generating..."}
                       </>
                     ) : (
                       <>
                         <ArrowDownTrayIcon className="h-4 w-4" />
-                        Download PDF
+                        {isUrdu ? "PDF ڈاؤن لوڈ کریں" : "Download PDF"}
                       </>
                     )}
                   </button>
@@ -1041,7 +1149,7 @@ function RiskAssessmentPageContent() {
                     onClick={() => router.push("/dashboard/history")}
                     className={secondaryButton}
                   >
-                    View in history
+                    {isUrdu ? "تاریخ میں دیکھیں" : "View in history"}
                   </button>
                 </div>
               </div>
@@ -1058,14 +1166,14 @@ function RiskAssessmentPageContent() {
                   <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)]" />
                   <div>
                     <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      Important dermatology disclaimer
+                      {isUrdu
+                        ? "اہم جلدی طبی انتباہ"
+                        : "Important dermatology disclaimer"}
                     </p>
                     <p className={`${mutedText} mt-1 text-xs`}>
-                      This assessment is generated by AI for informational
-                      purposes only. It should not replace professional
-                      dermatology advice, diagnosis, or treatment. Always
-                      consult a qualified dermatologist for skin-related
-                      concerns.
+                      {isUrdu
+                        ? "یہ جانچ AI کے ذریعے صرف معلوماتی مقصد کے لیے تیار کی گئی ہے۔ یہ پیشہ ور جلدی مشورے، تشخیص یا علاج کا متبادل نہیں۔ جلد سے متعلق مسائل کے لیے ہمیشہ مستند ڈرماٹولوجسٹ سے رجوع کریں۔"
+                        : "This assessment is generated by AI for informational purposes only. It should not replace professional dermatology advice, diagnosis, or treatment. Always consult a qualified dermatologist for skin-related concerns."}
                     </p>
                   </div>
                 </div>

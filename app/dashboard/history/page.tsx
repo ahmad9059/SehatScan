@@ -26,6 +26,7 @@ import {
   secondaryButton,
   subheading,
 } from "@/app/components/dashboardStyles";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 
 interface StructuredMetric {
   name?: string;
@@ -77,6 +78,8 @@ const ITEMS_PER_PAGE = 10;
 
 function HistoryPageContent() {
   const { user } = useUser();
+  const { language } = useSimpleLanguage();
+  const isUrdu = language === "ur";
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,7 +116,9 @@ function HistoryPageContent() {
         });
 
         if (!response.ok) {
-          let errorMessage = "Failed to fetch analyses";
+          let errorMessage = isUrdu
+            ? "تجزیے حاصل کرنے میں ناکامی"
+            : "Failed to fetch analyses";
 
           try {
             const errorData = await response.json();
@@ -123,11 +128,17 @@ function HistoryPageContent() {
           }
 
           if (response.status === 401) {
-            errorMessage = "Authentication required. Please log in again.";
+            errorMessage = isUrdu
+              ? "تصدیق درکار ہے۔ براہ کرم دوبارہ لاگ ان کریں۔"
+              : "Authentication required. Please log in again.";
           } else if (response.status === 403) {
-            errorMessage = "You don't have permission to access this data.";
+            errorMessage = isUrdu
+              ? "آپ کو اس ڈیٹا تک رسائی کی اجازت نہیں ہے۔"
+              : "You don't have permission to access this data.";
           } else if (response.status >= 500) {
-            errorMessage = "Server error. Please try again later.";
+            errorMessage = isUrdu
+              ? "سرور خرابی۔ براہ کرم بعد میں دوبارہ کوشش کریں۔"
+              : "Server error. Please try again later.";
           }
 
           throw new Error(errorMessage);
@@ -136,11 +147,15 @@ function HistoryPageContent() {
         const data: AnalysisHistoryResponse = await response.json();
 
         if (!data || typeof data !== "object") {
-          throw new Error("Invalid response format");
+          throw new Error(
+            isUrdu ? "غلط رسپانس فارمیٹ" : "Invalid response format"
+          );
         }
 
         if (!Array.isArray(data.analyses)) {
-          throw new Error("Invalid analyses data format");
+          throw new Error(
+            isUrdu ? "تجزیوں کے ڈیٹا کا فارمیٹ غلط ہے" : "Invalid analyses data format"
+          );
         }
 
         setAnalyses(data.analyses);
@@ -151,17 +166,25 @@ function HistoryPageContent() {
         if (data.analyses.length === 0 && page === 1) {
           if (type === "all") {
             showInfoToast(
-              "No analyses found. Upload a report or photo to get started!"
+              isUrdu
+                ? "کوئی تجزیہ نہیں ملا۔ آغاز کے لیے رپورٹ یا تصویر اپ لوڈ کریں!"
+                : "No analyses found. Upload a report or photo to get started!"
             );
           } else {
             showInfoToast(
-              `No ${type} analyses found. Try a different filter.`
+              isUrdu
+                ? `${type} کے کوئی تجزیے نہیں ملے۔ دوسرا فلٹر آزمائیں۔`
+                : `No ${type} analyses found. Try a different filter.`
             );
           }
         }
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to load analyses";
+          err instanceof Error
+            ? err.message
+            : isUrdu
+              ? "تجزیے لوڈ کرنے میں ناکامی"
+              : "Failed to load analyses";
         console.error("Error fetching analyses:", err);
         setError(errorMessage);
         showErrorToast(errorMessage);
@@ -169,7 +192,7 @@ function HistoryPageContent() {
         setLoading(false);
       }
     },
-    [user?.id]
+    [isUrdu, user?.id]
   );
 
   useEffect(() => {
@@ -201,13 +224,13 @@ function HistoryPageContent() {
   const getAnalysisTypeLabel = (type: string) => {
     switch (type) {
       case "face":
-        return "Facial Analysis";
+        return isUrdu ? "چہرے کا تجزیہ" : "Facial Analysis";
       case "report":
-        return "Report Analysis";
+        return isUrdu ? "رپورٹ تجزیہ" : "Report Analysis";
       case "risk":
-        return "Health Check";
+        return isUrdu ? "صحت کی جانچ" : "Health Check";
       default:
-        return "Analysis";
+        return isUrdu ? "تجزیہ" : "Analysis";
     }
   };
 
@@ -231,28 +254,38 @@ function HistoryPageContent() {
           analysis.visualMetrics.length > 0
         ) {
           const metrics = analysis.visualMetrics[0];
-          return `Redness: ${metrics.redness_percentage || 0}%, Yellowness: ${
-            metrics.yellowness_percentage || 0
-          }%`;
+          return isUrdu
+            ? `سرخی: ${metrics.redness_percentage || 0}٪، زردی: ${
+                metrics.yellowness_percentage || 0
+              }٪`
+            : `Redness: ${metrics.redness_percentage || 0}%, Yellowness: ${
+                metrics.yellowness_percentage || 0
+              }%`;
         }
-        return "Facial analysis completed";
+        return isUrdu ? "چہرے کا تجزیہ مکمل" : "Facial analysis completed";
       case "report":
         if (analysis.structuredData?.metrics) {
           const count = analysis.structuredData.metrics.length;
-          return `${count} health metrics extracted`;
+          return isUrdu
+            ? `${count} صحت میٹرکس اخذ کیے گئے`
+            : `${count} health metrics extracted`;
         }
-        return "Report analysis completed";
+        return isUrdu ? "رپورٹ تجزیہ مکمل" : "Report analysis completed";
       case "risk":
         return analysis.riskAssessment
-          ? "Risk assessment generated"
-          : "Risk assessment completed";
+          ? isUrdu
+            ? "خطرے کی جانچ تیار ہو گئی"
+            : "Risk assessment generated"
+          : isUrdu
+            ? "خطرے کی جانچ مکمل"
+            : "Risk assessment completed";
       default:
-        return "Analysis completed";
+        return isUrdu ? "تجزیہ مکمل" : "Analysis completed";
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString(isUrdu ? "ur-PK" : "en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -262,10 +295,10 @@ function HistoryPageContent() {
   };
 
   const filterOptions = [
-    { value: "all", label: "All" },
-    { value: "report", label: "Reports" },
-    { value: "face", label: "Faces" },
-    { value: "risk", label: "Risk" },
+    { value: "all", label: isUrdu ? "سب" : "All" },
+    { value: "report", label: isUrdu ? "رپورٹس" : "Reports" },
+    { value: "face", label: isUrdu ? "چہرے" : "Faces" },
+    { value: "risk", label: isUrdu ? "خطرہ" : "Risk" },
   ];
 
   return (
@@ -274,16 +307,22 @@ function HistoryPageContent() {
         <section className={`${fullWidthSection} space-y-8`}>
           <div className="flex flex-col gap-3 border-b border-[var(--color-border)] pb-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className={heading}>Analysis History</h1>
+              <h1 className={heading}>
+                {isUrdu ? "تجزیہ کی تاریخ" : "Analysis History"}
+              </h1>
               <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                Review past analyses in a single, continuous dashboard view.
+                {isUrdu
+                  ? "ایک مسلسل ڈیش بورڈ ویو میں پچھلے تجزیے دیکھیں۔"
+                  : "Review past analyses in a single, continuous dashboard view."}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className={pill}>{total} total</span>
+              <span className={pill}>
+                {total} {isUrdu ? "کل" : "total"}
+              </span>
               <span className={chip}>
                 <CalendarIcon className="h-4 w-4" />
-                Auto-saved
+                {isUrdu ? "خودکار محفوظ" : "Auto-saved"}
               </span>
             </div>
           </div>
@@ -305,7 +344,9 @@ function HistoryPageContent() {
               ))}
             </div>
             <div className={`${mutedText} text-sm`}>
-              Showing page {currentPage} of {totalPages}
+              {isUrdu
+                ? `صفحہ ${currentPage} از ${totalPages}`
+                : `Showing page ${currentPage} of ${totalPages}`}
             </div>
           </div>
 
@@ -328,19 +369,23 @@ function HistoryPageContent() {
             <div className="space-y-3 border border-[var(--color-border)] bg-[var(--color-card)]/60 px-6 py-8 text-center rounded-xl">
               <DocumentTextIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
               <h3 className="mt-3 text-lg font-semibold text-[var(--color-heading)]">
-                No analyses found
+                {isUrdu ? "کوئی تجزیہ نہیں ملا" : "No analyses found"}
               </h3>
               <p className={`${subheading} mt-1 text-sm`}>
                 {filterType === "all"
-                  ? "Upload a report or photo to start generating analyses."
-                  : `No ${filterType} analyses yet. Try another filter or upload new content.`}
+                  ? isUrdu
+                    ? "تجزیے شروع کرنے کے لیے رپورٹ یا تصویر اپ لوڈ کریں۔"
+                    : "Upload a report or photo to start generating analyses."
+                  : isUrdu
+                    ? `ابھی ${filterType} تجزیے موجود نہیں۔ دوسرا فلٹر آزمائیں یا نیا مواد اپ لوڈ کریں۔`
+                    : `No ${filterType} analyses yet. Try another filter or upload new content.`}
               </p>
               <div className="mt-4 flex justify-center gap-3">
                 <a href="/dashboard/scan-report" className={primaryButton}>
-                  Upload report
+                  {isUrdu ? "رپورٹ اپ لوڈ کریں" : "Upload report"}
                 </a>
                 <a href="/dashboard/scan-face" className={secondaryButton}>
-                  Scan face
+                  {isUrdu ? "چہرہ اسکین کریں" : "Scan face"}
                 </a>
               </div>
             </div>
@@ -374,7 +419,7 @@ function HistoryPageContent() {
                       <div className="shrink-0">
                         <span className={secondaryButton}>
                           <EyeIcon className="h-4 w-4" />
-                          View details
+                          {isUrdu ? "تفصیل دیکھیں" : "View details"}
                         </span>
                       </div>
                     </div>
@@ -387,7 +432,9 @@ function HistoryPageContent() {
           {totalPages > 1 && (
             <div className="flex flex-col gap-3 border-t border-[var(--color-border)] pt-4 sm:flex-row sm:items-center sm:justify-between">
               <div className={`${mutedText} text-sm`}>
-                {total} {total === 1 ? "analysis" : "analyses"} total
+                {isUrdu
+                  ? `${total} کل تجزیے`
+                  : `${total} ${total === 1 ? "analysis" : "analyses"} total`}
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -396,14 +443,14 @@ function HistoryPageContent() {
                   className={`${secondaryButton} disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   <ChevronLeftIcon className="h-4 w-4" />
-                  Previous
+                  {isUrdu ? "پچھلا" : "Previous"}
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={`${secondaryButton} disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  Next
+                  {isUrdu ? "اگلا" : "Next"}
                   <ChevronRightIcon className="h-4 w-4" />
                 </button>
               </div>

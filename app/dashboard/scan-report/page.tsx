@@ -35,6 +35,7 @@ import {
   sectionTitle,
   subheading,
 } from "@/app/components/dashboardStyles";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 
 interface AnalysisResult {
   raw_text: string;
@@ -62,19 +63,27 @@ interface AnalysisResult {
   };
 }
 
-const uploadTips = [
-  "Use clear, well-lit scans for best accuracy.",
-  "Supported files: PDF, JPG, or PNG up to 10MB.",
-  "Include complete pages to extract all metrics.",
-];
-
-const quickWins = [
-  "Automatic metric extraction",
-  "Secure upload processing",
-  "Save to history instantly",
-];
-
 function ScanReportPageContent() {
+  const { language } = useSimpleLanguage();
+  const isUrdu = language === "ur";
+  const uploadTips = isUrdu
+    ? [
+        "بہترین درستگی کے لیے واضح اور روشن اسکین استعمال کریں۔",
+        "معاون فائلیں: PDF، JPG، یا PNG (زیادہ سے زیادہ 10MB)",
+        "تمام میٹرکس نکالنے کے لیے مکمل صفحات شامل کریں۔",
+      ]
+    : [
+        "Use clear, well-lit scans for best accuracy.",
+        "Supported files: PDF, JPG, or PNG up to 10MB.",
+        "Include complete pages to extract all metrics.",
+      ];
+  const quickWins = isUrdu
+    ? ["خودکار میٹرک اخذ", "محفوظ اپ لوڈ پروسیسنگ", "فوراً تاریخ میں محفوظ"]
+    : [
+        "Automatic metric extraction",
+        "Secure upload processing",
+        "Save to history instantly",
+      ];
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -110,7 +119,9 @@ function ScanReportPageContent() {
       setImagePreview(null);
     }
 
-    showSuccessToast("File selected successfully");
+    showSuccessToast(
+      isUrdu ? "فائل کامیابی سے منتخب ہو گئی" : "File selected successfully"
+    );
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -162,7 +173,9 @@ function ScanReportPageContent() {
     e.preventDefault();
 
     if (!file) {
-      showErrorToast("Please select a file to upload");
+      showErrorToast(
+        isUrdu ? "براہ کرم اپ لوڈ کے لیے فائل منتخب کریں" : "Please select a file to upload"
+      );
       return;
     }
 
@@ -190,12 +203,17 @@ function ScanReportPageContent() {
 
       const success = handleServerActionResponse(response, {
         successMessage:
-          "Report analyzed successfully! You can view this in your history.",
+          isUrdu
+            ? "رپورٹ کامیابی سے تجزیہ ہو گئی! آپ اسے اپنی تاریخ میں دیکھ سکتے ہیں۔"
+            : "Report analyzed successfully! You can view this in your history.",
         onSuccess: (data) => {
           setResult(data);
         },
         onError: (serverError) => {
-          setError(serverError.error || "Failed to analyze report");
+          setError(
+            serverError.error ||
+              (isUrdu ? "رپورٹ کا تجزیہ کرنے میں ناکامی" : "Failed to analyze report")
+          );
         },
       });
 
@@ -204,8 +222,9 @@ function ScanReportPageContent() {
       }
     } catch (err) {
       console.error("Report analysis error:", err);
-      const errorMessage =
-        "An unexpected error occurred during report analysis";
+      const errorMessage = isUrdu
+        ? "رپورٹ کے تجزیے کے دوران غیر متوقع خرابی پیش آئی"
+        : "An unexpected error occurred during report analysis";
       setError(errorMessage);
       showErrorToast(errorMessage);
     } finally {
@@ -223,10 +242,13 @@ function ScanReportPageContent() {
                 <DocumentTextIcon className="h-7 w-7" />
               </div>
               <div>
-                <h1 className={heading}>Scan Medical Report</h1>
+                <h1 className={heading}>
+                  {isUrdu ? "طبی رپورٹ اسکین کریں" : "Scan Medical Report"}
+                </h1>
                 <p className={`${subheading} mt-2 text-sm sm:text-base`}>
-                  Upload your lab report to extract and analyze health metrics
-                  in a continuous, full-width dashboard flow.
+                  {isUrdu
+                    ? "اپنی لیب رپورٹ اپ لوڈ کریں تاکہ صحت کے میٹرکس ایک مسلسل، فل-وِڈتھ ڈیش بورڈ فلو میں اخذ اور تجزیہ کیے جا سکیں۔"
+                    : "Upload your lab report to extract and analyze health metrics in a continuous, full-width dashboard flow."}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className={pill}>PDF, JPG, PNG</span>
@@ -240,10 +262,10 @@ function ScanReportPageContent() {
                 type="button"
                 onClick={clearFile}
                 className={secondaryButton}
-                aria-label="Remove selected file"
+                aria-label={isUrdu ? "منتخب فائل ہٹائیں" : "Remove selected file"}
               >
                 <XMarkIcon className="h-4 w-4" />
-                Clear file
+                {isUrdu ? "فائل صاف کریں" : "Clear file"}
               </button>
             )}
           </div>
@@ -268,7 +290,7 @@ function ScanReportPageContent() {
                     onChange={handleFileInputChange}
                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     disabled={isLoading}
-                    aria-label="Upload medical document"
+                    aria-label={isUrdu ? "طبی دستاویز اپ لوڈ کریں" : "Upload medical document"}
                   />
 
                   <div className="space-y-4">
@@ -285,12 +307,17 @@ function ScanReportPageContent() {
                     <div className="space-y-2">
                       <h3 className="text-lg font-semibold text-[var(--color-heading)]">
                         {isLoading
-                          ? "Processing document..."
-                          : "Drop your document or browse"}
+                          ? isUrdu
+                            ? "دستاویز پروسیس ہو رہی ہے..."
+                            : "Processing document..."
+                          : isUrdu
+                            ? "اپنی دستاویز چھوڑیں یا منتخب کریں"
+                            : "Drop your document or browse"}
                       </h3>
                       <p className={`${subheading} text-sm`}>
-                        High-quality uploads help us extract accurate health
-                        metrics.
+                        {isUrdu
+                          ? "اعلیٰ معیار کی اپ لوڈز سے درست صحت میٹرکس اخذ کرنے میں مدد ملتی ہے۔"
+                          : "High-quality uploads help us extract accurate health metrics."}
                       </p>
                     </div>
 
@@ -319,7 +346,7 @@ function ScanReportPageContent() {
                             <div className="overflow-hidden border border-[var(--color-border)] bg-[var(--color-card)] rounded-xl">
                               <img
                                 src={imagePreview}
-                                alt="Selected preview"
+                                alt={isUrdu ? "منتخب پیش منظر" : "Selected preview"}
                                 className="h-48 w-full object-contain"
                               />
                             </div>
@@ -328,9 +355,11 @@ function ScanReportPageContent() {
                       </div>
                     ) : (
                       <div className="flex flex-wrap justify-center gap-2">
-                        <span className={chip}>Single file at a time</span>
-                        <span className={chip}>Keep text sharp</span>
-                        <span className={chip}>No personal IDs</span>
+                        <span className={chip}>
+                          {isUrdu ? "ایک وقت میں ایک فائل" : "Single file at a time"}
+                        </span>
+                        <span className={chip}>{isUrdu ? "متن واضح رکھیں" : "Keep text sharp"}</span>
+                        <span className={chip}>{isUrdu ? "ذاتی شناختی معلومات شامل نہ کریں" : "No personal IDs"}</span>
                       </div>
                     )}
                   </div>
@@ -350,23 +379,23 @@ function ScanReportPageContent() {
                       disabled={isLoading}
                     >
                       <PhotoIcon className="h-4 w-4" />
-                      Choose file
+                      {isUrdu ? "فائل منتخب کریں" : "Choose file"}
                     </button>
                     <button
                       type="submit"
                       disabled={!file || isLoading}
                       className={primaryButton}
-                      aria-label="Analyze document"
+                      aria-label={isUrdu ? "دستاویز کا تجزیہ کریں" : "Analyze document"}
                     >
                       {isLoading ? (
                         <>
                           <LoadingSpinner size="sm" color="white" />
-                          Analyzing...
+                          {isUrdu ? "تجزیہ جاری ہے..." : "Analyzing..."}
                         </>
                       ) : (
                         <>
                           <ChartBarIcon className="h-4 w-4" />
-                          Analyze report
+                          {isUrdu ? "رپورٹ کا تجزیہ کریں" : "Analyze report"}
                         </>
                       )}
                     </button>
@@ -381,10 +410,13 @@ function ScanReportPageContent() {
                   <InformationCircleIcon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className={sectionTitle}>Upload guidance</h3>
+                  <h3 className={sectionTitle}>
+                    {isUrdu ? "اپ لوڈ رہنمائی" : "Upload guidance"}
+                  </h3>
                   <p className={`${subheading} mt-1 text-sm`}>
-                    Follow these tips to keep the experience open and readable
-                    while getting reliable metrics.
+                    {isUrdu
+                      ? "قابلِ اعتماد میٹرکس کے لیے ان تجاویز پر عمل کریں۔"
+                      : "Follow these tips to keep the experience open and readable while getting reliable metrics."}
                   </p>
                 </div>
               </div>
@@ -403,7 +435,7 @@ function ScanReportPageContent() {
 
               <div className="border-t border-[var(--color-border)] pt-4 space-y-3">
                 <h4 className="text-sm font-semibold text-[var(--color-foreground)]">
-                  You will receive
+                  {isUrdu ? "آپ کو حاصل ہوگا" : "You will receive"}
                 </h4>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {quickWins.map((item) => (
@@ -433,8 +465,9 @@ function ScanReportPageContent() {
                 <div>
                   <h2 className={sectionTitle}>Analysis complete</h2>
                   <p className={`${subheading} mt-1 text-sm`}>
-                    Your medical report has been processed. Key findings are
-                    ready and saved to your history.
+                    {isUrdu
+                      ? "آپ کی طبی رپورٹ پروسیس ہو گئی ہے۔ اہم نتائج تیار ہیں اور تاریخ میں محفوظ ہو چکے ہیں۔"
+                      : "Your medical report has been processed. Key findings are ready and saved to your history."}
                   </p>
                 </div>
               </div>
@@ -443,14 +476,19 @@ function ScanReportPageContent() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className={sectionTitle}>Health metrics</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "صحت میٹرکس" : "Health metrics"}
+                      </h3>
                       <p className={`${subheading} text-sm`}>
-                        Structured values extracted from your report
+                        {isUrdu
+                          ? "آپ کی رپورٹ سے اخذ شدہ ساختہ اقدار"
+                          : "Structured values extracted from your report"}
                       </p>
                     </div>
                     {result.structured_data?.metrics && (
-                      <span className={pill}>
-                        {result.structured_data.metrics.length} metrics
+                        <span className={pill}>
+                        {result.structured_data.metrics.length}{" "}
+                        {isUrdu ? "میٹرکس" : "metrics"}
                       </span>
                     )}
                   </div>
@@ -516,7 +554,7 @@ function ScanReportPageContent() {
                             </div>
                             {metric.reference_range && (
                               <p className={`${mutedText} text-xs mt-1`}>
-                                Reference: {metric.reference_range}
+                                {isUrdu ? "حوالہ:" : "Reference:"} {metric.reference_range}
                               </p>
                             )}
                           </div>
@@ -527,11 +565,12 @@ function ScanReportPageContent() {
                     <div className="border border-[var(--color-border)] bg-[var(--color-surface)] px-5 py-6 text-center rounded-xl">
                       <ExclamationCircleIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
                       <h4 className="mt-3 text-base font-semibold text-[var(--color-heading)]">
-                        No health metrics found
+                        {isUrdu ? "صحت میٹرکس نہیں ملے" : "No health metrics found"}
                       </h4>
                       <p className={`${subheading} mt-1 text-sm`}>
-                        We could not detect structured metrics in this document.
-                        Please upload a clearer report.
+                        {isUrdu
+                          ? "ہم اس دستاویز میں ساختہ میٹرکس نہیں ڈھونڈ سکے۔ براہ کرم زیادہ واضح رپورٹ اپ لوڈ کریں۔"
+                          : "We could not detect structured metrics in this document. Please upload a clearer report."}
                       </p>
                     </div>
                   )}
@@ -546,7 +585,7 @@ function ScanReportPageContent() {
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold text-[var(--color-heading)]">
-                          Summary
+                          {isUrdu ? "خلاصہ" : "Summary"}
                         </h3>
                         <p className={`${mutedText} mt-1 text-sm`}>
                           {result.structured_data.summary}
@@ -566,15 +605,19 @@ function ScanReportPageContent() {
                             <ExclamationTriangleIcon className="h-5 w-5" />
                           </div>
                           <div>
-                            <h3 className={sectionTitle}>Detected concerns</h3>
+                            <h3 className={sectionTitle}>
+                              {isUrdu ? "شناخت شدہ خدشات" : "Detected concerns"}
+                            </h3>
                             <p className={`${subheading} text-sm`}>
-                              Health issues identified in your report
+                              {isUrdu
+                                ? "آپ کی رپورٹ میں شناخت شدہ صحت کے مسائل"
+                                : "Health issues identified in your report"}
                             </p>
                           </div>
                         </div>
                         <span className={pill}>
                           {result.structured_data.problems_detected.length}{" "}
-                          issues
+                          {isUrdu ? "مسائل" : "issues"}
                         </span>
                       </div>
 
@@ -626,7 +669,7 @@ function ScanReportPageContent() {
                                 </p>
                                 <div className="mt-3 flex items-center gap-2 text-xs text-[var(--color-subtle)]">
                                   <span className="font-semibold text-[var(--color-heading)]">
-                                    Confidence
+                                    {isUrdu ? "اعتماد" : "Confidence"}
                                   </span>
                                   <div className="h-2 w-28 rounded-full bg-[var(--color-card)] border border-[var(--color-border)]">
                                     <div
@@ -662,15 +705,18 @@ function ScanReportPageContent() {
                           </div>
                           <div>
                             <h3 className={sectionTitle}>
-                              Recommended actions
+                              {isUrdu ? "تجویز کردہ اقدامات" : "Recommended actions"}
                             </h3>
                             <p className={`${subheading} text-sm`}>
-                              Suggested treatments and next steps
+                              {isUrdu
+                                ? "تجویز کردہ علاج اور اگلے اقدامات"
+                                : "Suggested treatments and next steps"}
                             </p>
                           </div>
                         </div>
                         <span className={pill}>
-                          {result.structured_data.treatments.length} suggestions
+                          {result.structured_data.treatments.length}{" "}
+                          {isUrdu ? "تجاویز" : "suggestions"}
                         </span>
                       </div>
 
@@ -715,14 +761,12 @@ function ScanReportPageContent() {
                           <ExclamationTriangleIcon className="h-5 w-5 text-[var(--color-warning)] mt-0.5" />
                           <div>
                             <p className="text-sm font-semibold text-[var(--color-heading)]">
-                              Important Medical Disclaimer
+                              {isUrdu ? "اہم طبی انتباہ" : "Important Medical Disclaimer"}
                             </p>
                             <p className="text-xs text-[var(--color-foreground)] mt-1 leading-relaxed">
-                              These recommendations are for informational
-                              purposes only and should not replace professional
-                              medical advice. Always consult with a qualified
-                              healthcare provider for proper diagnosis and
-                              treatment.
+                              {isUrdu
+                                ? "یہ سفارشات صرف معلوماتی مقاصد کے لیے ہیں اور پیشہ ورانہ طبی مشورے کا متبادل نہیں۔ درست تشخیص اور علاج کے لیے ہمیشہ مستند ڈاکٹر سے رجوع کریں۔"
+                                : "These recommendations are for informational purposes only and should not replace professional medical advice. Always consult with a qualified healthcare provider for proper diagnosis and treatment."}
                             </p>
                           </div>
                         </div>
@@ -739,21 +783,21 @@ function ScanReportPageContent() {
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-[var(--color-heading)]">
-                            Extracted text
+                            {isUrdu ? "اخذ شدہ متن" : "Extracted text"}
                           </p>
                           <p className={`${subheading} text-xs`}>
-                            Full OCR output from your upload
+                            {isUrdu ? "آپ کی اپ لوڈ سے مکمل OCR آؤٹ پٹ" : "Full OCR output from your upload"}
                           </p>
                         </div>
                       </div>
                       <span className={`${mutedText} text-xs`}>
-                        Toggle view
+                        {isUrdu ? "ویو بدلیں" : "Toggle view"}
                       </span>
                     </summary>
                     <div className="mt-4 border border-[var(--color-border)] bg-[var(--color-card)] px-4 py-4 rounded-lg">
                       <div className="max-h-96 overflow-auto bg-[var(--color-surface)] px-4 py-4 rounded">
                         <pre className="whitespace-pre-wrap text-sm text-[var(--color-foreground)]">
-                          {result.raw_text || "No text extracted"}
+                          {result.raw_text || (isUrdu ? "کوئی متن اخذ نہیں ہوا" : "No text extracted")}
                         </pre>
                       </div>
                     </div>
@@ -771,7 +815,7 @@ function ScanReportPageContent() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-[var(--color-heading)]">
-                    Analysis error
+                    {isUrdu ? "تجزیہ خرابی" : "Analysis error"}
                   </h3>
                   <p className={`${mutedText} mt-1 text-sm`}>{error}</p>
                 </div>

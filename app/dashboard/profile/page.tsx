@@ -33,6 +33,7 @@ import {
   sectionTitle,
   subheading,
 } from "@/app/components/dashboardStyles";
+import { useSimpleLanguage } from "@/app/components/SimpleLanguageContext";
 
 interface UserStats {
   totalAnalyses: number;
@@ -40,6 +41,8 @@ interface UserStats {
 
 function ProfilePageContent() {
   const { user, isLoaded } = useUser();
+  const { language } = useSimpleLanguage();
+  const isUrdu = language === "ur";
   const { signOut } = useClerk();
   const [userStats, setUserStats] = useState<UserStats>({ totalAnalyses: 0 });
   const [isLoadingStats, setIsLoadingStats] = useState(true);
@@ -84,14 +87,18 @@ function ProfilePageContent() {
       await signOut({ redirectUrl: "/" });
     } catch (error) {
       console.error("Logout error:", error);
-      showErrorToast("Failed to log out. Please try again.");
+      showErrorToast(
+        isUrdu
+          ? "لاگ آؤٹ میں ناکامی۔ براہ کرم دوبارہ کوشش کریں۔"
+          : "Failed to log out. Please try again."
+      );
     }
   };
 
   const formatJoinDate = (dateString: string | Date) => {
     const date =
       typeof dateString === "string" ? new Date(dateString) : dateString;
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString(isUrdu ? "ur-PK" : "en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -108,19 +115,29 @@ function ProfilePageContent() {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!user?.id) {
-      showErrorToast("You need to be signed in to update your photo.");
+      showErrorToast(
+        isUrdu
+          ? "تصویر اپ ڈیٹ کرنے کے لیے سائن ان ہونا ضروری ہے۔"
+          : "You need to be signed in to update your photo."
+      );
       event.target.value = "";
       return;
     }
 
     if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
-      showErrorToast("Please upload a PNG, JPG, or WebP image.");
+      showErrorToast(
+        isUrdu
+          ? "براہ کرم PNG، JPG یا WebP تصویر اپ لوڈ کریں۔"
+          : "Please upload a PNG, JPG, or WebP image."
+      );
       event.target.value = "";
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      showErrorToast("Image must be 10MB or smaller.");
+      showErrorToast(
+        isUrdu ? "تصویر 10MB یا اس سے کم ہونی چاہیے۔" : "Image must be 10MB or smaller."
+      );
       event.target.value = "";
       return;
     }
@@ -156,13 +173,15 @@ function ProfilePageContent() {
         unsafeMetadata: { ...existingMetadata, avatarUrl: publicUrl },
       });
 
-      showSuccessToast("Profile photo updated");
+      showSuccessToast(isUrdu ? "پروفائل تصویر اپ ڈیٹ ہو گئی" : "Profile photo updated");
     } catch (error) {
       console.error("Avatar upload error:", error);
       showErrorToast(
         error instanceof Error
           ? error.message
-          : "Failed to upload profile photo. Please try again."
+          : isUrdu
+            ? "پروفائل تصویر اپ لوڈ کرنے میں ناکامی۔ براہ کرم دوبارہ کوشش کریں۔"
+            : "Failed to upload profile photo. Please try again."
       );
     } finally {
       setIsUploadingAvatar(false);
@@ -173,7 +192,7 @@ function ProfilePageContent() {
   if (!isLoaded) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center pb-[10%]">
-        <LogoSpinner message="Loading profile..." />
+        <LogoSpinner message={isUrdu ? "پروفائل لوڈ ہو رہا ہے..." : "Loading profile..."} />
       </div>
     );
   }
@@ -185,10 +204,12 @@ function ProfilePageContent() {
           <section className={`${fullWidthSection} space-y-4 text-center`}>
             <UserIcon className="mx-auto h-10 w-10 text-[var(--color-muted)]" />
             <h1 className="text-2xl font-bold text-[var(--color-heading)]">
-              Authentication required
+              {isUrdu ? "تصدیق درکار" : "Authentication required"}
             </h1>
             <p className={subheading}>
-              Please log in to view your profile and settings.
+              {isUrdu
+                ? "اپنا پروفائل اور ترتیبات دیکھنے کے لیے لاگ ان کریں۔"
+                : "Please log in to view your profile and settings."}
             </p>
           </section>
         </div>
@@ -207,7 +228,9 @@ function ProfilePageContent() {
     user.emailAddresses[0]?.verification?.status === "verified";
   const lastActive = user.lastSignInAt
     ? formatJoinDate(user.lastSignInAt)
-    : "Recently active";
+    : isUrdu
+      ? "حال ہی میں فعال"
+      : "Recently active";
 
   return (
     <div className={pageContainer}>
@@ -219,10 +242,12 @@ function ProfilePageContent() {
             accept="image/png,image/jpeg,image/webp"
             className="hidden"
             onChange={handleAvatarFileChange}
-            aria-label="Upload profile photo"
+            aria-label={isUrdu ? "پروفائل تصویر اپ لوڈ کریں" : "Upload profile photo"}
           />
           <div className="space-y-3">
-            <p className={`${subheading} text-sm`}>Profile overview</p>
+            <p className={`${subheading} text-sm`}>
+              {isUrdu ? "پروفائل جائزہ" : "Profile overview"}
+            </p>
             <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)]/80 px-6 py-6 ">
               <div
                 className="pointer-events-none absolute inset-0 opacity-60"
@@ -239,7 +264,7 @@ function ProfilePageContent() {
                       type="button"
                       onClick={handleAvatarClick}
                       className="group relative flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-primary-soft)] text-[var(--color-primary)] text-xl font-bold shadow-[var(--shadow-soft)] overflow-hidden transition hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
-                      aria-label="Change profile photo"
+                      aria-label={isUrdu ? "پروفائل تصویر تبدیل کریں" : "Change profile photo"}
                     >
                       {avatarUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -252,7 +277,13 @@ function ProfilePageContent() {
                         userInitial
                       )}
                       <span className="absolute inset-0 bg-black/40 text-[var(--color-on-primary)] text-[11px] font-semibold opacity-0 transition-opacity flex items-center justify-center group-hover:opacity-100">
-                        {isUploadingAvatar ? "Uploading..." : "Change photo"}
+                        {isUploadingAvatar
+                          ? isUrdu
+                            ? "اپ لوڈ ہو رہا ہے..."
+                            : "Uploading..."
+                          : isUrdu
+                            ? "تصویر تبدیل کریں"
+                            : "Change photo"}
                       </span>
                       {isUploadingAvatar && (
                         <span className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -278,7 +309,13 @@ function ProfilePageContent() {
                                 : "text-[var(--color-foreground)]"
                             }
                           >
-                            {isVerified ? "Verified" : "Verification pending"}
+                            {isUrdu
+                              ? isVerified
+                                ? "تصدیق شدہ"
+                                : "تصدیق زیر التوا"
+                              : isVerified
+                                ? "Verified"
+                                : "Verification pending"}
                           </span>
                         </span>
                       </div>
@@ -290,10 +327,12 @@ function ProfilePageContent() {
                         <div className="flex items-center gap-2">
                           <CalendarIcon className="h-4 w-4 text-[var(--color-subtle)]" />
                           <p className={mutedText}>
-                            Member since{" "}
+                            {isUrdu ? "رکن از " : "Member since "}
                             {user.createdAt
                               ? formatJoinDate(user.createdAt)
-                              : "Unknown"}
+                              : isUrdu
+                                ? "نامعلوم"
+                                : "Unknown"}
                           </p>
                         </div>
                       </div>
@@ -307,23 +346,23 @@ function ProfilePageContent() {
                       className={secondaryButton}
                     >
                       <UserIcon className="h-4 w-4" />
-                      Manage profile
+                      {isUrdu ? "پروفائل منظم کریں" : "Manage profile"}
                     </button>
                     <a href="/dashboard/history" className={secondaryButton}>
                       <DocumentTextIcon className="h-4 w-4" />
-                      View history
+                      {isUrdu ? "تاریخ دیکھیں" : "View history"}
                     </a>
                     <button onClick={handleLogout} className={primaryButton}>
                       <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                      Log out
+                      {isUrdu ? "لاگ آؤٹ" : "Log out"}
                     </button>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <span className={pill}>User ID: {user.id}</span>
-                  <span className={pill}>Last active: {lastActive}</span>
-                  <span className={pill}>Plan: Standard</span>
+                  <span className={pill}>{isUrdu ? "صارف آئی ڈی" : "User ID"}: {user.id}</span>
+                  <span className={pill}>{isUrdu ? "آخری سرگرمی" : "Last active"}: {lastActive}</span>
+                  <span className={pill}>{isUrdu ? "پلان: معیاری" : "Plan: Standard"}</span>
                 </div>
               </div>
             </div>
@@ -333,7 +372,7 @@ function ProfilePageContent() {
             <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]/70 p-5">
               <div className="flex items-center justify-between">
                 <p className={`${mutedText} text-xs uppercase tracking-wide`}>
-                  Total analyses
+                  {isUrdu ? "کل تجزیے" : "Total analyses"}
                 </p>
                 <ChartBarIcon className="h-5 w-5 text-[var(--color-primary)]" />
               </div>
@@ -341,37 +380,45 @@ function ProfilePageContent() {
                 {isLoadingStats ? "..." : userStats.totalAnalyses}
               </p>
               <p className={`${subheading} mt-1 text-xs`}>
-                Keep your history in one place.
+                {isUrdu ? "اپنی تاریخ ایک جگہ محفوظ رکھیں۔" : "Keep your history in one place."}
               </p>
             </div>
 
             <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]/70 p-5">
               <div className="flex items-center justify-between">
                 <p className={`${mutedText} text-xs uppercase tracking-wide`}>
-                  Email status
+                  {isUrdu ? "ای میل حیثیت" : "Email status"}
                 </p>
                 <ShieldCheckIcon className="h-5 w-5 text-[var(--color-primary)]" />
               </div>
               <p className="mt-3 text-lg font-semibold text-[var(--color-heading)]">
-                {isVerified ? "Verified" : "Pending verification"}
+                {isUrdu
+                  ? isVerified
+                    ? "تصدیق شدہ"
+                    : "تصدیق زیر التوا"
+                  : isVerified
+                    ? "Verified"
+                    : "Pending verification"}
               </p>
               <p className={`${subheading} mt-1 text-xs`}>
-                Secured with Clerk and protected sessions.
+                {isUrdu
+                  ? "Clerk اور محفوظ سیشنز کے ساتھ محفوظ۔"
+                  : "Secured with Clerk and protected sessions."}
               </p>
             </div>
 
             <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]/70 p-5">
               <div className="flex items-center justify-between">
                 <p className={`${mutedText} text-xs uppercase tracking-wide`}>
-                  Account health
+                  {isUrdu ? "اکاؤنٹ حالت" : "Account health"}
                 </p>
                 <SparklesIcon className="h-5 w-5 text-[var(--color-primary)]" />
               </div>
               <p className="mt-3 text-lg font-semibold text-[var(--color-heading)]">
-                Standard · Good standing
+                {isUrdu ? "معیاری · اچھی حالت" : "Standard · Good standing"}
               </p>
               <p className={`${subheading} mt-1 text-xs`}>
-                No outstanding issues detected.
+                {isUrdu ? "کوئی زیر التوا مسئلہ نہیں ملا۔" : "No outstanding issues detected."}
               </p>
             </div>
           </div>
@@ -385,19 +432,22 @@ function ProfilePageContent() {
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className={sectionTitle}>Security & sessions</h3>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "سیکیورٹی اور سیشنز" : "Security & sessions"}
+                      </h3>
                       <span className={chip}>{lastActive}</span>
                     </div>
                     <p className={`${subheading} mt-1 text-sm`}>
-                      Review how you sign in, where you last accessed the app,
-                      and keep your credentials protected.
+                      {isUrdu
+                        ? "جائزہ لیں کہ آپ کیسے سائن اِن کرتے ہیں، آخری بار ایپ کہاں استعمال کی، اور اپنی اسناد محفوظ رکھیں۔"
+                        : "Review how you sign in, where you last accessed the app, and keep your credentials protected."}
                     </p>
 
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-semibold text-[var(--color-heading)]">
-                            Sign-in email
+                            {isUrdu ? "سائن اِن ای میل" : "Sign-in email"}
                           </p>
                           <span
                             className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold ${
@@ -407,7 +457,13 @@ function ProfilePageContent() {
                             }`}
                           >
                             <ShieldCheckIcon className="h-3.5 w-3.5" />
-                            {isVerified ? "Verified" : "Pending"}
+                            {isUrdu
+                              ? isVerified
+                                ? "تصدیق شدہ"
+                                : "زیر التوا"
+                              : isVerified
+                                ? "Verified"
+                                : "Pending"}
                           </span>
                         </div>
                         <p className={`${mutedText} text-sm mt-1`}>
@@ -418,12 +474,14 @@ function ProfilePageContent() {
                       <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-semibold text-[var(--color-heading)]">
-                            Session status
+                            {isUrdu ? "سیشن کی حیثیت" : "Session status"}
                           </p>
-                          <span className={pill}>Secure</span>
+                          <span className={pill}>{isUrdu ? "محفوظ" : "Secure"}</span>
                         </div>
                         <p className={`${mutedText} text-sm mt-1`}>
-                          Signed in via Clerk · {lastActive}
+                          {isUrdu
+                            ? `Clerk کے ذریعے سائن اِن · ${lastActive}`
+                            : `Signed in via Clerk · ${lastActive}`}
                         </p>
                       </div>
                     </div>
@@ -438,34 +496,45 @@ function ProfilePageContent() {
                   </div>
                   <div className="flex-1 space-y-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className={sectionTitle}>Notifications</h3>
-                      <span className={chip}>Inbox & email</span>
+                      <h3 className={sectionTitle}>
+                        {isUrdu ? "اطلاعات" : "Notifications"}
+                      </h3>
+                      <span className={chip}>{isUrdu ? "اِن باکس اور ای میل" : "Inbox & email"}</span>
                     </div>
                     <p className={`${subheading} text-sm`}>
-                      Fine-tune how you hear about analysis results, account
-                      alerts, and security updates.
+                      {isUrdu
+                        ? "تجزیہ نتائج، اکاؤنٹ الرٹس، اور سیکیورٹی اپ ڈیٹس کے بارے میں اطلاع کی ترتیبات ایڈجسٹ کریں۔"
+                        : "Fine-tune how you hear about analysis results, account alerts, and security updates."}
                     </p>
 
                     <div className="grid gap-3 sm:grid-cols-2">
                       {[
                         {
-                          title: "Analysis summaries",
-                          description: "Send a digest when reports are ready.",
+                          title: isUrdu ? "تجزیہ خلاصے" : "Analysis summaries",
+                          description: isUrdu
+                            ? "رپورٹس تیار ہونے پر خلاصہ بھیجیں۔"
+                            : "Send a digest when reports are ready.",
                           enabled: true,
                         },
                         {
-                          title: "Security alerts",
-                          description: "Notify on new devices or logins.",
+                          title: isUrdu ? "سیکیورٹی الرٹس" : "Security alerts",
+                          description: isUrdu
+                            ? "نئے ڈیوائس یا لاگ اِن پر اطلاع دیں۔"
+                            : "Notify on new devices or logins.",
                           enabled: true,
                         },
                         {
-                          title: "Product updates",
-                          description: "Occasional highlights and tips.",
+                          title: isUrdu ? "پروڈکٹ اپ ڈیٹس" : "Product updates",
+                          description: isUrdu
+                            ? "کبھی کبھار جھلکیاں اور تجاویز۔"
+                            : "Occasional highlights and tips.",
                           enabled: false,
                         },
                         {
-                          title: "Reminders",
-                          description: "Nudges to review your history.",
+                          title: isUrdu ? "یاد دہانیاں" : "Reminders",
+                          description: isUrdu
+                            ? "اپنی تاریخ دیکھنے کے لیے یاد دہانی۔"
+                            : "Nudges to review your history.",
                           enabled: true,
                         },
                       ].map((item) => (
@@ -488,7 +557,13 @@ function ProfilePageContent() {
                                 : "bg-[var(--color-surface)] text-[var(--color-subtle)] border border-[var(--color-border)]"
                             }`}
                           >
-                            {item.enabled ? "On" : "Off"}
+                            {isUrdu
+                              ? item.enabled
+                                ? "آن"
+                                : "آف"
+                              : item.enabled
+                                ? "On"
+                                : "Off"}
                           </span>
                         </div>
                       ))}
@@ -500,9 +575,13 @@ function ProfilePageContent() {
 
             <div className="space-y-5">
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]/70 px-5 py-5">
-                <h3 className={sectionTitle}>Account actions</h3>
+                <h3 className={sectionTitle}>
+                  {isUrdu ? "اکاؤنٹ اعمال" : "Account actions"}
+                </h3>
                 <p className={`${subheading} text-sm`}>
-                  Manage credentials, keep history tidy, or leave securely.
+                  {isUrdu
+                    ? "اسناد منظم کریں، تاریخ صاف رکھیں، یا محفوظ طریقے سے باہر نکلیں۔"
+                    : "Manage credentials, keep history tidy, or leave securely."}
                 </p>
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
@@ -512,21 +591,21 @@ function ProfilePageContent() {
                     className={`${secondaryButton} w-full sm:w-auto`}
                   >
                     <UserIcon className="h-4 w-4" />
-                    Open Clerk account
+                    {isUrdu ? "Clerk اکاؤنٹ کھولیں" : "Open Clerk account"}
                   </button>
                   <a
                     href="/dashboard/history"
                     className={`${secondaryButton} w-full sm:w-auto`}
                   >
                     <DocumentTextIcon className="h-4 w-4" />
-                    View saved analyses
+                    {isUrdu ? "محفوظ تجزیے دیکھیں" : "View saved analyses"}
                   </a>
                   <button
                     onClick={handleLogout}
                     className={`${primaryButton} w-full sm:w-auto sm:ml-auto`}
                   >
                     <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                    Log out everywhere
+                    {isUrdu ? "ہر جگہ سے لاگ آؤٹ" : "Log out everywhere"}
                   </button>
                 </div>
               </div>
@@ -537,51 +616,61 @@ function ProfilePageContent() {
                     <ShieldCheckIcon className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className={sectionTitle}>Data & privacy</h3>
+                    <h3 className={sectionTitle}>
+                      {isUrdu ? "ڈیٹا اور پرائیویسی" : "Data & privacy"}
+                    </h3>
                     <p className={`${subheading} mt-1 text-sm`}>
-                      Your profile and analyses are protected. Reach out to
-                      export or remove your data.
+                      {isUrdu
+                        ? "آپ کا پروفائل اور تجزیے محفوظ ہیں۔ ڈیٹا ایکسپورٹ یا حذف کرنے کے لیے رابطہ کریں۔"
+                        : "Your profile and analyses are protected. Reach out to export or remove your data."}
                     </p>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
                     <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      Export data
+                      {isUrdu ? "ڈیٹا ایکسپورٹ" : "Export data"}
                     </p>
                     <p className={`${mutedText} text-sm mt-1`}>
-                      Contact support to receive analyses in a structured
-                      format.
+                      {isUrdu
+                        ? "ساختہ فارمیٹ میں تجزیے حاصل کرنے کے لیے سپورٹ سے رابطہ کریں۔"
+                        : "Contact support to receive analyses in a structured format."}
                     </p>
                   </div>
                   <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
                     <p className="text-sm font-semibold text-[var(--color-heading)]">
-                      Delete account
+                      {isUrdu ? "اکاؤنٹ حذف کریں" : "Delete account"}
                     </p>
                     <p className={`${mutedText} text-sm mt-1`}>
-                      We'll guide you through secure removal of your profile and
-                      data.
+                      {isUrdu
+                        ? "ہم آپ کے پروفائل اور ڈیٹا کو محفوظ طریقے سے ہٹانے میں رہنمائی کریں گے۔"
+                        : "We'll guide you through secure removal of your profile and data."}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]/70 px-5 py-5">
-                <h3 className={sectionTitle}>Need assistance?</h3>
+                <h3 className={sectionTitle}>
+                  {isUrdu ? "مدد چاہیے؟" : "Need assistance?"}
+                </h3>
                 <p className={`${subheading} text-sm`}>
-                  Our team can help with access issues, billing questions, or
-                  data requests.
+                  {isUrdu
+                    ? "ہماری ٹیم رسائی، بلنگ، یا ڈیٹا درخواستوں میں مدد کر سکتی ہے۔"
+                    : "Our team can help with access issues, billing questions, or data requests."}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <span className={pill}>Support response · under 24h</span>
-                  <span className={pill}>Secure handling</span>
+                  <span className={pill}>
+                    {isUrdu ? "سپورٹ جواب · 24 گھنٹوں سے کم" : "Support response · under 24h"}
+                  </span>
+                  <span className={pill}>{isUrdu ? "محفوظ ہینڈلنگ" : "Secure handling"}</span>
                 </div>
                 <a
                   href="mailto:support@sehatscan.app"
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm font-semibold text-[var(--color-heading)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition"
                 >
                   <EnvelopeIcon className="h-4 w-4" />
-                  Email support
+                  {isUrdu ? "ای میل سپورٹ" : "Email support"}
                 </a>
               </div>
             </div>

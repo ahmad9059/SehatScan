@@ -28,7 +28,8 @@ const userBubble =
 
 function ChatbotPageContent() {
   const { user } = useUser();
-  const { t } = useSimpleLanguage();
+  const { t, language } = useSimpleLanguage();
+  const isUrdu = language === "ur";
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -119,13 +120,18 @@ function ChatbotPageContent() {
         }
 
         if (!fullText.trim()) {
-          throw new Error("Empty response from assistant");
+          throw new Error(
+            isUrdu ? "اسسٹنٹ سے خالی جواب موصول ہوا" : "Empty response from assistant"
+          );
         }
       } else {
         // JSON fallback (for error responses that still return 200)
         const data = await response.json();
         if (!data.success) {
-          throw new Error(data.error || "Failed to get response");
+          throw new Error(
+            data.error ||
+              (isUrdu ? "جواب حاصل کرنے میں ناکامی" : "Failed to get response")
+          );
         }
 
         setMessages((prev) =>
@@ -144,14 +150,20 @@ function ChatbotPageContent() {
             ? {
                 ...msg,
                 content:
-                  "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
+                  isUrdu
+                    ? "معذرت، اس وقت جواب دینے میں مسئلہ ہو رہا ہے۔ براہ کرم ایک لمحے بعد دوبارہ کوشش کریں۔"
+                    : "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
                 isLoading: false,
               }
             : msg,
         ),
       );
 
-      showErrorToast("Failed to get response from AI assistant");
+      showErrorToast(
+        isUrdu
+          ? "AI اسسٹنٹ سے جواب حاصل کرنے میں ناکامی"
+          : "Failed to get response from AI assistant"
+      );
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
@@ -306,7 +318,7 @@ function ChatbotPageContent() {
                 ? "bg-[var(--color-foreground)] text-[var(--color-bg)]"
                 : "bg-transparent text-[var(--color-subtle)]"
             } disabled:opacity-50 disabled:cursor-not-allowed`}
-            aria-label="Send message"
+            aria-label={isUrdu ? "پیغام بھیجیں" : "Send message"}
           >
             <PaperAirplaneIcon className="h-6 w-6" />
           </button>

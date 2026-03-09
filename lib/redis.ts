@@ -150,17 +150,8 @@ export async function deleteCachePattern(pattern: string): Promise<void> {
 export async function withCache<T>(
   key: string,
   fn: () => Promise<T>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ttlSeconds: number = CACHE_TTL.SHORT,
 ): Promise<T> {
-  // Try to get from cache first
-  const cached = await getCache<T>(key);
-  if (cached !== null) {
-    return cached;
-  }
-
-  // Execute function and cache result
-  const result = await fn();
-  await setCache(key, result, ttlSeconds);
-
-  return result;
+  return fn();
 }

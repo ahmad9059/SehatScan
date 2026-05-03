@@ -6,7 +6,8 @@ WORKDIR /app
 # ---- Deps ----
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+# Skip postinstall (prisma generate) — we'll run it explicitly in builder
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # ---- Build ----
 FROM base AS builder
@@ -18,22 +19,22 @@ RUN pnpm prisma generate && pnpm build
 FROM node:22-slim AS runner
 WORKDIR /app
 
+# Prisma needs openssl at runtime
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Standalone output preserves the source directory structure.
-# COPY from the nested path that Next.js created.
-ARG SOURCE_DIR=.next/standalone
-
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 
-# Copy standalone server and its node_modules
-COPY --from=builder /app/${SOURCE_DIR} ./
+# Standalone output mirrors the build path inside .next/standalone/
+# Since WORKDIR is /app, the server lands at .next/standalone/app/server.js
+COPY --from=builder /app/.next/standalone ./
 
 USER nextjs
 

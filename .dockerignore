@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+.vscode
+.env
+.env.local
+.env*.local
+README.md
+docs
+*.md
+!package.json
+!pnpm-lock.yaml
+test-face-analysis.js
+proxy.ts

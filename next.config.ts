@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
+
   // Enable React Compiler for automatic optimizations
   reactCompiler: true,
 

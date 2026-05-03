@@ -13,11 +13,12 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Skip full env validation at build time; runtime Cloud Run will provide real values
+# Skip full env validation at build time; runtime provides real values
 ENV BUILDING=1
 
-# NEXT_PUBLIC_ vars are baked into the client bundle at build time,
-# so they must be provided during the build step.
+# NEXT_PUBLIC_ vars are baked into client bundles at build time.
+# Pass these via --build-arg or cloudbuild.yaml. They are public keys
+# (visible in browser bundles) but should NOT be committed to source.
 ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -25,11 +26,12 @@ ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
 ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
 
-# Placeholder server-only vars so Next.js can compile server code.
-# Real values come from Cloud Run env at runtime.
+# Placeholder server-only vars for compilation.
+# Real values are injected at runtime by Cloud Run env vars.
 ENV DATABASE_URL=postgresql://placeholder:placeholder@localhost:5432/placeholder
-ENV CLERK_SECRET_KEY=sk_test_placeholder
+ENV CLERK_SECRET_KEY=sk_test_placeholder_build
 ENV GEMINI_API_KEY=placeholder
+ENV REDIS_URL=redis://placeholder
 
 RUN pnpm prisma generate && pnpm build
 

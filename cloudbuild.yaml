@@ -1,0 +1,36 @@
+# Google Cloud Build configuration for SehatScan
+# Deploy: gcloud builds submit --config=cloudbuild.yaml
+
+steps:
+  # Build the Docker image, passing NEXT_PUBLIC_ vars as build args.
+  # These are public client-side keys (baked into browser bundles).
+  # Server secrets are set at runtime via Cloud Run --set-env-vars.
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - --build-arg
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${_CLERK_PUBLISHABLE_KEY}
+      - --build-arg
+      - NEXT_PUBLIC_SUPABASE_URL=${_SUPABASE_URL}
+      - --build-arg
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${_SUPABASE_ANON_KEY}
+      - -t
+      - gcr.io/$PROJECT_ID/sehatscan
+      - .
+    timeout: 600s
+
+  # Push the image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/sehatscan"]
+
+images:
+  - gcr.io/$PROJECT_ID/sehatscan
+
+substitutions:
+  # --- NEXT_PUBLIC_ vars (public, client-side keys) ---
+  # Update these values directly here, or override at deploy time:
+  #   gcloud builds submit --config=cloudbuild.yaml \
+  #     --substitutions=_CLERK_PUBLISHABLE_KEY=pk_test_...,_SUPABASE_URL=https://...,_SUPABASE_ANON_KEY=eyJ...
+  _CLERK_PUBLISHABLE_KEY: "pk_test_REPLACE_ME"
+  _SUPABASE_URL: "https://REPLACE_ME.supabase.co"
+  _SUPABASE_ANON_KEY: "REPLACE_ME"

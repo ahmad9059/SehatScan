@@ -173,6 +173,12 @@ export function getEnvConfig(): EnvConfig {
  * Call this in your main application entry point
  */
 export function validateEnvironmentOnStartup(): void {
+  // Skip validation during builds — env vars are only needed at runtime
+  if (process.env.NEXT_PHASE === "phase-production-build" || process.env.BUILDING === "1") {
+    console.log("⏭️  Skipping environment validation during build");
+    return;
+  }
+
   try {
     const config = getEnvConfig();
     console.log("✅ Environment validation passed");
